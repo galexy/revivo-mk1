@@ -15,6 +15,7 @@ All endpoints use dependency injection for AccountService and current user.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typeid.core.errors import SuffixValidationException
 
 from src.adapters.persistence.database import create_sync_session_factory
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
@@ -573,7 +574,7 @@ async def get_account(
     """
     try:
         parsed_id = AccountId.from_string(account_id)
-    except ValueError as e:
+    except (ValueError, SuffixValidationException) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
@@ -621,7 +622,7 @@ async def update_account(
     """
     try:
         parsed_id = AccountId.from_string(account_id)
-    except ValueError as e:
+    except (ValueError, SuffixValidationException) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
@@ -675,7 +676,7 @@ async def close_account(
     """
     try:
         parsed_id = AccountId.from_string(account_id)
-    except ValueError as e:
+    except (ValueError, SuffixValidationException) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
@@ -716,7 +717,7 @@ async def reopen_account(
     """
     try:
         parsed_id = AccountId.from_string(account_id)
-    except ValueError as e:
+    except (ValueError, SuffixValidationException) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
@@ -755,7 +756,7 @@ async def delete_account(
     """
     try:
         parsed_id = AccountId.from_string(account_id)
-    except ValueError as e:
+    except (ValueError, SuffixValidationException) as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
