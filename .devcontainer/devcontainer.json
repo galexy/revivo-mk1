@@ -1,32 +1,45 @@
 {
-  "name": "Claude Code Sandbox",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "TZ": "${localEnv:TZ:America/Los_Angeles}",
-      "CLAUDE_CODE_VERSION": "latest",
-      "GIT_DELTA_VERSION": "0.18.2",
-      "ZSH_IN_DOCKER_VERSION": "1.2.0"
-    }
-  },
+  "name": "Personal Finance Platform",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose.override.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
   "runArgs": [
     "--cap-add=NET_ADMIN",
     "--cap-add=NET_RAW"
   ],
+
   "customizations": {
     "vscode": {
       "extensions": [
         "anthropic.claude-code",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ckolkman.vscode-postgres",
+        "ms-python.debugpy",
+        "tamasfe.even-better-toml",
         "eamodio.gitlens"
       ],
       "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.typeCheckingMode": "strict",
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+          }
         },
+        "ruff.lint.run": "onSave",
+        "editor.rulers": [88],
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
           "bash": {
@@ -40,18 +53,31 @@
       }
     }
   },
-  "remoteUser": "node",
+
+  "forwardPorts": [8000, 5432],
+
+  "remoteUser": "developer",
+
   "mounts": [
-    "source=claude-code-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=claude-code-config-${devcontainerId},target=/home/node/.claude,type=volume"
+    "source=personal-finance-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=personal-finance-claude-config-${devcontainerId},target=/home/developer/.claude,type=volume"
   ],
+
   "containerEnv": {
     "NODE_OPTIONS": "--max-old-space-size=4096",
-    "CLAUDE_CONFIG_DIR": "/home/node/.claude",
-    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+    "CLAUDE_CONFIG_DIR": "/home/developer/.claude",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true",
+    "DATABASE_URL": "postgresql+asyncpg://postgres:postgres@postgres:5432/personal_finance",
+    "DATABASE_URL_SYNC": "postgresql+psycopg2://postgres:postgres@postgres:5432/personal_finance",
+    "ENVIRONMENT": "development",
+    "LOG_LEVEL": "DEBUG"
   },
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
-  "workspaceFolder": "/workspace",
+
+  "postCreateCommand": "uv sync",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
-  "waitFor": "postStartCommand"
+  "waitFor": "postStartCommand",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  }
 }
