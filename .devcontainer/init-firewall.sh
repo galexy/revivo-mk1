@@ -128,6 +128,12 @@ else
     echo "Firewall verification passed - unable to reach https://example.com as expected"
 fi
 
+echo "IPs in ipset:"
+ipset list allowed-domains
+
+echo "api.github.com resolves to:"
+dig +short api.github.com
+
 # Verify GitHub API access
 if ! curl --connect-timeout 5 https://api.github.com/zen >/dev/null 2>&1; then
     echo "ERROR: Firewall verification failed - unable to reach https://api.github.com"

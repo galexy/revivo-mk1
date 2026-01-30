@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ipset \
     iproute2 \
     dnsutils \
+    aggregate \
     jq \
     nano \
     vim \
@@ -93,10 +94,12 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     -x
 
 # Install Claude Code
+USER root
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
+USER $USERNAME
 
 # Copy and set up firewall script
-COPY init-firewall.sh /tmp/
+COPY .devcontainer/init-firewall.sh /tmp/
 USER root
 RUN cp /tmp/init-firewall.sh /usr/local/bin/ && \
     chmod +x /usr/local/bin/init-firewall.sh && \

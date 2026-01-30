@@ -5,6 +5,9 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - .:/workspace:cached
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/personal_finance
       - DATABASE_URL_SYNC=postgresql+psycopg2://postgres:postgres@postgres:5432/personal_finance
