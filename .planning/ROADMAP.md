@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
-- [ ] **Phase 3: Transaction Domain** - Double-entry transaction model with categories, splits, and transfers
+- [ ] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
 - [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
@@ -66,21 +66,25 @@ Plans:
 - [x] 02-06-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 3: Transaction Domain
-**Goal**: Users can record financial transactions with double-entry accounting, categories, splits, and transfers
+**Goal**: Users can record financial transactions with categories, splits, and transfers
 **Depends on**: Phase 2
-**Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-05, TRAN-06, TRAN-07, TRAN-08, TRAN-09, TRAN-10, TRAN-11, TRAN-12, TRAN-13, TRAN-14
+**Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-05, TRAN-06, TRAN-07, TRAN-08, TRAN-09, TRAN-10, TRAN-11, TRAN-12, TRAN-13
 **Success Criteria** (what must be TRUE):
   1. User can create, edit, and delete transactions with date, amount, payee, category, and account
   2. User can split a transaction across multiple categories with specific amounts
   3. User can record a transfer between two accounts as a single transaction that affects both balances
   4. User can attach receipt files to transactions and view all attachments
   5. User can search and filter transactions by payee, category, amount, date, or account
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md — Transaction domain primitives (types, enums, SplitLine, Attachment, events)
+- [ ] 03-02-PLAN.md — Transaction aggregate and Category entity with repository protocols
+- [ ] 03-03-PLAN.md — Database tables and Alembic migration
+- [ ] 03-04-PLAN.md — ORM mappers and repository implementations
+- [ ] 03-05-PLAN.md — TransactionService and CategoryService with file storage
+- [ ] 03-06-PLAN.md — REST API endpoints for transactions and categories
+- [ ] 03-07-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -205,8 +209,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete | 2026-01-30 |
-| 2. Account Domain | 0/6 | Planned | - |
-| 3. Transaction Domain | 0/3 | Not started | - |
+| 2. Account Domain | 6/6 | Complete | 2026-01-30 |
+| 3. Transaction Domain | 0/7 | Planned | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |
