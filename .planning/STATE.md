@@ -68,6 +68,8 @@ Recent decisions affecting current work:
 - Account aggregate eq=False (identity by ID, not field comparison)
 - Explicit mutation methods with event emission (not frozen dataclass)
 - RewardsBalance for rewards accounts (tracks points/miles with unit, not monetary value)
+- StrEnum with auto() for type-safe string enums (JSON-friendly, direct comparison)
+- Domain events use default values for fields to handle dataclass inheritance
 
 ### Pending Todos
 
