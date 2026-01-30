@@ -237,13 +237,128 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| ACCT-01 | Phase 2 | Pending |
+| ACCT-02 | Phase 2 | Pending |
+| ACCT-03 | Phase 2 | Pending |
+| ACCT-04 | Phase 2 | Pending |
+| ACCT-05 | Phase 2 | Pending |
+| ACCT-06 | Phase 2 | Pending |
+| ACCT-07 | Phase 2 | Pending |
+| ACCT-08 | Phase 2 | Pending |
+| ACCT-09 | Phase 2 | Pending |
+| ACCT-10 | Phase 2 | Pending |
+| ACCT-11 | Phase 2 | Pending |
+| TRAN-01 | Phase 3 | Pending |
+| TRAN-02 | Phase 3 | Pending |
+| TRAN-03 | Phase 3 | Pending |
+| TRAN-04 | Phase 3 | Pending |
+| TRAN-05 | Phase 3 | Pending |
+| TRAN-06 | Phase 3 | Pending |
+| TRAN-07 | Phase 3 | Pending |
+| TRAN-08 | Phase 3 | Pending |
+| TRAN-09 | Phase 3 | Pending |
+| TRAN-10 | Phase 3 | Pending |
+| TRAN-11 | Phase 3 | Pending |
+| TRAN-12 | Phase 3 | Pending |
+| TRAN-13 | Phase 3 | Pending |
+| TRAN-14 | Phase 3 | Pending |
+| PLAID-01 | Phase 6 | Pending |
+| PLAID-02 | Phase 6 | Pending |
+| PLAID-03 | Phase 6 | Pending |
+| PLAID-04 | Phase 6 | Pending |
+| PLAID-05 | Phase 6 | Pending |
+| PLAID-06 | Phase 6 | Pending |
+| PLAID-07 | Phase 6 | Pending |
+| PLAID-08 | Phase 6 | Pending |
+| PLAID-09 | Phase 6 | Pending |
+| RECON-01 | Phase 6 | Pending |
+| RECON-02 | Phase 6 | Pending |
+| RECON-03 | Phase 6 | Pending |
+| RECON-04 | Phase 6 | Pending |
+| RECON-05 | Phase 6 | Pending |
+| SCHED-01 | Phase 5 | Pending |
+| SCHED-02 | Phase 5 | Pending |
+| SCHED-03 | Phase 5 | Pending |
+| SCHED-04 | Phase 5 | Pending |
+| SCHED-05 | Phase 5 | Pending |
+| SCHED-06 | Phase 5 | Pending |
+| SCHED-07 | Phase 5 | Pending |
+| BUDG-01 | Phase 7 | Pending |
+| BUDG-02 | Phase 7 | Pending |
+| BUDG-03 | Phase 7 | Pending |
+| BUDG-04 | Phase 7 | Pending |
+| BUDG-05 | Phase 7 | Pending |
+| BUDG-06 | Phase 7 | Pending |
+| BUDG-07 | Phase 7 | Pending |
+| BUDG-08 | Phase 7 | Pending |
+| INV-01 | Phase 9 | Pending |
+| INV-02 | Phase 9 | Pending |
+| INV-03 | Phase 9 | Pending |
+| INV-04 | Phase 9 | Pending |
+| INV-05 | Phase 9 | Pending |
+| INV-06 | Phase 9 | Pending |
+| INV-07 | Phase 9 | Pending |
+| INV-08 | Phase 9 | Pending |
+| RPT-01 | Phase 8 | Pending |
+| RPT-02 | Phase 8 | Pending |
+| RPT-03 | Phase 8 | Pending |
+| RPT-04 | Phase 8 | Pending |
+| RPT-05 | Phase 8 | Pending |
+| RPT-06 | Phase 8 | Pending |
+| MIG-01 | Phase 10 | Pending |
+| MIG-02 | Phase 10 | Pending |
+| MIG-03 | Phase 10 | Pending |
+| MIG-04 | Phase 10 | Pending |
+| MIG-05 | Phase 10 | Pending |
+| MIG-06 | Phase 10 | Pending |
+| MIG-07 | Phase 10 | Pending |
+| ARCH-01 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Pending |
+| ARCH-03 | Phase 1 | Pending |
+| ARCH-04 | Phase 1 | Pending |
+| ARCH-05 | Phase 1 | Pending |
+| ARCH-06 | Phase 1 | Pending |
+| ARCH-07 | Phase 1 | Pending |
+| ARCH-08 | Phase 1 | Pending |
+| ARCH-09 | Phase 1 | Pending |
+| ARCH-10 | Phase 1 | Pending |
+| ARCH-11 | Phase 1 | Pending |
+| ARCH-12 | Phase 1 | Pending |
+| OBS-01 | Phase 10 | Pending |
+| OBS-02 | Phase 10 | Pending |
+| OBS-03 | Phase 10 | Pending |
+| OBS-04 | Phase 10 | Pending |
+| OBS-05 | Phase 10 | Pending |
+| OBS-06 | Phase 10 | Pending |
+| OBS-07 | Phase 10 | Pending |
+| TEST-01 | Phase 10 | Pending |
+| TEST-02 | Phase 10 | Pending |
+| TEST-03 | Phase 10 | Pending |
+| TEST-04 | Phase 10 | Pending |
+| TEST-05 | Phase 10 | Pending |
+| TEST-06 | Phase 10 | Pending |
+| TEST-07 | Phase 10 | Pending |
+| WEB-01 | Phase 4 | Pending |
+| WEB-02 | Phase 4 | Pending |
+| WEB-03 | Phase 4 | Pending |
+| WEB-04 | Phase 4 | Pending |
+| WEB-05 | Phase 4 | Pending |
+| WEB-06 | Phase 4 | Pending |
+| WEB-07 | Phase 4 | Pending |
+| WEB-08 | Phase 4 | Pending |
+| API-01 | Phase 4 | Pending |
+| API-02 | Phase 4 | Pending |
+| API-03 | Phase 4 | Pending |
+| API-04 | Phase 4 | Pending |
+| API-05 | Phase 4 | Pending |
+| API-06 | Phase 4 | Pending |
+| API-07 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: TBD total
-- Mapped to phases: TBD
-- Unmapped: TBD
+- v1 requirements: 116 total
+- Mapped to phases: 116
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after initial definition*
+*Last updated: 2026-01-29 after roadmap creation*
