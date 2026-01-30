@@ -1,24 +1,24 @@
 # Phase 3: Transaction Domain - Research
 
 **Researched:** 2026-01-30
-**Domain:** Double-Entry Accounting, Transaction Modeling, File Attachments, DDD Aggregate Design
+**Domain:** Single-Entry Accounting, Transaction Modeling, File Attachments, Personal Finance Patterns
 **Confidence:** HIGH
 
 ## Summary
 
-This research covers the design patterns and implementation strategies for building the Transaction domain in a personal finance application. Phase 3 implements double-entry accounting with transaction splits, transfers between accounts, receipt attachments, and comprehensive search/filter capabilities. The phase builds directly on Phase 2's Account aggregate and Phase 1's foundation patterns.
+This research covers the design patterns and implementation strategies for building the Transaction domain in a personal finance application using **SINGLE-ENTRY accounting**. This is a deliberate choice to keep the model simple and match how users think about transactions - each transaction is one record with an amount, not a debit/credit pair.
 
-The standard approach for transaction modeling in a double-entry system uses:
-- **Transaction aggregate** as the root containing multiple Entry/Leg records
-- **Entry pattern** where each Entry links to an account with a signed amount (debits and credits)
-- **Split support** via multiple Entries per Transaction allowing category allocation
-- **Transfer modeling** as a Transaction with two Entries affecting source and destination accounts
-- **Attachment entity** storing file metadata with local filesystem storage (cloud storage deferred)
+The standard approach for single-entry transaction modeling in personal finance apps uses:
+- **Transaction as a single record** with date, amount, account, category, payee, type (expense/income/transfer)
+- **Split support via SplitLine child records** where a transaction can have multiple category allocations
+- **Transfer modeling as a special transaction type** that links from_account and to_account
+- **Balance calculation** as opening_balance + sum(transactions for account)
+- **Attachment entity** storing file metadata with local filesystem storage
 - **PostgreSQL full-text search** via tsvector for payee/notes search
 
 The codebase already establishes Money value object, EntityId pattern (TransactionId, CategoryId already defined), DomainEvent base, UnitOfWork, and Account aggregate - Phase 3 builds on all these foundations.
 
-**Primary recommendation:** Model transactions using Entry pattern where each Transaction contains 1+ Entries (debits/credits), with entries summing to zero for balanced accounting. Use separate Attachment table with local file storage initially.
+**Primary recommendation:** Model transactions as single records with type discriminator (EXPENSE, INCOME, TRANSFER). Use a separate SplitLine table for splits. Transfers are a single transaction with both from_account_id and to_account_id populated.
 
 ## Standard Stack
 
@@ -36,7 +36,7 @@ The established libraries/tools are already in place from Phase 1 and Phase 2:
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
 | python-multipart | 0.0.9+ | FastAPI file upload | Required for UploadFile handling |
-| aiofiles | 23.2+ | Async file I/O | Writing uploaded files without blocking |
+| aiofiles | 24.1+ | Async file I/O | Writing uploaded files without blocking |
 
 ### No Major Dependencies Required
 Phase 3 uses existing stack. Only python-multipart and aiofiles needed for file upload support.
@@ -55,10 +55,10 @@ src/
     domain/
         model/
             transaction.py      # Transaction aggregate root
-            entry.py            # Entry value object (debit/credit line)
+            split_line.py       # SplitLine value object for splits
             category.py         # Category entity
             attachment.py       # Attachment entity
-            transaction_types.py # TransactionType, EntryType enums
+            transaction_types.py # TransactionType, TransactionStatus enums
         events/
             transaction_events.py  # TransactionCreated, TransactionUpdated, etc.
         ports/
@@ -68,7 +68,7 @@ src/
     adapters/
         persistence/
             orm/
-                tables.py       # Add transactions, entries, categories, attachments tables
+                tables.py       # Add transactions, split_lines, categories, attachments tables
                 mappers.py      # Add Transaction, Category, Attachment mappings
             repositories/
                 transaction.py  # SqlAlchemyTransactionRepository
@@ -92,60 +92,21 @@ tests/
     unit/
         domain/
             test_transaction.py
-            test_entry.py
+            test_split_line.py
             test_category.py
     integration/
         test_transaction_repository.py
         test_transaction_search.py
 ```
 
-### Pattern 1: Transaction Aggregate with Entry Pattern (Double-Entry)
+### Pattern 1: Single-Entry Transaction Model
 
-**What:** Transaction as aggregate root containing multiple Entry records, where entries must sum to zero
-**When to use:** All financial transactions - ensures accounting equation balance
-**Why this pattern:** Matches double-entry accounting semantics, allows splits and transfers naturally
+**What:** Transaction as a single record representing one financial event
+**When to use:** All financial transactions - simpler than double-entry, matches user mental model
+**Why this pattern:** Personal finance apps don't need formal accounting; users think "I spent $50 at grocery store" not "debit expense, credit cash"
 
 **Example:**
 ```python
-# src/domain/model/entry.py
-from dataclasses import dataclass
-from decimal import Decimal
-
-from src.domain.model.entity_id import AccountId, CategoryId
-from src.domain.model.money import Money
-
-
-@dataclass(frozen=True, slots=True)
-class Entry:
-    """A single debit or credit line within a transaction.
-
-    In double-entry accounting:
-    - Positive amount = money INCREASES account's reporting balance
-      (debit for assets/expenses, credit for liabilities/equity/income)
-    - Negative amount = money DECREASES account's reporting balance
-
-    For a personal finance app simplified model:
-    - Positive = money going INTO account (deposit, income)
-    - Negative = money going OUT of account (withdrawal, expense)
-
-    All entries in a transaction must sum to zero.
-    """
-    account_id: AccountId
-    amount: Money  # Positive = inflow, Negative = outflow
-    category_id: CategoryId | None = None  # Optional category for expense/income
-    memo: str | None = None  # Entry-level note
-
-    @property
-    def is_debit(self) -> bool:
-        """Check if this is a debit (outflow from account)."""
-        return self.amount.is_negative()
-
-    @property
-    def is_credit(self) -> bool:
-        """Check if this is a credit (inflow to account)."""
-        return self.amount.is_positive()
-
-
 # src/domain/model/transaction.py
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -159,40 +120,50 @@ from src.domain.events.transaction_events import (
     TransactionUpdated,
 )
 from src.domain.model.entity_id import AccountId, CategoryId, TransactionId, UserId
-from src.domain.model.entry import Entry
 from src.domain.model.money import Money
+from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction_types import TransactionStatus, TransactionType
 
 
 @dataclass(eq=False)
 class Transaction:
-    """Transaction aggregate root.
+    """Transaction aggregate root - single-entry accounting model.
 
-    Represents a financial transaction with one or more entries.
-    All entries must sum to zero (double-entry balance).
+    Each transaction is one record representing a financial event:
+    - EXPENSE: Money going out (negative impact on account balance)
+    - INCOME: Money coming in (positive impact on account balance)
+    - TRANSFER: Money moving between two accounts (links both accounts)
 
-    Transaction types:
-    - EXPENSE: Single entry (outflow from one account, implicit category inflow)
-    - INCOME: Single entry (inflow to one account, implicit source outflow)
-    - TRANSFER: Two entries (outflow from source, inflow to destination)
-    - SPLIT: Multiple entries (outflow from one account, multiple category allocations)
+    For simple transactions: amount, account_id, category_id
+    For splits: amount is total, split_lines break down by category
+    For transfers: from_account_id and to_account_id are both populated
     """
     id: TransactionId
     user_id: UserId
     transaction_type: TransactionType
     status: TransactionStatus
 
-    # Transaction metadata
+    # Transaction core data
     date: datetime  # When transaction occurred (user-specified)
+    amount: Money   # Always positive - type determines direction
+
+    # Account linkage (which account(s) affected)
+    account_id: AccountId  # Primary account (or source for transfers)
+    transfer_account_id: AccountId | None = None  # Destination for transfers only
+
+    # Categorization (for expenses/income, not transfers)
+    category_id: CategoryId | None = None
+
+    # Split lines (for split transactions)
+    split_lines: list[SplitLine] = field(default_factory=list)
+
+    # Description
     payee: str | None = None  # Who received/sent money
     description: str | None = None  # User notes
     reference_number: str | None = None  # Check number, confirmation code, etc.
 
-    # Entries (the actual debits/credits)
-    entries: list[Entry] = field(default_factory=list)
-
-    # Lifecycle
-    cleared_at: datetime | None = None  # When transaction cleared/reconciled
+    # Reconciliation
+    cleared_at: datetime | None = None
 
     # Audit
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
@@ -200,28 +171,6 @@ class Transaction:
 
     # Domain events (not persisted directly)
     _events: list[DomainEvent] = field(default_factory=list, repr=False)
-
-    def __post_init__(self) -> None:
-        """Validate entries sum to zero on creation."""
-        if self.entries:
-            self._validate_balance()
-
-    def _validate_balance(self) -> None:
-        """Ensure all entries sum to zero (balanced transaction)."""
-        if not self.entries:
-            return
-
-        # Group by currency
-        totals: dict[str, Decimal] = {}
-        for entry in self.entries:
-            currency = entry.amount.currency
-            totals[currency] = totals.get(currency, Decimal("0")) + entry.amount.amount
-
-        for currency, total in totals.items():
-            if total != Decimal("0"):
-                raise ValueError(
-                    f"Transaction is unbalanced: {currency} entries sum to {total}, must be 0"
-                )
 
     @property
     def events(self) -> list[DomainEvent]:
@@ -233,19 +182,28 @@ class Transaction:
         self._events.clear()
 
     @property
-    def primary_account_id(self) -> AccountId | None:
-        """Get the primary account (first entry's account)."""
-        if self.entries:
-            return self.entries[0].account_id
-        return None
+    def is_split(self) -> bool:
+        """Check if this is a split transaction."""
+        return len(self.split_lines) > 0
 
     @property
-    def total_amount(self) -> Money | None:
-        """Get the absolute amount of the transaction (outflow side)."""
-        for entry in self.entries:
-            if entry.amount.is_negative():
-                return entry.amount.abs()
-        return None
+    def is_transfer(self) -> bool:
+        """Check if this is a transfer."""
+        return self.transaction_type == TransactionType.TRANSFER
+
+    def _validate_split_total(self) -> None:
+        """Validate split lines sum to transaction amount."""
+        if not self.split_lines:
+            return
+
+        split_total = sum(
+            (line.amount.amount for line in self.split_lines),
+            Decimal("0")
+        )
+        if split_total != self.amount.amount:
+            raise ValueError(
+                f"Split lines sum ({split_total}) must equal transaction amount ({self.amount.amount})"
+            )
 
     # --- Factory Methods ---
 
@@ -262,23 +220,11 @@ class Transaction:
     ) -> Self:
         """Create a simple expense transaction.
 
-        Single entry: negative amount (money leaving account).
-        For double-entry balance, we conceptually have an implicit
-        inflow to the expense category, but for simplicity in
-        personal finance we track only the account side.
+        Expense = money leaving account, stored as positive amount.
+        The sign is determined by transaction_type, not amount value.
         """
-        if amount.is_negative():
-            raise ValueError("Expense amount must be positive (will be stored as negative outflow)")
-
-        # In personal finance app, we simplify: expense is single-entry
-        # representing outflow. Category tracks what the expense was for.
-        entries = [
-            Entry(
-                account_id=account_id,
-                amount=-amount,  # Negative = outflow
-                category_id=category_id,
-            )
-        ]
+        if amount.is_negative() or amount.is_zero():
+            raise ValueError("Expense amount must be positive")
 
         txn = cls(
             id=TransactionId.generate(),
@@ -286,9 +232,11 @@ class Transaction:
             transaction_type=TransactionType.EXPENSE,
             status=TransactionStatus.PENDING,
             date=date,
+            amount=amount,
+            account_id=account_id,
+            category_id=category_id,
             payee=payee,
             description=description,
-            entries=entries,
         )
 
         txn._events.append(
@@ -315,18 +263,10 @@ class Transaction:
     ) -> Self:
         """Create an income transaction.
 
-        Single entry: positive amount (money entering account).
+        Income = money entering account, stored as positive amount.
         """
-        if amount.is_negative():
+        if amount.is_negative() or amount.is_zero():
             raise ValueError("Income amount must be positive")
-
-        entries = [
-            Entry(
-                account_id=account_id,
-                amount=amount,  # Positive = inflow
-                category_id=category_id,
-            )
-        ]
 
         txn = cls(
             id=TransactionId.generate(),
@@ -334,9 +274,11 @@ class Transaction:
             transaction_type=TransactionType.INCOME,
             status=TransactionStatus.PENDING,
             date=date,
+            amount=amount,
+            account_id=account_id,
+            category_id=category_id,
             payee=payee,
             description=description,
-            entries=entries,
         )
 
         txn._events.append(
@@ -362,8 +304,11 @@ class Transaction:
     ) -> Self:
         """Create a transfer between two accounts.
 
-        Two entries: negative from source, positive to destination.
-        Entries sum to zero (balanced).
+        Transfer = single transaction affecting two accounts:
+        - Decreases from_account balance
+        - Increases to_account balance
+
+        Stored as ONE record, not two separate transactions.
         """
         if amount.is_negative() or amount.is_zero():
             raise ValueError("Transfer amount must be positive")
@@ -371,19 +316,17 @@ class Transaction:
         if from_account_id == to_account_id:
             raise ValueError("Cannot transfer to same account")
 
-        entries = [
-            Entry(account_id=from_account_id, amount=-amount),  # Outflow
-            Entry(account_id=to_account_id, amount=amount),    # Inflow
-        ]
-
         txn = cls(
             id=TransactionId.generate(),
             user_id=user_id,
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             date=date,
+            amount=amount,
+            account_id=from_account_id,  # Source account
+            transfer_account_id=to_account_id,  # Destination account
             description=description,
-            entries=entries,
+            # No category for transfers
         )
 
         txn._events.append(
@@ -398,60 +341,54 @@ class Transaction:
         return txn
 
     @classmethod
-    def create_split(
+    def create_split_expense(
         cls,
         user_id: UserId,
         account_id: AccountId,
-        splits: list[tuple[Money, CategoryId | None, str | None]],
+        total_amount: Money,
+        split_lines: list[SplitLine],
         date: datetime,
         payee: str | None = None,
         description: str | None = None,
     ) -> Self:
-        """Create a split transaction across multiple categories.
+        """Create a split expense across multiple categories.
 
-        Args:
-            splits: List of (amount, category_id, memo) tuples.
-                    All amounts should be positive; they represent outflows.
+        Split = single transaction with total amount broken down
+        into multiple category allocations (e.g., grocery receipt
+        with food and household items).
 
-        Each split becomes a separate Entry with the same account but
-        different category. Total represents a single payment split
-        across categories (e.g., grocery receipt with food and household items).
+        Split lines must sum to total_amount.
         """
-        if not splits:
-            raise ValueError("Split transaction requires at least one split")
+        if total_amount.is_negative() or total_amount.is_zero():
+            raise ValueError("Split expense amount must be positive")
 
-        entries = []
-        for amount, category_id, memo in splits:
-            if amount.is_negative() or amount.is_zero():
-                raise ValueError("Split amounts must be positive")
-            entries.append(
-                Entry(
-                    account_id=account_id,
-                    amount=-amount,  # Outflow
-                    category_id=category_id,
-                    memo=memo,
-                )
-            )
+        if not split_lines:
+            raise ValueError("Split transaction requires at least one split line")
 
         txn = cls(
             id=TransactionId.generate(),
             user_id=user_id,
-            transaction_type=TransactionType.SPLIT,
+            transaction_type=TransactionType.EXPENSE,
             status=TransactionStatus.PENDING,
             date=date,
+            amount=total_amount,
+            account_id=account_id,
+            split_lines=split_lines,
             payee=payee,
             description=description,
-            entries=entries,
+            # category_id is None for splits - categories are on split_lines
         )
 
-        total = sum((s[0].amount for s in splits), Decimal("0"))
+        # Validate split total
+        txn._validate_split_total()
+
         txn._events.append(
             TransactionCreated(
                 aggregate_id=str(txn.id),
                 aggregate_type="Transaction",
-                transaction_type=TransactionType.SPLIT.value,
-                amount=str(total),
-                currency=splits[0][0].currency,
+                transaction_type="SPLIT_EXPENSE",
+                amount=str(total_amount.amount),
+                currency=total_amount.currency,
             )
         )
         return txn
@@ -473,6 +410,26 @@ class Transaction:
             )
         )
 
+    def update_category(self, new_category_id: CategoryId | None) -> None:
+        """Update transaction category (not for splits or transfers)."""
+        if self.is_split:
+            raise ValueError("Cannot set category on split transaction - update split lines instead")
+        if self.is_transfer:
+            raise ValueError("Transfers do not have categories")
+
+        old_category = str(self.category_id) if self.category_id else None
+        self.category_id = new_category_id
+        self.updated_at = datetime.now(UTC)
+        self._events.append(
+            TransactionUpdated(
+                aggregate_id=str(self.id),
+                aggregate_type="Transaction",
+                field="category_id",
+                old_value=old_category,
+                new_value=str(new_category_id) if new_category_id else None,
+            )
+        )
+
     def update_date(self, new_date: datetime) -> None:
         """Update transaction date."""
         old_date = self.date
@@ -483,8 +440,29 @@ class Transaction:
                 aggregate_id=str(self.id),
                 aggregate_type="Transaction",
                 field="date",
-                old_value=old_date.isoformat() if old_date else None,
+                old_value=old_date.isoformat(),
                 new_value=new_date.isoformat(),
+            )
+        )
+
+    def update_amount(self, new_amount: Money) -> None:
+        """Update transaction amount.
+
+        Note: For split transactions, also need to update split lines.
+        """
+        if new_amount.is_negative() or new_amount.is_zero():
+            raise ValueError("Amount must be positive")
+
+        old_amount = self.amount
+        self.amount = new_amount
+        self.updated_at = datetime.now(UTC)
+        self._events.append(
+            TransactionUpdated(
+                aggregate_id=str(self.id),
+                aggregate_type="Transaction",
+                field="amount",
+                old_value=str(old_amount.amount),
+                new_value=str(new_amount.amount),
             )
         )
 
@@ -497,7 +475,38 @@ class Transaction:
         self.updated_at = datetime.now(UTC)
 ```
 
-### Pattern 2: Transaction Type Enumerations
+### Pattern 2: SplitLine Value Object
+
+**What:** Value object representing one line of a split transaction
+**When to use:** When a single payment needs to be allocated across multiple categories
+
+**Example:**
+```python
+# src/domain/model/split_line.py
+from dataclasses import dataclass
+
+from src.domain.model.entity_id import CategoryId
+from src.domain.model.money import Money
+
+
+@dataclass(frozen=True, slots=True)
+class SplitLine:
+    """A single line item in a split transaction.
+
+    Represents a portion of the transaction allocated to a specific category.
+    Example: $100 grocery receipt split into $70 food + $30 household supplies.
+    """
+    amount: Money  # Portion of total (always positive)
+    category_id: CategoryId | None = None  # Category for this portion
+    memo: str | None = None  # Description for this split line
+
+    def __post_init__(self) -> None:
+        """Validate split line amount is positive."""
+        if self.amount.is_negative() or self.amount.is_zero():
+            raise ValueError("Split line amount must be positive")
+```
+
+### Pattern 3: Transaction Type Enumerations
 
 **What:** Type-safe string enums for transaction type and status
 **When to use:** All transaction classification fields
@@ -509,21 +518,20 @@ from enum import StrEnum, auto
 
 
 class TransactionType(StrEnum):
-    """Types of financial transactions."""
+    """Types of financial transactions in single-entry system."""
     EXPENSE = auto()    # Money out of account
     INCOME = auto()     # Money into account
-    TRANSFER = auto()   # Between two accounts
-    SPLIT = auto()      # Single payment split across categories
+    TRANSFER = auto()   # Between two accounts (single record)
 
 
 class TransactionStatus(StrEnum):
     """Transaction lifecycle status."""
-    PENDING = auto()    # Not yet cleared
-    CLEARED = auto()    # Reconciled with bank
+    PENDING = auto()    # Not yet cleared/reconciled
+    CLEARED = auto()    # Reconciled with bank statement
     VOID = auto()       # Cancelled/reversed
 ```
 
-### Pattern 3: Category Entity
+### Pattern 4: Category Entity
 
 **What:** Simple entity for organizing transactions by type
 **When to use:** Expense and income categorization
@@ -547,8 +555,9 @@ class Category:
     id: CategoryId
     user_id: UserId
     name: str
+    category_type: str = "expense"  # "expense", "income", or "both"
     parent_id: CategoryId | None = None  # For hierarchical categories
-    is_system: bool = False  # System-defined categories (Transfer, etc.)
+    is_system: bool = False  # System-defined categories (Uncategorized, etc.)
     sort_order: int = 0
     icon: str | None = None  # Optional emoji or icon name
 
@@ -564,7 +573,7 @@ class Category:
         self.updated_at = datetime.now(UTC)
 ```
 
-### Pattern 4: Attachment Entity with File Storage
+### Pattern 5: Attachment Entity with File Storage
 
 **What:** Separate entity for file attachments with metadata
 **When to use:** Receipt images, documents attached to transactions
@@ -574,6 +583,9 @@ class Category:
 # src/domain/model/attachment.py
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Self
+
+from typeid import TypeID
 
 from src.domain.model.entity_id import TransactionId, UserId
 
@@ -585,13 +597,11 @@ class AttachmentId:
 
     @classmethod
     def generate(cls) -> "AttachmentId":
-        from typeid import TypeID
         tid = TypeID(prefix="att")
         return cls(value=str(tid))
 
     @classmethod
     def from_string(cls, value: str) -> "AttachmentId":
-        from typeid import TypeID
         tid = TypeID.from_string(value)
         if tid.prefix != "att":
             raise ValueError(f"Expected 'att' prefix, got '{tid.prefix}'")
@@ -630,7 +640,7 @@ class Attachment:
         storage_path: str,
         content_type: str,
         size_bytes: int,
-    ) -> "Attachment":
+    ) -> Self:
         """Create a new attachment."""
         return cls(
             id=AttachmentId.generate(),
@@ -643,7 +653,7 @@ class Attachment:
         )
 ```
 
-### Pattern 5: File Storage Adapter
+### Pattern 6: File Storage Adapter
 
 **What:** Simple local filesystem storage for attachments
 **When to use:** All file upload operations
@@ -651,12 +661,32 @@ class Attachment:
 **Example:**
 ```python
 # src/adapters/storage/file_storage.py
-import os
 import uuid
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Protocol
 
 import aiofiles
+
+
+class FileStorage(Protocol):
+    """Protocol for file storage operations."""
+
+    async def save(
+        self,
+        file: BinaryIO,
+        user_id: str,
+        original_filename: str,
+    ) -> str:
+        """Save file and return storage path."""
+        ...
+
+    def get_full_path(self, storage_path: str) -> Path:
+        """Get full filesystem path for a storage path."""
+        ...
+
+    def delete(self, storage_path: str) -> None:
+        """Delete a file by storage path."""
+        ...
 
 
 class LocalFileStorage:
@@ -691,6 +721,9 @@ class LocalFileStorage:
 
         # Generate unique filename preserving extension
         ext = Path(original_filename).suffix.lower()
+        allowed_extensions = {".jpg", ".jpeg", ".png", ".gif", ".pdf", ".webp"}
+        if ext not in allowed_extensions:
+            ext = ""  # Strip unknown extensions for security
         unique_name = f"{uuid.uuid4()}{ext}"
 
         # Save file
@@ -713,7 +746,7 @@ class LocalFileStorage:
             full_path.unlink()
 ```
 
-### Pattern 6: PostgreSQL Full-Text Search for Transactions
+### Pattern 7: PostgreSQL Full-Text Search for Transactions
 
 **What:** Use PostgreSQL tsvector for searching transactions by payee/description
 **When to use:** Transaction search functionality (TRAN-09)
@@ -721,7 +754,6 @@ class LocalFileStorage:
 **Example:**
 ```python
 # In tables.py - Add search vector column
-from sqlalchemy import Column, Index, func
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 transactions = Table(
@@ -748,106 +780,113 @@ class SqlAlchemyTransactionRepository:
         offset: int = 0,
     ) -> list[Transaction]:
         """Full-text search on payee and description."""
-        from sqlalchemy import func
+        from sqlalchemy import func, select
 
         # plainto_tsquery handles user input safely
         ts_query = func.plainto_tsquery("english", query)
 
+        # Use @@ operator for full-text match
         stmt = (
-            select(Transaction)
-            .where(Transaction.user_id == str(user_id))
-            .where(
-                func.to_tsvector("english",
-                    func.coalesce(Transaction.payee, "") + " " +
-                    func.coalesce(Transaction.description, "")
-                ).op("@@")(ts_query)
-            )
-            .order_by(Transaction.date.desc())
+            select(transactions)
+            .where(transactions.c.user_id == str(user_id))
+            .where(transactions.c.search_vector.op("@@")(ts_query))
+            .order_by(transactions.c.date.desc())
             .limit(limit)
             .offset(offset)
         )
 
         result = self._session.execute(stmt)
-        return list(result.scalars().all())
+        return [self._map_to_domain(row) for row in result]
+
+    def _update_search_vector(self, txn: Transaction) -> None:
+        """Update search vector when saving transaction."""
+        # Combine searchable fields
+        searchable = " ".join(filter(None, [txn.payee, txn.description]))
+
+        # Update via SQL to use to_tsvector
+        stmt = (
+            transactions.update()
+            .where(transactions.c.id == str(txn.id))
+            .values(
+                search_vector=func.to_tsvector("english", searchable)
+            )
+        )
+        self._session.execute(stmt)
 ```
 
-### Pattern 7: Transaction Filtering
+### Pattern 8: Balance Calculation
 
-**What:** Repository methods for filtering transactions by multiple criteria
-**When to use:** Transaction list views (TRAN-09, TRAN-10, TRAN-11)
+**What:** Calculate account balance from transactions (not stored on account)
+**When to use:** Any balance display or validation
 
 **Example:**
 ```python
-# src/adapters/persistence/repositories/transaction.py
-from datetime import datetime
-from decimal import Decimal
-
+# In transaction_repository.py
 class SqlAlchemyTransactionRepository:
-    def get_filtered(
-        self,
-        user_id: UserId,
-        account_id: AccountId | None = None,
-        category_id: CategoryId | None = None,
-        date_from: datetime | None = None,
-        date_to: datetime | None = None,
-        amount_min: Decimal | None = None,
-        amount_max: Decimal | None = None,
-        payee_contains: str | None = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> list[Transaction]:
-        """Get transactions with multiple filter criteria."""
-        from sqlalchemy import and_, or_
+    def calculate_account_balance(self, account_id: AccountId) -> Money:
+        """Calculate balance from opening balance + all transactions.
 
-        stmt = select(Transaction).where(Transaction.user_id == str(user_id))
+        Single-entry balance logic:
+        - INCOME: +amount (money in)
+        - EXPENSE: -amount (money out)
+        - TRANSFER from this account: -amount
+        - TRANSFER to this account: +amount
+        """
+        from sqlalchemy import case, func, select
 
-        # Filter by account (check entries)
-        if account_id:
-            # Join with entries and filter
-            stmt = stmt.join(entries_table).where(
-                entries_table.c.account_id == str(account_id)
+        # Sum based on transaction type and account role
+        balance_expr = func.sum(
+            case(
+                # Income to this account: +amount
+                (
+                    (transactions.c.transaction_type == "income") &
+                    (transactions.c.account_id == str(account_id)),
+                    transactions.c.amount
+                ),
+                # Expense from this account: -amount
+                (
+                    (transactions.c.transaction_type == "expense") &
+                    (transactions.c.account_id == str(account_id)),
+                    -transactions.c.amount
+                ),
+                # Transfer FROM this account: -amount
+                (
+                    (transactions.c.transaction_type == "transfer") &
+                    (transactions.c.account_id == str(account_id)),
+                    -transactions.c.amount
+                ),
+                # Transfer TO this account: +amount
+                (
+                    (transactions.c.transaction_type == "transfer") &
+                    (transactions.c.transfer_account_id == str(account_id)),
+                    transactions.c.amount
+                ),
+                else_=Decimal("0")
             )
+        )
 
-        # Filter by category (check entries)
-        if category_id:
-            stmt = stmt.join(entries_table).where(
-                entries_table.c.category_id == str(category_id)
+        stmt = (
+            select(balance_expr)
+            .where(
+                (transactions.c.account_id == str(account_id)) |
+                (transactions.c.transfer_account_id == str(account_id))
             )
+            .where(transactions.c.status != "void")  # Exclude voided
+        )
 
-        # Date range filter
-        if date_from:
-            stmt = stmt.where(Transaction.date >= date_from)
-        if date_to:
-            stmt = stmt.where(Transaction.date <= date_to)
-
-        # Payee contains (case-insensitive)
-        if payee_contains:
-            stmt = stmt.where(
-                Transaction.payee.ilike(f"%{payee_contains}%")
-            )
-
-        # Order by date descending (newest first)
-        stmt = stmt.order_by(Transaction.date.desc())
-        stmt = stmt.limit(limit).offset(offset)
-
-        result = self._session.execute(stmt)
-        transactions = list(result.scalars().unique().all())
-
-        for txn in transactions:
-            self._reconstruct_value_objects(txn)
-
-        return transactions
+        result = self._session.execute(stmt).scalar()
+        return Money(result or Decimal("0"), "USD")  # Default currency
 ```
 
 ### Anti-Patterns to Avoid
 
-- **Storing balance on Account:** Balance should be calculated from transaction entries. Cached balance leads to inconsistency.
-- **Single-entry transactions:** Even simple expenses should fit the Entry pattern for consistency.
+- **Storing balance on Account aggregate:** Balance should be calculated from transactions. Cached balance leads to inconsistency.
+- **Two transactions for transfers:** Use single transaction with from/to accounts, not two linked transactions.
 - **Floating-point amounts:** Always use Decimal via Money value object.
+- **Negative amounts for expenses:** Store all amounts as positive; type determines direction.
 - **Storing full file paths:** Store relative paths, construct full paths at runtime.
 - **Generic category ID (no validation):** Validate category belongs to user.
-- **Transactions without user_id:** All transactions must be scoped to a user.
-- **Direct SQL for search:** Use PostgreSQL tsvector, not LIKE '%query%' patterns.
+- **Direct SQL LIKE for search:** Use PostgreSQL tsvector with GIN index.
 
 ## Don't Hand-Roll
 
@@ -858,70 +897,71 @@ Problems that look simple but have existing solutions:
 | Transaction amounts | Custom amount class | Money from money.py | Already handles precision, currency |
 | Transaction IDs | String concatenation | TransactionId from entity_id.py | Already implemented |
 | Category IDs | String concatenation | CategoryId from entity_id.py | Already implemented |
-| Full-text search | SQL LIKE queries | PostgreSQL tsvector | Proper tokenization, stemming, ranking |
+| Full-text search | SQL LIKE queries | PostgreSQL tsvector + GIN | Proper tokenization, stemming, ranking |
 | File upload handling | Manual multipart parsing | FastAPI UploadFile | Built-in validation, streaming |
 | Date range queries | String parsing | datetime objects | Type safety, timezone handling |
 | Event collection | Manual list management | _events pattern + UoW | Already established in Phase 1-2 |
+| Decimal precision | Python float | SQLAlchemy Numeric(19, 4) | Exact precision for financial data |
 
 **Key insight:** Phase 1 and Phase 2 established all foundation patterns. Phase 3 should compose existing building blocks (Money, EntityId, UoW, Events) and add transaction-specific domain logic.
 
 ## Common Pitfalls
 
-### Pitfall 1: Unbalanced Double-Entry Transactions
+### Pitfall 1: Storing Amount Sign Based on Type
 
-**What goes wrong:** Entries don't sum to zero, accounting equation violated
-**Why it happens:** Forgetting to validate in factory methods or allowing direct entry manipulation
-**How to avoid:** Validate in __post_init__ and all mutation methods; entries list should be immutable after creation
-**Warning signs:** Account balances don't match expected values, reports don't reconcile
+**What goes wrong:** Inconsistent handling of positive/negative amounts
+**Why it happens:** Confusion about whether expense should be stored as negative
+**How to avoid:** Always store amounts as positive; let transaction_type determine effect on balance
+**Warning signs:** Negative amounts in database, confusing balance calculations
 
-### Pitfall 2: Transfer Modeling as Two Separate Transactions
+### Pitfall 2: Transfer Appears in Account History Twice
 
-**What goes wrong:** Transfer appears as two unrelated transactions, hard to track
-**Why it happens:** Simpler initial implementation
-**How to avoid:** Model transfer as single Transaction with two entries (source outflow, destination inflow)
-**Warning signs:** Difficulty matching transfer pairs, doubled transaction counts
+**What goes wrong:** When listing transactions for an account, transfer shows once as outflow and once as inflow
+**Why it happens:** Query returns transaction when account matches either from or to
+**How to avoid:** Query logic should identify the account's role and show appropriate view
+**Warning signs:** Transfer appears twice in combined account view
 
-### Pitfall 3: Missing Category Validation
+### Pitfall 3: Split Transaction Total Mismatch
+
+**What goes wrong:** Split line amounts don't sum to transaction total
+**Why it happens:** No validation when creating/updating split lines
+**How to avoid:** Validate in factory method and mutation methods; enforce in domain
+**Warning signs:** Category reports don't match account totals
+
+### Pitfall 4: Missing Category Validation
 
 **What goes wrong:** Category from another user assigned to transaction
 **Why it happens:** No ownership check when creating/updating transaction
 **How to avoid:** Application service validates category.user_id == transaction.user_id
 **Warning signs:** Security bugs, users seeing other users' categories
 
-### Pitfall 4: Large File Uploads Blocking Event Loop
+### Pitfall 5: Large File Uploads Blocking Event Loop
 
 **What goes wrong:** Synchronous file writes block async FastAPI
 **Why it happens:** Using regular file.write() instead of async
 **How to avoid:** Use aiofiles for async file operations
 **Warning signs:** High latency during uploads, timeout errors
 
-### Pitfall 5: Full-Text Search Without Index
+### Pitfall 6: Full-Text Search Without Index
 
 **What goes wrong:** Search becomes slow as transactions grow
 **Why it happens:** Using LIKE '%query%' instead of tsvector
-**How to avoid:** Create GIN index on tsvector column, use to_tsquery
+**How to avoid:** Create GIN index on tsvector column, use plainto_tsquery
 **Warning signs:** Slow search, queries scanning full table
 
-### Pitfall 6: Not Handling Negative Balance Prevention
+### Pitfall 7: Not Handling Negative Balance Prevention (TRAN-13)
 
-**What goes wrong:** Account goes negative when it shouldn't (TRAN-14)
-**Why it happens:** No balance check before committing transaction
-**How to avoid:** Application service calculates projected balance before allowing expense/withdrawal
+**What goes wrong:** Account goes negative when it shouldn't
+**Why it happens:** No balance check before committing expense/withdrawal
+**How to avoid:** Application service calculates projected balance before allowing expense/transfer
 **Warning signs:** Negative balances on checking accounts without overdraft
 
-### Pitfall 7: Attachment Orphans After Transaction Delete
+### Pitfall 8: Attachment Orphans After Transaction Delete
 
 **What goes wrong:** Files remain on disk after transaction deleted
-**Why it happens:** No cascade delete, no cleanup job
-**How to avoid:** Delete attachments in same unit of work as transaction; or background cleanup job
+**Why it happens:** No cascade delete, no cleanup
+**How to avoid:** Delete attachments in same unit of work; use ON DELETE CASCADE in DB
 **Warning signs:** Storage usage growing, orphan files on disk
-
-### Pitfall 8: Split Transaction with Inconsistent Totals
-
-**What goes wrong:** Split amounts don't match receipt total
-**Why it happens:** No validation that splits sum to expected total
-**How to avoid:** Optionally accept expected_total parameter and validate sum matches
-**Warning signs:** Discrepancies in category spending reports
 
 ## Code Examples
 
@@ -969,6 +1009,226 @@ class AttachmentRemoved(DomainEvent):
     attachment_id: str
 ```
 
+### SQLAlchemy Tables
+
+```python
+# Addition to src/adapters/persistence/orm/tables.py
+
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Table,
+    Text,
+)
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
+# Transaction categories
+categories = Table(
+    "categories",
+    metadata,
+    Column("id", String(36), primary_key=True),  # cat_xxx
+    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
+    Column("name", String(255), nullable=False),
+    Column("category_type", String(20), nullable=False, default="expense"),
+    Column("parent_id", String(36), ForeignKey("categories.id"), nullable=True),
+    Column("is_system", Boolean, nullable=False, default=False),
+    Column("sort_order", Integer, nullable=False, default=0),
+    Column("icon", String(50), nullable=True),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+
+    Index("ix_categories_user_id", "user_id"),
+    Index("ix_categories_parent", "parent_id"),
+)
+
+# Transactions (single-entry model)
+transactions = Table(
+    "transactions",
+    metadata,
+    Column("id", String(36), primary_key=True),  # txn_xxx
+    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
+    Column("transaction_type", String(20), nullable=False),  # expense, income, transfer
+    Column("status", String(20), nullable=False, default="pending"),
+    Column("date", DateTime(timezone=True), nullable=False),
+
+    # Amount (always positive, type determines direction)
+    Column("amount", Numeric(19, 4), nullable=False),
+    Column("currency", String(3), nullable=False, default="USD"),
+
+    # Account linkage
+    Column("account_id", String(36), ForeignKey("accounts.id"), nullable=False),
+    Column("transfer_account_id", String(36), ForeignKey("accounts.id"), nullable=True),
+
+    # Categorization (null for transfers and splits)
+    Column("category_id", String(36), ForeignKey("categories.id"), nullable=True),
+
+    # Description
+    Column("payee", String(255), nullable=True),
+    Column("description", Text, nullable=True),
+    Column("reference_number", String(100), nullable=True),
+
+    # Reconciliation
+    Column("cleared_at", DateTime(timezone=True), nullable=True),
+
+    # Audit
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+
+    # Full-text search vector (updated by application)
+    Column("search_vector", TSVECTOR, nullable=True),
+
+    Index("ix_transactions_user_id", "user_id"),
+    Index("ix_transactions_user_date", "user_id", "date"),
+    Index("ix_transactions_account", "account_id"),
+    Index("ix_transactions_transfer_account", "transfer_account_id"),
+    Index("ix_transactions_category", "category_id"),
+    Index("ix_transactions_search", "search_vector", postgresql_using="gin"),
+)
+
+# Split lines (for split transactions)
+split_lines = Table(
+    "split_lines",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("transaction_id", String(36), ForeignKey("transactions.id", ondelete="CASCADE"), nullable=False),
+    Column("amount", Numeric(19, 4), nullable=False),
+    Column("currency", String(3), nullable=False, default="USD"),
+    Column("category_id", String(36), ForeignKey("categories.id"), nullable=True),
+    Column("memo", String(500), nullable=True),
+
+    Index("ix_split_lines_transaction", "transaction_id"),
+    Index("ix_split_lines_category", "category_id"),
+)
+
+# Attachments
+attachments = Table(
+    "attachments",
+    metadata,
+    Column("id", String(36), primary_key=True),  # att_xxx
+    Column("transaction_id", String(36), ForeignKey("transactions.id", ondelete="CASCADE"), nullable=False),
+    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
+    Column("filename", String(255), nullable=False),
+    Column("storage_path", String(500), nullable=False),
+    Column("content_type", String(100), nullable=False),
+    Column("size_bytes", Integer, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+
+    Index("ix_attachments_transaction", "transaction_id"),
+    Index("ix_attachments_user", "user_id"),
+)
+```
+
+### Pydantic API Schemas
+
+```python
+# src/adapters/api/schemas/transaction.py
+from datetime import datetime
+from decimal import Decimal
+from pydantic import BaseModel, Field
+
+from src.domain.model.transaction_types import TransactionStatus, TransactionType
+
+
+class MoneySchema(BaseModel):
+    """Schema for money amounts."""
+    amount: Decimal = Field(..., decimal_places=4)
+    currency: str = Field(default="USD", min_length=3, max_length=3)
+
+
+class SplitLineSchema(BaseModel):
+    """Schema for a split line."""
+    amount: MoneySchema
+    category_id: str | None = None
+    memo: str | None = Field(default=None, max_length=500)
+
+
+class CreateExpenseRequest(BaseModel):
+    """Request to create an expense transaction."""
+    account_id: str = Field(..., description="Account ID for the expense")
+    amount: MoneySchema = Field(..., description="Expense amount (positive)")
+    date: datetime = Field(..., description="Transaction date")
+    category_id: str | None = Field(default=None, description="Category for the expense")
+    payee: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class CreateIncomeRequest(BaseModel):
+    """Request to create an income transaction."""
+    account_id: str
+    amount: MoneySchema
+    date: datetime
+    category_id: str | None = None
+    payee: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class CreateTransferRequest(BaseModel):
+    """Request to create a transfer between accounts."""
+    from_account_id: str
+    to_account_id: str
+    amount: MoneySchema
+    date: datetime
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class CreateSplitExpenseRequest(BaseModel):
+    """Request to create a split expense transaction."""
+    account_id: str
+    total_amount: MoneySchema
+    split_lines: list[SplitLineSchema] = Field(..., min_length=1)
+    date: datetime
+    payee: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class TransactionResponse(BaseModel):
+    """Response schema for a single transaction."""
+    id: str
+    user_id: str
+    transaction_type: TransactionType
+    status: TransactionStatus
+    date: datetime
+    amount: MoneySchema
+    account_id: str
+    transfer_account_id: str | None = None
+    category_id: str | None = None
+    split_lines: list[SplitLineSchema] = []
+    payee: str | None
+    description: str | None
+    attachment_count: int = 0
+    created_at: datetime
+    updated_at: datetime
+
+
+class TransactionListResponse(BaseModel):
+    """Response for listing transactions."""
+    transactions: list[TransactionResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class TransactionFilterParams(BaseModel):
+    """Query parameters for filtering transactions."""
+    account_id: str | None = None
+    category_id: str | None = None
+    transaction_type: TransactionType | None = None
+    date_from: datetime | None = None
+    date_to: datetime | None = None
+    amount_min: Decimal | None = None
+    amount_max: Decimal | None = None
+    payee: str | None = None
+    search: str | None = None  # Full-text search
+    limit: int = Field(default=100, le=500)
+    offset: int = Field(default=0, ge=0)
+```
+
 ### Transaction Service (Application Layer)
 
 ```python
@@ -976,11 +1236,17 @@ class AttachmentRemoved(DomainEvent):
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import BinaryIO
+from typing import TYPE_CHECKING, BinaryIO
 
+from src.domain.model.account_types import AccountType
 from src.domain.model.entity_id import AccountId, CategoryId, TransactionId, UserId
 from src.domain.model.money import Money
+from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction import Transaction
+
+if TYPE_CHECKING:
+    from src.adapters.storage.file_storage import FileStorage
+    from src.domain.ports.unit_of_work import UnitOfWork
 
 
 @dataclass(frozen=True, slots=True)
@@ -993,7 +1259,7 @@ class TransactionError:
 class TransactionService:
     """Application service for transaction use cases."""
 
-    def __init__(self, uow, file_storage):
+    def __init__(self, uow: "UnitOfWork", file_storage: "FileStorage") -> None:
         self._uow = uow
         self._file_storage = file_storage
 
@@ -1024,11 +1290,11 @@ class TransactionService:
                 if category.user_id != user_id:
                     return TransactionError("CATEGORY_NOT_OWNED", "Category does not belong to user")
 
-            # Check if expense would cause negative balance (TRAN-14)
-            # For accounts that don't allow negative balances
+            # Check if expense would cause negative balance (TRAN-13)
             if not self._can_account_go_negative(account):
-                current_balance = self._calculate_account_balance(account_id)
-                if current_balance - amount < Money(Decimal("0"), amount.currency):
+                current_balance = self._uow.transactions.calculate_account_balance(account_id)
+                projected = current_balance - amount
+                if projected.is_negative():
                     return TransactionError(
                         "INSUFFICIENT_BALANCE",
                         f"Expense would result in negative balance"
@@ -1068,16 +1334,17 @@ class TransactionService:
             to_account = self._uow.accounts.get(to_account_id)
 
             if from_account is None:
-                return TransactionError("ACCOUNT_NOT_FOUND", f"Source account {from_account_id} not found")
+                return TransactionError("ACCOUNT_NOT_FOUND", f"Source account not found")
             if to_account is None:
-                return TransactionError("ACCOUNT_NOT_FOUND", f"Destination account {to_account_id} not found")
+                return TransactionError("ACCOUNT_NOT_FOUND", f"Destination account not found")
             if from_account.user_id != user_id or to_account.user_id != user_id:
                 return TransactionError("ACCOUNT_NOT_OWNED", "Accounts do not belong to user")
 
-            # Check balance
+            # Check balance on source
             if not self._can_account_go_negative(from_account):
-                current_balance = self._calculate_account_balance(from_account_id)
-                if current_balance - amount < Money(Decimal("0"), amount.currency):
+                current_balance = self._uow.transactions.calculate_account_balance(from_account_id)
+                projected = current_balance - amount
+                if projected.is_negative():
                     return TransactionError(
                         "INSUFFICIENT_BALANCE",
                         f"Transfer would result in negative balance in source account"
@@ -1099,257 +1366,29 @@ class TransactionService:
 
             return txn
 
-    async def add_attachment(
-        self,
-        transaction_id: TransactionId,
-        user_id: UserId,
-        file: BinaryIO,
-        filename: str,
-        content_type: str,
-        size_bytes: int,
-    ) -> "Attachment | TransactionError":
-        """Add an attachment to a transaction."""
-        from src.domain.model.attachment import Attachment
-
-        with self._uow:
-            txn = self._uow.transactions.get(transaction_id)
-            if txn is None:
-                return TransactionError("TRANSACTION_NOT_FOUND", f"Transaction {transaction_id} not found")
-            if txn.user_id != user_id:
-                return TransactionError("TRANSACTION_NOT_OWNED", "Transaction does not belong to user")
-
-            # Save file to storage
-            storage_path = await self._file_storage.save(file, str(user_id), filename)
-
-            # Create attachment record
-            attachment = Attachment.create(
-                transaction_id=transaction_id,
-                user_id=user_id,
-                filename=filename,
-                storage_path=storage_path,
-                content_type=content_type,
-                size_bytes=size_bytes,
-            )
-
-            self._uow.attachments.add(attachment)
-            self._uow.commit()
-
-            return attachment
-
     def _can_account_go_negative(self, account) -> bool:
         """Check if account type allows negative balance."""
-        from src.domain.model.account_types import AccountType
-
         # Credit cards and loans naturally have negative balances (owed money)
-        # Checking/savings should not go negative
+        # Checking/savings should not go negative without overdraft
         return account.account_type in {
             AccountType.CREDIT_CARD,
             AccountType.LOAN,
         }
-
-    def _calculate_account_balance(self, account_id: AccountId) -> Money:
-        """Calculate current balance from opening balance + all entries."""
-        account = self._uow.accounts.get_or_raise(account_id)
-        opening = account.opening_balance
-
-        # Sum all entries for this account
-        entries_sum = self._uow.transactions.sum_entries_for_account(account_id)
-
-        return opening + entries_sum
-```
-
-### Pydantic API Schemas
-
-```python
-# src/adapters/api/schemas/transaction.py
-from datetime import datetime
-from decimal import Decimal
-from pydantic import BaseModel, Field
-
-from src.adapters.api.schemas.account import MoneySchema
-from src.domain.model.transaction_types import TransactionStatus, TransactionType
-
-
-class EntrySchema(BaseModel):
-    """Schema for transaction entry."""
-    account_id: str
-    amount: MoneySchema
-    category_id: str | None = None
-    memo: str | None = None
-
-
-class CreateExpenseRequest(BaseModel):
-    """Request to create an expense transaction."""
-    account_id: str = Field(..., description="Account ID for the expense")
-    amount: MoneySchema = Field(..., description="Expense amount (positive)")
-    date: datetime = Field(..., description="Transaction date")
-    category_id: str | None = Field(default=None, description="Category for the expense")
-    payee: str | None = Field(default=None, max_length=255)
-    description: str | None = Field(default=None, max_length=2000)
-
-
-class CreateTransferRequest(BaseModel):
-    """Request to create a transfer between accounts."""
-    from_account_id: str
-    to_account_id: str
-    amount: MoneySchema
-    date: datetime
-    description: str | None = Field(default=None, max_length=2000)
-
-
-class SplitItem(BaseModel):
-    """A single item in a split transaction."""
-    amount: MoneySchema
-    category_id: str | None = None
-    memo: str | None = Field(default=None, max_length=500)
-
-
-class CreateSplitRequest(BaseModel):
-    """Request to create a split transaction."""
-    account_id: str
-    splits: list[SplitItem] = Field(..., min_length=1)
-    date: datetime
-    payee: str | None = Field(default=None, max_length=255)
-    description: str | None = Field(default=None, max_length=2000)
-
-
-class TransactionResponse(BaseModel):
-    """Response schema for a single transaction."""
-    id: str
-    user_id: str
-    transaction_type: TransactionType
-    status: TransactionStatus
-    date: datetime
-    payee: str | None
-    description: str | None
-    entries: list[EntrySchema]
-    total_amount: MoneySchema | None
-    attachment_count: int = 0
-    created_at: datetime
-    updated_at: datetime
-
-
-class TransactionListResponse(BaseModel):
-    """Response for listing transactions."""
-    transactions: list[TransactionResponse]
-    total: int
-    limit: int
-    offset: int
-
-
-class TransactionFilterParams(BaseModel):
-    """Query parameters for filtering transactions."""
-    account_id: str | None = None
-    category_id: str | None = None
-    date_from: datetime | None = None
-    date_to: datetime | None = None
-    amount_min: Decimal | None = None
-    amount_max: Decimal | None = None
-    payee: str | None = None
-    search: str | None = None  # Full-text search
-    limit: int = Field(default=100, le=500)
-    offset: int = Field(default=0, ge=0)
-```
-
-### SQLAlchemy Tables
-
-```python
-# Addition to src/adapters/persistence/orm/tables.py
-
-from sqlalchemy import (
-    Column, DateTime, ForeignKey, Index, Integer, Numeric, String, Table, Text,
-)
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
-# Transaction categories
-categories = Table(
-    "categories",
-    metadata,
-    Column("id", String(36), primary_key=True),  # cat_xxx
-    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
-    Column("name", String(255), nullable=False),
-    Column("parent_id", String(36), ForeignKey("categories.id"), nullable=True),
-    Column("is_system", Boolean, nullable=False, default=False),
-    Column("sort_order", Integer, nullable=False, default=0),
-    Column("icon", String(50), nullable=True),
-    Column("created_at", DateTime(timezone=True), nullable=False),
-    Column("updated_at", DateTime(timezone=True), nullable=False),
-
-    Index("ix_categories_user_id", "user_id"),
-    Index("ix_categories_parent", "parent_id"),
-)
-
-# Transactions (header)
-transactions = Table(
-    "transactions",
-    metadata,
-    Column("id", String(36), primary_key=True),  # txn_xxx
-    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
-    Column("transaction_type", String(20), nullable=False),
-    Column("status", String(20), nullable=False),
-    Column("date", DateTime(timezone=True), nullable=False),
-    Column("payee", String(255), nullable=True),
-    Column("description", Text, nullable=True),
-    Column("reference_number", String(100), nullable=True),
-    Column("cleared_at", DateTime(timezone=True), nullable=True),
-    Column("created_at", DateTime(timezone=True), nullable=False),
-    Column("updated_at", DateTime(timezone=True), nullable=False),
-
-    # Full-text search vector (populated by trigger or app)
-    Column("search_vector", TSVECTOR, nullable=True),
-
-    Index("ix_transactions_user_id", "user_id"),
-    Index("ix_transactions_user_date", "user_id", "date"),
-    Index("ix_transactions_search", "search_vector", postgresql_using="gin"),
-)
-
-# Transaction entries (line items)
-entries = Table(
-    "entries",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("transaction_id", String(36), ForeignKey("transactions.id", ondelete="CASCADE"), nullable=False),
-    Column("account_id", String(36), ForeignKey("accounts.id"), nullable=False),
-    Column("category_id", String(36), ForeignKey("categories.id"), nullable=True),
-    Column("amount", Numeric(19, 4), nullable=False),
-    Column("currency", String(3), nullable=False),
-    Column("memo", String(500), nullable=True),
-
-    Index("ix_entries_transaction", "transaction_id"),
-    Index("ix_entries_account", "account_id"),
-    Index("ix_entries_category", "category_id"),
-)
-
-# Attachments
-attachments = Table(
-    "attachments",
-    metadata,
-    Column("id", String(36), primary_key=True),  # att_xxx
-    Column("transaction_id", String(36), ForeignKey("transactions.id", ondelete="CASCADE"), nullable=False),
-    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
-    Column("filename", String(255), nullable=False),
-    Column("storage_path", String(500), nullable=False),
-    Column("content_type", String(100), nullable=False),
-    Column("size_bytes", Integer, nullable=False),
-    Column("created_at", DateTime(timezone=True), nullable=False),
-
-    Index("ix_attachments_transaction", "transaction_id"),
-    Index("ix_attachments_user", "user_id"),
-)
 ```
 
 ## State of the Art
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| Single-entry transactions | Entry pattern with balanced debits/credits | Best practice | Proper double-entry accounting |
-| Two-transaction transfers | Single transaction with two entries | Best practice | Simpler tracking, atomic transfers |
-| SQL LIKE for search | PostgreSQL tsvector + GIN index | Ongoing | Better performance, linguistic support |
+| Double-entry for personal finance | Single-entry with type discriminator | User preference | Simpler model, matches user thinking |
+| Two transactions for transfers | Single transaction with from/to accounts | Best practice | Atomic transfers, simpler queries |
+| Balance stored on Account | Balance calculated from transactions | Best practice | No stale data, always accurate |
+| SQL LIKE for search | PostgreSQL tsvector + GIN index | PostgreSQL best practice | Performance at scale |
 | Sync file uploads | Async with aiofiles | FastAPI best practice | Non-blocking I/O |
-| Cloud storage required | Local storage sufficient initially | Pragmatic | Simpler deployment, cloud deferred |
 
 **Deprecated/outdated:**
-- **Storing balance on account:** Calculate from transactions
+- **Double-entry for personal finance apps:** Overkill for consumer apps; single-entry is simpler
+- **Storing balance on account:** Calculate from transactions to avoid inconsistency
 - **Floating-point for money:** Always use Decimal
 - **LIKE '%query%' for search:** Use full-text search
 
@@ -1359,48 +1398,48 @@ Things that couldn't be fully resolved:
 
 1. **Full-text search trigger vs application update**
    - What we know: tsvector can be updated via database trigger or application code
-   - What's unclear: Which approach is more maintainable
-   - Recommendation: Start with application code updating search_vector on save; add trigger if needed for performance
+   - What's unclear: Which approach is more maintainable for our stack
+   - Recommendation: Start with application code updating search_vector on save; add trigger if needed
 
 2. **Attachment storage: local vs cloud**
    - What we know: Local storage is simpler; cloud (S3) is scalable
    - What's unclear: When to migrate to cloud storage
-   - Recommendation: Start with local storage, design interface to support future cloud migration
+   - Recommendation: Start with local storage, design interface (Protocol) to support future cloud migration
 
-3. **Split transaction UI representation**
-   - What we know: Multiple entries with same account, different categories
-   - What's unclear: Best UX for displaying/editing splits
-   - Recommendation: Domain model supports it; UI design is Phase 4 concern
+3. **Opening balance as a transaction vs account field**
+   - What we know: Opening balance is currently on Account
+   - What's unclear: Should it be an initial transaction for consistency?
+   - Recommendation: Keep as account field for simplicity; it represents state before tracking began
 
-4. **Negative balance prevention scope**
-   - What we know: TRAN-14 requires preventing negative balances on some accounts
-   - What's unclear: Should this apply to all account types or configurable per-account?
-   - Recommendation: Apply to CHECKING and SAVINGS by default; credit cards and loans naturally have negative (owed) balances
+4. **Negative balance prevention scope (TRAN-13)**
+   - What we know: Requirement says "accounts that don't allow them"
+   - What's unclear: Is this per-account configurable or by type?
+   - Recommendation: Apply by account type (CHECKING, SAVINGS prevent negative; CREDIT_CARD, LOAN allow)
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Phase 1 RESEARCH.md - Established patterns for Money, EntityId, Events, UoW, imperative mapping
-- Phase 2 RESEARCH.md - Account aggregate pattern, repository patterns
-- [SQLAlchemy 2.0 Full-Text Search](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html) - tsvector, GIN index
-- [FastAPI File Uploads](https://fastapi.tiangolo.com/tutorial/request-files/) - UploadFile handling
-- [Django Hordak](https://github.com/adamcharnock/django-hordak) - Double-entry accounting model (Transaction + Leg pattern)
+- Existing codebase patterns from Phase 1 and Phase 2
+- [SQLAlchemy 2.0 Numeric type documentation](https://docs.sqlalchemy.org/en/20/core/type_basics.html)
+- [PostgreSQL Full-Text Search documentation](https://www.postgresql.org/docs/current/textsearch-intro.html)
+- [FastAPI File Uploads tutorial](https://fastapi.tiangolo.com/tutorial/request-files/)
 
 ### Secondary (MEDIUM confidence)
-- [SQLAlchemy-file](https://jowilf.github.io/sqlalchemy-file/) - File attachment patterns (adapted for simpler local storage)
-- [Python Accounting](https://github.com/ekmungai/python-accounting) - Double-entry patterns
-- Web searches on transaction split modeling - multiple sources agree on entry-based approach
+- [FreshBooks Single Entry Bookkeeping](https://www.freshbooks.com/hub/accounting/single-entry-bookkeeping) - Single-entry concepts
+- [Sling Academy FastAPI PostgreSQL Full-Text Search](https://www.slingacademy.com/article/how-to-use-postgresql-full-text-search-in-fastapi-applications/) - tsvector integration
+- [Better Stack FastAPI File Uploads Guide](https://betterstack.com/community/guides/scaling-python/uploading-files-using-fastapi/) - aiofiles patterns
 
 ### Tertiary (LOW confidence)
-- Medium articles on double-entry accounting implementation - cross-referenced with official docs
-- Financial Freedom wiki - transaction split concept (implementation details not available)
+- Personal finance app comparisons (YNAB, Mint, Money Pro) - feature patterns
+- Medium articles on transaction split modeling - conceptual approaches
 
 ## Metadata
 
 **Confidence breakdown:**
 - Standard stack: HIGH - Uses existing Phase 1/2 stack with minimal additions
-- Architecture patterns: HIGH - Entry pattern well-established in accounting, matches existing aggregate patterns
-- Pitfalls: MEDIUM - Some based on general best practices rather than specific documentation
+- Architecture patterns: HIGH - Single-entry is simpler than double-entry, well-understood
+- Database schema: HIGH - Follows existing patterns, standard PostgreSQL features
+- Pitfalls: MEDIUM - Based on general best practices and experience
 - Code examples: MEDIUM - Adapted from established patterns, needs integration testing
 
 **Research date:** 2026-01-30
