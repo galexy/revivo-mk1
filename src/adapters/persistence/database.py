@@ -23,13 +23,27 @@ from sqlalchemy.orm import Session, sessionmaker
 def get_database_url() -> str:
     """Get database URL from environment.
 
+    For sync operations, uses DATABASE_URL_SYNC if DATABASE_URL contains asyncpg.
+    Otherwise uses DATABASE_URL directly (for tests and explicit sync configurations).
+
     Returns:
         PostgreSQL connection string. Defaults to Docker Compose postgres service.
     """
-    return os.getenv(
+    url = os.getenv(
         "DATABASE_URL",
         "postgresql://postgres:postgres@postgres:5432/finance",
     )
+
+    # If DATABASE_URL has asyncpg driver, prefer DATABASE_URL_SYNC if available
+    if "asyncpg" in url:
+        sync_url = os.getenv("DATABASE_URL_SYNC")
+        if sync_url:
+            return sync_url
+        # Fall back to stripping asyncpg from DATABASE_URL
+        return url.replace("postgresql+asyncpg://", "postgresql://")
+
+    # DATABASE_URL is already sync-compatible
+    return url
 
 
 def get_async_database_url() -> str:
@@ -50,7 +64,7 @@ def create_sync_engine(echo: bool = False):
     Used for:
     - Alembic migrations
     - Scripts and one-off commands
-    - Tests that don't require async
+    - API endpoints (until async migration in Phase 4)
 
     Args:
         echo: If True, log all SQL statements.
@@ -58,10 +72,7 @@ def create_sync_engine(echo: bool = False):
     Returns:
         SQLAlchemy sync Engine.
     """
-    url = get_database_url()
-    # Ensure we use psycopg2 (sync) driver, not asyncpg
-    url = url.replace("postgresql+asyncpg://", "postgresql://")
-    return create_engine(url, echo=echo)
+    return create_engine(get_database_url(), echo=echo)
 
 
 def create_async_engine_instance(echo: bool = False):
