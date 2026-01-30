@@ -35,12 +35,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Money value object performs arithmetic without precision loss (verified by property tests)
   4. Database schema exists with proper migrations and can be applied to fresh database
   5. Security infrastructure encrypts sensitive fields at rest (verified by inspecting stored data)
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Development environment (devcontainer, Docker Compose, tooling)
+- [ ] 01-02-PLAN.md — Domain primitives (Money, EntityId, ports, events)
+- [ ] 01-03-PLAN.md — Property-based tests for Money value object
+- [ ] 01-04-PLAN.md — Persistence infrastructure (SQLAlchemy, migrations, outbox)
+- [ ] 01-05-PLAN.md — Security and API scaffolding (encryption, FastAPI)
+- [ ] 01-06-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 2: Account Domain
 **Goal**: Users can create and manage all supported account types with proper balance tracking
@@ -197,7 +200,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/6 | Planned | - |
 | 2. Account Domain | 0/2 | Not started | - |
 | 3. Transaction Domain | 0/3 | Not started | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
