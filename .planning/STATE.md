@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 2 of 10 (Account Domain)
-Plan: 4 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In progress
-Last activity: 2026-01-30 - Completed 02-04-PLAN.md (Account Service)
+Last activity: 2026-01-30 - Completed 02-05-PLAN.md (Account REST API)
 
-Progress: [██░░░░░░░░] ~27%
+Progress: [███░░░░░░░] ~30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.3 min
-- Total execution time: 0.82 hours
+- Total plans completed: 10
+- Average duration: 5.1 min
+- Total execution time: 0.88 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
-| 02-account-domain | 3 | 17 min | 5.7 min |
+| 02-account-domain | 4 | 21 min | 5.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-05 (3 min), 01-06 (15 min), 02-02 (8 min), 02-03 (6 min), 02-04 (3 min)
-- Trend: Application service plans completing quickly with clear domain foundation
+- Last 5 plans: 01-06 (15 min), 02-02 (8 min), 02-03 (6 min), 02-04 (3 min), 02-05 (4 min)
+- Trend: Consistent velocity with API layer following established patterns
 
 *Updated after each plan completion*
 
@@ -75,6 +75,9 @@ Recent decisions affecting current work:
 - AccountError dataclass for explicit failure handling (not exceptions for expected failures)
 - Application service owns transaction boundaries (with self._uow context manager)
 - Events collected from aggregate and cleared before commit
+- API versioning with /api/v1 prefix for accounts router
+- Placeholder user ID for development until Phase 4 auth
+- Account number masking - show only last 4 digits in responses
 
 ### Pending Todos
 
@@ -87,7 +90,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 02-04-PLAN.md (Account Service)
+Stopped at: Completed 02-05-PLAN.md (Account REST API)
 Resume file: None
 
 ## Phase 1 Milestone
