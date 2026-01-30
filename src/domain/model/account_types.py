@@ -2,10 +2,11 @@
 
 Provides type-safe string enums for account classification:
 - AccountType: The 7 supported account types
-- AccountStatus: Account lifecycle states (active/closed)
-- AccountSubtype: Optional subtypes for type-specific logic
+- AccountStatus: Account lifecycle states (ACTIVE, CLOSED)
+- AccountSubtype: Optional subtypes for type-specific domain logic
 
-Uses StrEnum (Python 3.11+) for direct string comparison and JSON serialization.
+All enums use StrEnum (Python 3.11+) for direct string comparison
+and JSON-friendly serialization.
 """
 
 from enum import StrEnum, auto
@@ -14,9 +15,8 @@ from enum import StrEnum, auto
 class AccountType(StrEnum):
     """Supported account types.
 
-    These are the core account types supported by the system.
-    Future specialized types (HSA, 529) should be built on these
-    core types with additional hooks/rules.
+    Each value represents a distinct category of financial account
+    with its own validation rules and behavior.
     """
 
     CHECKING = auto()
@@ -31,8 +31,8 @@ class AccountType(StrEnum):
 class AccountStatus(StrEnum):
     """Account lifecycle status.
 
-    Accounts are either active (accepting transactions) or closed
-    (preserved for history but no new transactions).
+    Accounts start as ACTIVE and can be CLOSED. Closed accounts
+    can be reopened, returning to ACTIVE status.
     """
 
     ACTIVE = auto()
@@ -42,9 +42,8 @@ class AccountStatus(StrEnum):
 class AccountSubtype(StrEnum):
     """Optional subtypes for type-specific domain logic.
 
-    Used to differentiate behavior within major account types:
-    - IRA accounts may be Traditional, Roth, or SEP
-    - Loan accounts may be Mortgage, Auto, Personal, or Line of Credit
+    Subtypes provide additional classification within a main account type.
+    For example, IRA accounts can be Traditional, Roth, or SEP.
     """
 
     # IRA subtypes
