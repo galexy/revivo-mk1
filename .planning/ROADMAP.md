@@ -12,7 +12,7 @@ A 10-phase journey to build a modern personal finance platform that replaces Qui
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
+- [x] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
 - [ ] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [ ] **Phase 3: Transaction Domain** - Double-entry transaction model with categories, splits, and transfers
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
@@ -55,11 +55,15 @@ Plans:
   3. User can delete an account (system prevents deletion if transactions exist)
   4. User can view current balance for each account
   5. User can view historical balance for an account over time
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Account type enums, value objects, and domain events
+- [ ] 02-02-PLAN.md — Account aggregate root entity with factory methods
+- [ ] 02-03-PLAN.md — Persistence layer (table, migration, mapper, repository)
+- [ ] 02-04-PLAN.md — AccountService application service
+- [ ] 02-05-PLAN.md — REST API endpoints with Pydantic schemas
+- [ ] 02-06-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 3: Transaction Domain
 **Goal**: Users can record financial transactions with double-entry accounting, categories, splits, and transfers
@@ -200,8 +204,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 6/6 | ✓ Complete | 2026-01-30 |
-| 2. Account Domain | 0/2 | Ready to plan | - |
+| 1. Foundation | 6/6 | Complete | 2026-01-30 |
+| 2. Account Domain | 0/6 | Planned | - |
 | 3. Transaction Domain | 0/3 | Not started | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
