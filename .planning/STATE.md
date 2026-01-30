@@ -78,6 +78,8 @@ Recent decisions affecting current work:
 - API versioning with /api/v1 prefix for accounts router
 - Placeholder user ID for development until Phase 4 auth
 - Account number masking - show only last 4 digits in responses
+- Sync database operations for Phase 2 (async FastAPI routes with sync service/repository layer using psycopg2, full async migration deferred to Phase 4)
+- Smart DATABASE_URL handling - prefers DATABASE_URL_SYNC when DATABASE_URL contains asyncpg
 
 ### Pending Todos
 
