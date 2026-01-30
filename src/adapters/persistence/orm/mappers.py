@@ -7,6 +7,10 @@ imperative (classical) mapping. This approach:
 - Enables clean architecture with persistence ignorance
 
 Mappings are registered once at application startup via start_mappers().
+
+Note: Value object reconstruction (Money, InstitutionDetails, RewardsBalance, etc.)
+is handled in the repository layer rather than via composite() mappings.
+This simplifies handling of nullable value objects.
 """
 
 from .base import mapper_registry
@@ -20,25 +24,29 @@ def start_mappers() -> None:
     Call once at application startup (e.g., in main.py or FastAPI lifespan).
     Idempotent - safe to call multiple times.
 
-    Note: Currently no domain entities to map. Mappings will be added
-    as entities are created in later phases:
-    - Phase 2: Account entity mapping
-    - Phase 3: Transaction entity mapping
-
-    Example future mapping:
-        from src.domain.model.account import Account
-        from .tables import accounts
-        mapper_registry.map_imperatively(Account, accounts)
+    Mappings:
+    - Account: Maps to accounts table with primitive columns.
+      Value object reconstruction handled in SqlAlchemyAccountRepository.
     """
     global _mappers_started
     if _mappers_started:
         return
 
-    # Domain entity mappings will be added here as entities are created.
-    # Example (Phase 2):
-    # from src.domain.model.account import Account
-    # from .tables import accounts
-    # mapper_registry.map_imperatively(Account, accounts)
+    # Import domain entities inside function to avoid circular imports
+    from src.domain.model.account import Account
+
+    from .tables import accounts
+
+    # Account aggregate mapping
+    # Maps Account class to accounts table.
+    # Value objects (Money, InstitutionDetails, RewardsBalance) are reconstructed
+    # in the repository layer after loading - not via composite() mappings.
+    # This approach avoids complexity with nullable composite fields.
+    mapper_registry.map_imperatively(
+        Account,
+        accounts,
+        exclude_properties=["_events"],  # _events is transient, not persisted
+    )
 
     _mappers_started = True
 
