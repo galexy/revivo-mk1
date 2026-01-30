@@ -58,7 +58,10 @@ def create_sync_engine(echo: bool = False):
     Returns:
         SQLAlchemy sync Engine.
     """
-    return create_engine(get_database_url(), echo=echo)
+    url = get_database_url()
+    # Ensure we use psycopg2 (sync) driver, not asyncpg
+    url = url.replace("postgresql+asyncpg://", "postgresql://")
+    return create_engine(url, echo=echo)
 
 
 def create_async_engine_instance(echo: bool = False):
