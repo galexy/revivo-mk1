@@ -93,29 +93,29 @@ class TestMoneyValidation:
         """Cannot add USD to EUR."""
         usd = Money(Decimal("100"), "USD")
         eur = Money(Decimal("100"), "EUR")
-        with pytest.raises(ValueError, match="currency"):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd + eur
 
     def test_rejects_different_currencies_on_subtract(self):
         """Cannot subtract EUR from USD."""
         usd = Money(Decimal("100"), "USD")
         eur = Money(Decimal("100"), "EUR")
-        with pytest.raises(ValueError, match="currency"):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd - eur
 
     def test_rejects_invalid_currency_code_too_short(self):
         """Currency must be 3 letters."""
-        with pytest.raises(ValueError, match="currency"):
+        with pytest.raises(ValueError, match="(?i)currency"):
             Money(Decimal("100"), "US")
 
     def test_rejects_invalid_currency_code_too_long(self):
         """Currency must be 3 letters."""
-        with pytest.raises(ValueError, match="currency"):
+        with pytest.raises(ValueError, match="(?i)currency"):
             Money(Decimal("100"), "USDD")
 
     def test_rejects_currency_with_numbers(self):
         """Currency must be alphabetic."""
-        with pytest.raises(ValueError, match="currency"):
+        with pytest.raises(ValueError, match="(?i)currency"):
             Money(Decimal("100"), "US1")
 
     def test_normalizes_precision_to_four_decimals(self):

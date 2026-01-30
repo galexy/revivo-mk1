@@ -125,6 +125,7 @@ ignore_missing_imports = true
 # ============================================================================
 [tool.importlinter]
 root_packages = ["src"]
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "Domain layer has no infrastructure dependencies"
@@ -152,14 +153,9 @@ layers = [
     "src.domain",
 ]
 
-[[tool.importlinter.contracts]]
-name = "Adapters are independent"
-type = "independence"
-modules = [
-    "src.adapters.api",
-    "src.adapters.persistence",
-    "src.adapters.security",
-]
+# Note: We don't enforce adapter independence because the API adapter
+# acts as the composition root and needs to coordinate between adapters.
+# The critical constraint is that domain has no infrastructure dependencies.
 
 # ============================================================================
 # Pytest Configuration

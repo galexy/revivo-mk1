@@ -88,3 +88,4 @@ docker-compose.local.yml
 
 # Alembic
 alembic/versions/__pycache__/
+.hypothesis/

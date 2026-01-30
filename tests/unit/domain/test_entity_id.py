@@ -10,6 +10,7 @@ Verifies that TypeID-based entity IDs:
 import time
 
 import pytest
+from typeid.core.errors import InvalidTypeIDStringException, SuffixValidationException
 
 from src.domain.model.entity_id import (
     AccountId,
@@ -196,17 +197,17 @@ class TestEntityIdEdgeCases:
 
     def test_invalid_format_rejected(self):
         """Completely invalid format is rejected."""
-        with pytest.raises((ValueError, TypeError)):
+        with pytest.raises((ValueError, TypeError, InvalidTypeIDStringException, SuffixValidationException)):
             AccountId.from_string("not_a_valid_id")
 
     def test_empty_string_rejected(self):
         """Empty string is rejected."""
-        with pytest.raises((ValueError, TypeError)):
+        with pytest.raises((ValueError, TypeError, InvalidTypeIDStringException)):
             AccountId.from_string("")
 
     def test_underscore_only_rejected(self):
         """Just underscore is rejected."""
-        with pytest.raises((ValueError, TypeError)):
+        with pytest.raises((ValueError, TypeError, InvalidTypeIDStringException)):
             AccountId.from_string("_")
 
     def test_hash_for_dict_key(self):

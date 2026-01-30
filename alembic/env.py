@@ -21,9 +21,13 @@ config = context.config
 
 # Set database URL from environment (with default for local development)
 # Note: For Docker Compose, postgres is the service name
+# Use DATABASE_URL_SYNC if available (for migrations), otherwise DATABASE_URL
 database_url = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/finance",
+    "DATABASE_URL_SYNC",
+    os.getenv(
+        "DATABASE_URL",
+        "postgresql://postgres:postgres@localhost:5432/finance",
+    ),
 )
 config.set_main_option("sqlalchemy.url", database_url)
 
