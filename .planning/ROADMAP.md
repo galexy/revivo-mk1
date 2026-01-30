@@ -13,7 +13,7 @@ A 10-phase journey to build a modern personal finance platform that replaces Qui
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
-- [ ] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
+- [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [ ] **Phase 3: Transaction Domain** - Double-entry transaction model with categories, splits, and transfers
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
@@ -58,12 +58,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Account type enums, value objects, and domain events
-- [ ] 02-02-PLAN.md — Account aggregate root entity with factory methods
-- [ ] 02-03-PLAN.md — Persistence layer (table, migration, mapper, repository)
-- [ ] 02-04-PLAN.md — AccountService application service
-- [ ] 02-05-PLAN.md — REST API endpoints with Pydantic schemas
-- [ ] 02-06-PLAN.md — Integration tests and verification checkpoint
+- [x] 02-01-PLAN.md — Account type enums, value objects, and domain events
+- [x] 02-02-PLAN.md — Account aggregate root entity with factory methods
+- [x] 02-03-PLAN.md — Persistence layer (table, migration, mapper, repository)
+- [x] 02-04-PLAN.md — AccountService application service
+- [x] 02-05-PLAN.md — REST API endpoints with Pydantic schemas
+- [x] 02-06-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 3: Transaction Domain
 **Goal**: Users can record financial transactions with double-entry accounting, categories, splits, and transfers
