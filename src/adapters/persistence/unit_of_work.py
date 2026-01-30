@@ -9,8 +9,10 @@ persistence of changes across multiple repositories. Key responsibilities:
 This implements the UnitOfWork protocol from src/domain/ports/unit_of_work.py.
 """
 
+from __future__ import annotations
+
 import json
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from sqlalchemy import insert
 from sqlalchemy.orm import Session, sessionmaker
@@ -18,6 +20,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from src.domain.events.base import DomainEvent
 
 from .orm.tables import outbox
+
+if TYPE_CHECKING:
+    from .repositories.account import SqlAlchemyAccountRepository
 
 
 class SqlAlchemyUnitOfWork:
@@ -30,18 +35,16 @@ class SqlAlchemyUnitOfWork:
     Usage:
         uow = SqlAlchemyUnitOfWork(session_factory)
         with uow:
-            # Do work with uow.session
-            uow.collect_events(aggregate.events)
-            uow.commit()  # Events written to outbox here
-
-    Future: Repositories will be added as properties as they are created:
-        with uow:
             uow.accounts.add(account)
             uow.collect_events(account.events)
-            uow.commit()
+            uow.commit()  # Events written to outbox here
+
+    Repositories are lazily created on first access via properties.
     """
 
-    def __init__(self, session_factory: sessionmaker[Session]):
+    _accounts: SqlAlchemyAccountRepository | None
+
+    def __init__(self, session_factory: sessionmaker[Session]) -> None:
         """Initialize Unit of Work.
 
         Args:
@@ -50,6 +53,7 @@ class SqlAlchemyUnitOfWork:
         self._session_factory = session_factory
         self._events: list[DomainEvent] = []
         self._session: Session | None = None
+        self._accounts: SqlAlchemyAccountRepository | None = None
 
     def __enter__(self) -> Self:
         """Start a new unit of work (transaction).
@@ -58,8 +62,8 @@ class SqlAlchemyUnitOfWork:
             Self for use in with statement.
         """
         self._session = self._session_factory()
-        # Repositories will be added here as they're created:
-        # self.accounts = SqlAlchemyAccountRepository(self._session)
+        # Reset repository instances for fresh session
+        self._accounts = None
         return self
 
     def __exit__(
@@ -90,6 +94,21 @@ class SqlAlchemyUnitOfWork:
         if self._session is None:
             raise RuntimeError("UnitOfWork must be used as context manager")
         return self._session
+
+    @property
+    def accounts(self) -> SqlAlchemyAccountRepository:
+        """Access to Account repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            SqlAlchemyAccountRepository for account persistence.
+        """
+        if self._accounts is None:
+            from .repositories.account import SqlAlchemyAccountRepository
+
+            self._accounts = SqlAlchemyAccountRepository(self.session)
+        return self._accounts
 
     def collect_events(self, events: list[DomainEvent]) -> None:
         """Collect domain events to be persisted with commit.
