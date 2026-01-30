@@ -20,6 +20,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     String,
     Table,
     Text,
@@ -99,4 +100,62 @@ encrypted_secrets = Table(
     ),
     # Unique constraint: one secret type per user
     Index("ix_encrypted_secrets_user_type", "user_id", "secret_type", unique=True),
+)
+
+# Accounts table with single table inheritance (type discriminator)
+# Supports multiple account types (checking, savings, credit card, loan, etc.)
+# with type-specific optional fields.
+accounts = Table(
+    "accounts",
+    metadata,
+    # Identity
+    Column("id", String(36), primary_key=True),  # acct_xxx
+    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
+
+    # Core fields
+    Column("name", String(255), nullable=False),
+    Column("account_type", String(50), nullable=False),  # Discriminator
+    Column("status", String(20), nullable=False, default="active"),
+    Column("subtype", String(50), nullable=True),
+
+    # Balance tracking
+    Column("opening_balance_amount", Numeric(19, 4), nullable=False),
+    Column("opening_balance_currency", String(3), nullable=False),
+    Column("opening_date", DateTime(timezone=True), nullable=False),
+
+    # Type-specific fields (nullable for types that don't use them)
+    Column("credit_limit_amount", Numeric(19, 4), nullable=True),
+    Column("credit_limit_currency", String(3), nullable=True),
+    Column("apr", Numeric(5, 4), nullable=True),  # e.g., 0.1999 for 19.99%
+    Column("term_months", Integer, nullable=True),
+    Column("due_date", DateTime(timezone=True), nullable=True),
+
+    # Rewards-specific
+    Column("rewards_value", Numeric(19, 0), nullable=True),
+    Column("rewards_unit", String(100), nullable=True),
+
+    # Institution
+    Column("institution_name", String(255), nullable=True),
+    Column("institution_website", String(500), nullable=True),
+    Column("institution_phone", String(50), nullable=True),
+    Column("institution_notes", Text, nullable=True),
+
+    # Encrypted account number (AES-256-GCM via FieldEncryption)
+    Column("encrypted_account_number", Text, nullable=True),
+
+    # Lifecycle
+    Column("closing_date", DateTime(timezone=True), nullable=True),
+    Column("notes", Text, nullable=True),
+    Column("sort_order", Integer, nullable=False, default=0),
+
+    # Audit
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+    Column("created_by", String(36), nullable=True),
+    Column("updated_by", String(36), nullable=True),
+
+    # Indexes
+    Index("ix_accounts_user_id", "user_id"),
+    Index("ix_accounts_user_type", "user_id", "account_type"),
+    Index("ix_accounts_user_status", "user_id", "status"),
 )
