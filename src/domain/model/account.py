@@ -30,13 +30,16 @@ from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
 
 
-@dataclass(eq=False, slots=True)
+@dataclass(eq=False)
 class Account:
     """Account aggregate root.
 
     Supports multiple account types with type-specific fields.
     Uses factory methods for type-specific validation.
     Not frozen - uses explicit mutation methods that emit events.
+
+    Note: Does not use slots=True because SQLAlchemy imperative mapping
+    requires __dict__ and __weakref__ for instance state tracking.
     """
 
     # Identity

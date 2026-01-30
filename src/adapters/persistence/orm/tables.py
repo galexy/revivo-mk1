@@ -7,8 +7,9 @@ Tables created:
 - outbox: Domain event outbox for reliable delivery (Pattern 5 from RESEARCH.md)
 - users: Foundation user table (expanded in later phases)
 - encrypted_secrets: Storage for encrypted sensitive data (Plaid tokens, etc.)
+- accounts: Account aggregate persistence with type-specific fields
 
-Note: Account and Transaction tables will be added in Phases 2 and 3.
+Custom type decorators handle domain type conversion for EntityIds and Enums.
 """
 
 from datetime import UTC, datetime
@@ -27,6 +28,13 @@ from sqlalchemy import (
 )
 
 from .base import metadata
+from .types import (
+    AccountIdType,
+    AccountStatusEnum,
+    AccountSubtypeEnum,
+    AccountTypeEnum,
+    UserIdType,
+)
 
 # Outbox table for domain events (RESEARCH.md Pattern 5)
 # Events are written here in same transaction as business data,
@@ -105,18 +113,19 @@ encrypted_secrets = Table(
 # Accounts table with single table inheritance (type discriminator)
 # Supports multiple account types (checking, savings, credit card, loan, etc.)
 # with type-specific optional fields.
+# Uses custom TypeDecorators for domain type conversion.
 accounts = Table(
     "accounts",
     metadata,
-    # Identity
-    Column("id", String(36), primary_key=True),  # acct_xxx
-    Column("user_id", String(36), ForeignKey("users.id"), nullable=False),
+    # Identity - uses custom type decorators for EntityId conversion
+    Column("id", AccountIdType(36), primary_key=True),  # acct_xxx
+    Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
 
-    # Core fields
+    # Core fields - uses custom type decorators for enum conversion
     Column("name", String(255), nullable=False),
-    Column("account_type", String(50), nullable=False),  # Discriminator
-    Column("status", String(20), nullable=False, default="active"),
-    Column("subtype", String(50), nullable=True),
+    Column("account_type", AccountTypeEnum(50), nullable=False),  # Discriminator
+    Column("status", AccountStatusEnum(20), nullable=False, default="active"),
+    Column("subtype", AccountSubtypeEnum(50), nullable=True),
 
     # Balance tracking
     Column("opening_balance_amount", Numeric(19, 4), nullable=False),
@@ -148,11 +157,11 @@ accounts = Table(
     Column("notes", Text, nullable=True),
     Column("sort_order", Integer, nullable=False, default=0),
 
-    # Audit
+    # Audit - uses UserIdType for nullable user references
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
-    Column("created_by", String(36), nullable=True),
-    Column("updated_by", String(36), nullable=True),
+    Column("created_by", UserIdType(36), nullable=True),
+    Column("updated_by", UserIdType(36), nullable=True),
 
     # Indexes
     Index("ix_accounts_user_id", "user_id"),

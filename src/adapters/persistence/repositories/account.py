@@ -145,8 +145,8 @@ class SqlAlchemyAccountRepository:
         SQLAlchemy loads primitive column values. This method converts
         them back to domain value objects (Money, InstitutionDetails, etc.).
 
-        Uses object.__setattr__ because Account has slots=True which
-        prevents normal attribute assignment after __init__.
+        Uses object.__setattr__ to bypass SQLAlchemy instrumentation
+        and ensure domain value objects are properly reconstructed.
 
         Args:
             account: Account entity loaded from database.
