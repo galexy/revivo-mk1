@@ -19,19 +19,19 @@ Progress: [████░░░░░░] ~13%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 3.25 min
-- Total execution time: 0.22 hours
+- Total plans completed: 5
+- Average duration: 3.4 min
+- Total execution time: 0.28 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 4 | 13 min | 3.25 min |
+| 01-foundation | 5 | 17 min | 3.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (5 min), 01-03 (2 min), 01-05 (3 min)
-- Trend: Accelerating
+- Last 5 plans: 01-01 (3 min), 01-02 (5 min), 01-03 (2 min), 01-04 (4 min), 01-05 (3 min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - Nonce prepended to ciphertext for self-contained encrypted values
 - Environment-based logging: ConsoleRenderer (dev) vs JSONRenderer (prod)
 - FastAPI lifespan context manager for startup/shutdown lifecycle
+- String(36) for entity IDs to accommodate TypeID prefix format
+- Partial index on outbox.processed_at for efficient unprocessed event polling
+- Separate sync/async session factories for migrations vs API
 
 ### Pending Todos
 
