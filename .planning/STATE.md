@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 2 - Account Domain (ready to plan)
+**Current focus:** Phase 2 - Account Domain (in progress)
 
 ## Current Position
 
-Phase: 1 of 10 (Foundation) - COMPLETE ✓
-Plan: 6 of 6 in current phase
-Status: Complete
-Last activity: 2026-01-30 - Completed 01-06-PLAN.md, Phase 1 verified
+Phase: 2 of 10 (Account Domain)
+Plan: 2 of 6 in current phase
+Status: In progress
+Last activity: 2026-01-30 - Completed 02-02-PLAN.md (Account Aggregate)
 
-Progress: [██░░░░░░░░] ~17%
+Progress: [██░░░░░░░░] ~21%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 5.3 min
-- Total execution time: 0.53 hours
+- Total plans completed: 7
+- Average duration: 5.6 min
+- Total execution time: 0.67 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
+| 02-account-domain | 1 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5 min), 01-03 (2 min), 01-04 (4 min), 01-05 (3 min), 01-06 (15 min)
-- Trend: 01-06 spike due to verification and fixes
+- Last 5 plans: 01-03 (2 min), 01-04 (4 min), 01-05 (3 min), 01-06 (15 min), 02-02 (8 min)
+- Trend: 02-02 included blocking fix for 02-01 dependencies
 
 *Updated after each plan completion*
 
@@ -63,6 +64,10 @@ Recent decisions affecting current work:
 - DATABASE_URL_SYNC for synchronous Alembic migrations (avoid asyncpg in sync context)
 - Removed overly strict adapter independence contract (API is composition root)
 - Session-scoped database setup with per-test transactional rollback for integration tests
+- Single Account class with type discriminator (not subclasses per account type)
+- Account aggregate eq=False (identity by ID, not field comparison)
+- Explicit mutation methods with event emission (not frozen dataclass)
+- RewardsBalance for rewards accounts (tracks points/miles with unit, not monetary value)
 
 ### Pending Todos
 
@@ -75,7 +80,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed Phase 1 (01-06-PLAN.md verified, all tests passing)
+Stopped at: Completed 02-02-PLAN.md (Account Aggregate)
 Resume file: None
 
 ## Phase 1 Milestone
