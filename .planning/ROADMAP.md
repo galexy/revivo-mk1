@@ -68,21 +68,21 @@ Plans:
 ### Phase 3: Transaction Domain
 **Goal**: Users can record financial transactions with categories, splits, and transfers
 **Depends on**: Phase 2
-**Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-05, TRAN-06, TRAN-07, TRAN-08, TRAN-09, TRAN-10, TRAN-11, TRAN-12, TRAN-13
+**Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-05, TRAN-06, TRAN-09, TRAN-10, TRAN-11, TRAN-12 (TRAN-07, TRAN-08 deferred - attachments)
 **Success Criteria** (what must be TRUE):
   1. User can create, edit, and delete transactions with date, amount, payee, category, and account
   2. User can split a transaction across multiple categories with specific amounts
   3. User can record a transfer between two accounts as a single transaction that affects both balances
-  4. User can attach receipt files to transactions and view all attachments
-  5. User can search and filter transactions by payee, category, amount, date, or account
+  4. User can search and filter transactions by payee, category, amount, date, or account
+  5. (Deferred) User can attach receipt files to transactions and view all attachments
 **Plans**: 7 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Transaction domain primitives (types, enums, SplitLine, Attachment, events)
+- [ ] 03-01-PLAN.md — Transaction domain primitives (types, enums, SplitLine, Payee, events)
 - [ ] 03-02-PLAN.md — Transaction aggregate and Category entity with repository protocols
 - [ ] 03-03-PLAN.md — Database tables and Alembic migration
 - [ ] 03-04-PLAN.md — ORM mappers and repository implementations
-- [ ] 03-05-PLAN.md — TransactionService and CategoryService with file storage
+- [ ] 03-05-PLAN.md — TransactionService and CategoryService application services
 - [ ] 03-06-PLAN.md — REST API endpoints for transactions and categories
 - [ ] 03-07-PLAN.md — Integration tests and verification checkpoint
 
