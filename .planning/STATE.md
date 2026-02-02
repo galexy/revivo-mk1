@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 3 of 10 (Transaction Domain)
-Plan: 2 of 6 in current phase
+Plan: 3 of 6 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 03-02-PLAN.md (Transaction Aggregate)
+Last activity: 2026-02-02 - Completed 03-03-PLAN.md (Transaction Domain Database Tables)
 
-Progress: [████░░░░░░] ~38%
+Progress: [████░░░░░░] ~40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 7.0 min
-- Total execution time: 1.63 hours
+- Total plans completed: 15
+- Average duration: 6.8 min
+- Total execution time: 1.70 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] ~38%
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
-| 03-transaction-domain | 2 | 4 min | 2.0 min |
+| 03-transaction-domain | 3 | 8 min | 2.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-04 (3 min), 02-05 (4 min), 02-06 (25 min), 03-01 (2 min), 03-02 (2 min)
-- Trend: Domain primitive plans execute quickly; verification/integration phases take longer
+- Last 5 plans: 02-05 (4 min), 02-06 (25 min), 03-01 (2 min), 03-02 (2 min), 03-03 (4 min)
+- Trend: Domain primitive and database table plans execute quickly
 
 *Updated after each plan completion*
 
@@ -89,6 +89,9 @@ Recent decisions affecting current work:
 - Mirror transactions for transfers (source owns, mirror auto-created)
 - Two-level category hierarchy (parent/child categories)
 - System categories protected from modification/deletion (e.g., Uncategorized)
+- Date type (not DateTime) for effective_date and posted_date
+- TSVECTOR with GIN index for full-text search on transactions
+- CASCADE delete on split_lines when transaction deleted
 
 ### Pending Todos
 
@@ -101,7 +104,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-02-PLAN.md (Transaction Aggregate)
+Stopped at: Completed 03-03-PLAN.md (Transaction Domain Database Tables)
 Resume file: None
 
 ## Phase 1 Milestone
@@ -145,4 +148,9 @@ Plan 02: Transaction Aggregate - COMPLETE
 - Category entity with hierarchical structure
 - TransactionRepository, CategoryRepository, PayeeRepository protocols
 
-Next: Plan 03 - Transaction Persistence
+Plan 03: Transaction Domain Database Tables - COMPLETE
+- TypeDecorators for TransactionId, CategoryId, PayeeId, enums
+- Table definitions for categories, payees, transactions, split_lines
+- Alembic migration 003 with FK constraints and GIN index
+
+Next: Plan 04 - Transaction Repository
