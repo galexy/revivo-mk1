@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -26,6 +27,7 @@ from sqlalchemy import (
     Table,
     Text,
 )
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from .base import metadata
 from .types import (
@@ -33,6 +35,11 @@ from .types import (
     AccountStatusEnum,
     AccountSubtypeEnum,
     AccountTypeEnum,
+    CategoryIdType,
+    PayeeIdType,
+    TransactionIdType,
+    TransactionSourceEnum,
+    TransactionStatusEnum,
     UserIdType,
 )
 
@@ -167,4 +174,157 @@ accounts = Table(
     Index("ix_accounts_user_id", "user_id"),
     Index("ix_accounts_user_type", "user_id", "account_type"),
     Index("ix_accounts_user_status", "user_id", "status"),
+)
+
+# Categories table (hierarchical structure for transaction categorization)
+# Parent/child relationships enable nested categories (e.g., Food > Groceries)
+categories = Table(
+    "categories",
+    metadata,
+    Column("id", CategoryIdType(36), primary_key=True),  # cat_xxx
+    Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column("name", String(255), nullable=False),
+
+    # Hierarchy - parent_id is None for top-level categories
+    Column("parent_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True),
+
+    # Metadata
+    Column("is_system", Boolean, nullable=False, default=False),
+    Column("is_hidden", Boolean, nullable=False, default=False),
+    Column("sort_order", Integer, nullable=False, default=0),
+    Column("icon", String(50), nullable=True),
+
+    # Audit
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+
+    # Indexes
+    Index("ix_categories_user_id", "user_id"),
+    Index("ix_categories_parent_id", "parent_id"),
+    Index("ix_categories_user_system", "user_id", "is_system"),
+)
+
+# Payees table (managed entity list for autocomplete and categorization)
+# normalized_name enables case-insensitive matching
+payees = Table(
+    "payees",
+    metadata,
+    Column("id", PayeeIdType(36), primary_key=True),  # payee_xxx
+    Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column("name", String(255), nullable=False),
+    Column("normalized_name", String(255), nullable=False),  # Lowercase for matching
+
+    # Default category for auto-fill when selecting this payee
+    Column(
+        "default_category_id",
+        CategoryIdType(36),
+        ForeignKey("categories.id"),
+        nullable=True,
+    ),
+
+    # Usage tracking for autocomplete relevance
+    Column("last_used_at", DateTime(timezone=True), nullable=True),
+    Column("usage_count", Integer, nullable=False, default=0),
+
+    # Audit
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+
+    # Indexes
+    Index("ix_payees_user_id", "user_id"),
+    Index("ix_payees_user_normalized", "user_id", "normalized_name"),
+)
+
+# Transactions table (always-split model per CONTEXT)
+# Every transaction has 1+ split lines, even single-category transactions
+transactions = Table(
+    "transactions",
+    metadata,
+    Column("id", TransactionIdType(36), primary_key=True),  # txn_xxx
+    Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column("account_id", AccountIdType(36), ForeignKey("accounts.id"), nullable=False),
+
+    # Dates per CONTEXT: effective_date and posted_date (Date type, not DateTime)
+    Column("effective_date", Date, nullable=False),
+    Column("posted_date", Date, nullable=True),  # None = pending
+
+    # Amount: net flow to account (positive = inflow, negative = outflow)
+    Column("amount", Numeric(19, 4), nullable=False),
+    Column("currency", String(3), nullable=False, default="USD"),
+
+    # Status and source
+    Column("status", TransactionStatusEnum(20), nullable=False, default="pending"),
+    Column("source", TransactionSourceEnum(20), nullable=False, default="manual"),
+
+    # Payee (managed entity reference + denormalized name for display)
+    Column("payee_id", PayeeIdType(36), ForeignKey("payees.id"), nullable=True),
+    Column("payee_name", String(255), nullable=True),
+
+    # Description
+    Column("memo", Text, nullable=True),
+    Column("check_number", String(50), nullable=True),
+
+    # Mirror transaction link for transfers
+    Column(
+        "source_transaction_id",
+        TransactionIdType(36),
+        ForeignKey("transactions.id"),
+        nullable=True,
+    ),
+    Column("is_mirror", Boolean, nullable=False, default=False),
+
+    # Audit
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+
+    # Full-text search vector (updated by application)
+    Column("search_vector", TSVECTOR, nullable=True),
+
+    # Indexes
+    Index("ix_transactions_user_id", "user_id"),
+    Index("ix_transactions_account_id", "account_id"),
+    Index("ix_transactions_user_effective_date", "user_id", "effective_date"),
+    Index("ix_transactions_account_effective_date", "account_id", "effective_date"),
+    Index("ix_transactions_source_transaction", "source_transaction_id"),
+    Index("ix_transactions_search", "search_vector", postgresql_using="gin"),
+)
+
+# Split lines table (always 1+ per transaction)
+# Each split assigns a portion of the transaction to either:
+# - A category (expense/income categorization)
+# - A transfer account (money moving between accounts)
+split_lines = Table(
+    "split_lines",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column(
+        "transaction_id",
+        TransactionIdType(36),
+        ForeignKey("transactions.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+
+    # Amount: signed (positive = income/inflow, negative = expense/outflow)
+    Column("amount", Numeric(19, 4), nullable=False),
+    Column("currency", String(3), nullable=False, default="USD"),
+
+    # Either category OR transfer account (not both, enforced by application)
+    Column("category_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True),
+    Column(
+        "transfer_account_id",
+        AccountIdType(36),
+        ForeignKey("accounts.id"),
+        nullable=True,
+    ),
+
+    # Per-split memo
+    Column("memo", String(500), nullable=True),
+
+    # Order within transaction
+    Column("sort_order", Integer, nullable=False, default=0),
+
+    # Indexes
+    Index("ix_split_lines_transaction_id", "transaction_id"),
+    Index("ix_split_lines_category_id", "category_id"),
+    Index("ix_split_lines_transfer_account", "transfer_account_id"),
 )
