@@ -134,6 +134,7 @@ class TransactionResponse(BaseModel):
     check_number: str | None
     is_mirror: bool
     source_transaction_id: str | None
+    source_split_id: str | None  # Links mirror to source split
     created_at: datetime
     updated_at: datetime
 

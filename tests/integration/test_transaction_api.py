@@ -842,3 +842,255 @@ class TestTransactionAPI:
 
         assert len(savings_txns["transactions"]) == 1
         assert len(invest_txns["transactions"]) == 1
+
+
+class TestTransactionValidationErrors:
+    """Tests for proper 400/422 responses on validation errors."""
+
+    def test_invalid_account_id_returns_400(self, client, setup_database) -> None:
+        """Invalid account ID format should return 400, not 500."""
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": "invalid_format",
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-100.00", "currency": "USD"}}],
+            },
+        )
+        assert response.status_code == 400
+        assert "INVALID_ID_FORMAT" in response.json().get("detail", {}).get("code", "")
+
+    def test_invalid_category_id_returns_400(self, client, test_account) -> None:
+        """Invalid category ID format should return 400, not 500."""
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": "invalid_format",
+                    }
+                ],
+            },
+        )
+        assert response.status_code == 400
+
+    def test_empty_string_category_id_returns_422(self, client, test_account) -> None:
+        """Empty string category_id should return 422 (Pydantic validation)."""
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": "",  # Empty string - should be rejected
+                    }
+                ],
+            },
+        )
+        assert response.status_code == 422
+        # Pydantic error includes the field name
+        assert "category_id" in str(response.json())
+
+    def test_empty_string_transfer_account_id_returns_422(
+        self, client, test_account
+    ) -> None:
+        """Empty string transfer_account_id should return 422."""
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "transfer_account_id": "",  # Empty string - should be rejected
+                    }
+                ],
+            },
+        )
+        assert response.status_code == 422
+        assert "transfer_account_id" in str(response.json())
+
+
+class TestSplitIdentity:
+    """Tests for split ID persistence and PATCH semantics."""
+
+    def test_transaction_response_includes_split_ids(
+        self, client, test_account
+    ) -> None:
+        """Transaction response should include split IDs."""
+        # Create transaction
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-100.00", "currency": "USD"}}],
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert len(data["splits"]) == 1
+        assert "id" in data["splits"][0]
+        assert data["splits"][0]["id"].startswith("split_")
+
+    def test_split_ids_persist_across_get(self, client, test_account) -> None:
+        """Split IDs should persist when getting transaction."""
+        # Create
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-100.00", "currency": "USD"}}],
+            },
+        )
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # Get
+        get_response = client.get(f"/api/v1/transactions/{txn_id}")
+        assert get_response.status_code == 200
+        assert get_response.json()["splits"][0]["id"] == split_id
+
+    def test_patch_with_split_id_updates_specific_split(
+        self, client, test_account, test_category
+    ) -> None:
+        """PATCH with split ID should update that specific split."""
+        # Create transaction with two splits
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {"amount": {"amount": "-60.00", "currency": "USD"}},
+                    {"amount": {"amount": "-40.00", "currency": "USD"}},
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        splits = create_response.json()["splits"]
+        split1_id = splits[0]["id"]
+        split2_id = splits[1]["id"]
+
+        # PATCH - update first split, keep second
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split1_id,
+                        "amount": {"amount": "-70.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    },
+                    {
+                        "id": split2_id,
+                        "amount": {"amount": "-30.00", "currency": "USD"},
+                    },
+                ],
+            },
+        )
+        assert patch_response.status_code == 200
+
+        # Verify IDs preserved
+        updated = patch_response.json()
+        assert updated["splits"][0]["id"] == split1_id
+        assert updated["splits"][1]["id"] == split2_id
+        # Verify amounts changed
+        split_amounts = {s["id"]: Decimal(s["amount"]["amount"]) for s in updated["splits"]}
+        assert split_amounts[split1_id] == Decimal("-70.00")
+        assert split_amounts[split2_id] == Decimal("-30.00")
+
+    def test_mirror_transaction_has_source_split_id(self, client, test_account) -> None:
+        """Mirror transactions should have source_split_id populated."""
+        # Create savings account
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings SplitID Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create transfer
+        source = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-250.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-250.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        ).json()
+
+        # Get source split ID
+        source_split_id = source["splits"][0]["id"]
+        assert source_split_id.startswith("split_")
+
+        # Get mirror transaction
+        savings_txns = client.get(
+            f"/api/v1/transactions?account_id={savings['id']}"
+        ).json()
+        assert len(savings_txns["transactions"]) == 1
+        mirror = savings_txns["transactions"][0]
+
+        # Verify mirror has source_split_id linking to source split
+        assert mirror["is_mirror"] is True
+        assert mirror["source_split_id"] == source_split_id
+
+    def test_multi_split_transaction_has_unique_split_ids(
+        self, client, test_account, test_category
+    ) -> None:
+        """Multiple splits in same transaction should each have unique IDs."""
+        # Create second category
+        cat2 = client.post("/api/v1/categories", json={"name": "Split ID Test Cat2"}).json()
+
+        # Create transaction with multiple splits
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": "2026-01-15",
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-60.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    },
+                    {
+                        "amount": {"amount": "-40.00", "currency": "USD"},
+                        "category_id": cat2["id"],
+                    },
+                ],
+            },
+        )
+        assert response.status_code == 201
+        splits = response.json()["splits"]
+
+        # All splits have IDs
+        assert all("id" in s for s in splits)
+        assert all(s["id"].startswith("split_") for s in splits)
+
+        # All IDs are unique
+        split_ids = [s["id"] for s in splits]
+        assert len(split_ids) == len(set(split_ids))

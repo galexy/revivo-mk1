@@ -29,7 +29,7 @@ from src.adapters.api.schemas.transaction import (
     UpdateTransactionRequest,
 )
 from src.application.services.transaction_service import TransactionError, TransactionService
-from src.domain.model.entity_id import AccountId, CategoryId, TransactionId, UserId
+from src.domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId, UserId
 from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction import Transaction
@@ -66,6 +66,7 @@ def _transaction_to_response(txn: Transaction) -> TransactionResponse:
         check_number=txn.check_number,
         is_mirror=txn.is_mirror,
         source_transaction_id=str(txn.source_transaction_id) if txn.source_transaction_id else None,
+        source_split_id=str(txn.source_split_id) if txn.source_split_id else None,
         created_at=txn.created_at,
         updated_at=txn.updated_at,
     )
@@ -215,16 +216,26 @@ def update_transaction(
                 detail={"code": "MISSING_AMOUNT", "message": "amount is required when updating splits"},
             )
 
-        # Convert splits to domain objects
+        # Convert splits to domain objects, preserving IDs if provided
         new_splits = []
         for split_req in request.splits:
             try:
-                split = SplitLine.create(
-                    amount=Money(split_req.amount.amount, split_req.amount.currency),
-                    category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-                    transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
-                    memo=split_req.memo,
-                )
+                # If split ID provided, preserve it; otherwise generate new one
+                if split_req.id:
+                    split = SplitLine(
+                        id=SplitId.from_string(split_req.id),
+                        amount=Money(split_req.amount.amount, split_req.amount.currency),
+                        category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
+                        transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                        memo=split_req.memo,
+                    )
+                else:
+                    split = SplitLine.create(
+                        amount=Money(split_req.amount.amount, split_req.amount.currency),
+                        category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
+                        transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                        memo=split_req.memo,
+                    )
             except ValueError as e:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
