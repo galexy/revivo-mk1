@@ -13,6 +13,12 @@ Value object handling:
   before persistence via a before_flush event listener
 - Reconstruction from flat columns to value objects happens in the repository
 - Type conversions for EntityIds and Enums use custom TypeDecorators
+
+Transaction domain handling:
+- Category and Payee are simple entities with direct mapping
+- Transaction has splits excluded (loaded/saved manually in repository)
+- Transaction.amount excluded (reconstructed from columns in repository)
+- SplitLine is a frozen dataclass - not mapped directly, handled in repository
 """
 
 from sqlalchemy import event
@@ -84,6 +90,12 @@ def start_mappers() -> None:
     - Account: Maps Account class to accounts table.
       EntityIds and Enums use TypeDecorators for automatic conversion.
       Value objects are decomposed before flush and reconstructed after load.
+    - Category: Maps Category class to categories table.
+      Simple entity with hierarchy support (parent_id).
+    - Payee: Maps Payee class to payees table.
+      Simple entity with usage tracking.
+    - Transaction: Maps Transaction class to transactions table.
+      splits and amount excluded - handled manually in repository.
     """
     global _mappers_started
     if _mappers_started:
@@ -91,8 +103,11 @@ def start_mappers() -> None:
 
     # Import domain entities inside function to avoid circular imports
     from src.domain.model.account import Account
+    from src.domain.model.category import Category
+    from src.domain.model.payee import Payee
+    from src.domain.model.transaction import Transaction
 
-    from .tables import accounts
+    from .tables import accounts, categories, payees, transactions
 
     # Account aggregate mapping
     # - EntityIds (id, user_id, etc.): TypeDecorators handle string conversion
@@ -109,6 +124,40 @@ def start_mappers() -> None:
             "credit_limit",  # Decomposed/reconstructed via events/repository
             "institution",  # Decomposed/reconstructed via events/repository
             "rewards_balance",  # Decomposed/reconstructed via events/repository
+        ],
+    )
+
+    # Category entity mapping
+    # - Simple entity with hierarchy (parent_id)
+    # - _events excluded (transient)
+    mapper_registry.map_imperatively(
+        Category,
+        categories,
+        exclude_properties=[
+            "_events",  # _events is transient, not persisted
+        ],
+    )
+
+    # Payee entity mapping
+    # - Simple entity with usage tracking
+    # - No excluded properties (no domain events or value objects)
+    mapper_registry.map_imperatively(
+        Payee,
+        payees,
+    )
+
+    # Transaction aggregate mapping
+    # - splits excluded: SplitLine is frozen dataclass with Money value object
+    #   Loaded and saved manually in repository
+    # - amount excluded: Reconstructed from amount/currency columns in repository
+    # - _events excluded: Transient, not persisted
+    mapper_registry.map_imperatively(
+        Transaction,
+        transactions,
+        exclude_properties=[
+            "_events",  # _events is transient, not persisted
+            "splits",  # Loaded manually in repository (frozen dataclass with Money)
+            "amount",  # Reconstructed from amount/currency columns in repository
         ],
     )
 
