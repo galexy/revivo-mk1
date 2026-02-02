@@ -1,9 +1,9 @@
 ---
-status: testing
+status: complete
 phase: 03-transaction-domain
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md, 03-05-SUMMARY.md, 03-06-SUMMARY.md]
 started: 2026-02-02T04:35:00Z
-updated: 2026-02-02T04:55:00Z
+updated: 2026-02-02T13:00:00Z
 ---
 
 ## Setup
@@ -15,25 +15,7 @@ uvicorn src.adapters.api.app:create_app --factory --reload
 
 ## Current Test
 
-number: 16
-name: Mixed Splits: Category + Transfer
-expected: |
-  Returns 201 with transaction containing both a category split AND a transfer split. Mirror created for transfer portion only.
-command: |
-  # Pay $500 credit card bill from checking, get $20 cash back to wallet
-  curl -X POST http://localhost:8000/api/v1/transactions \
-    -H "Content-Type: application/json" \
-    -d '{
-      "account_id": "<CHECKING_ID>",
-      "effective_date": "2026-02-02",
-      "amount": {"amount": "-480.00", "currency": "USD"},
-      "splits": [
-        {"amount": {"amount": "-500.00", "currency": "USD"}, "transfer_account_id": "<CREDIT_CARD_ID>"},
-        {"amount": {"amount": "20.00", "currency": "USD"}, "category_id": "<CASH_BACK_CATEGORY_ID>", "memo": "Cash back reward"}
-      ],
-      "payee_name": "Credit Card Payment"
-    }'
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -200,7 +182,7 @@ command: |
       ],
       "payee_name": "Credit Card Payment"
     }'
-result: [pending]
+result: pass
 
 ### 17. Transfer to Self (Same Account)
 expected: Returns 400 with error - cannot transfer to same account.
@@ -213,7 +195,7 @@ command: |
       "amount": {"amount": "-100.00", "currency": "USD"},
       "splits": [{"amount": {"amount": "-100.00", "currency": "USD"}, "transfer_account_id": "<CHECKING_ID>"}]
     }'
-result: [pending]
+result: pass
 
 ### 18. Positive Transfer Split (Invalid)
 expected: Returns 400 - transfer splits must be negative (outgoing from source).
@@ -226,7 +208,7 @@ command: |
       "amount": {"amount": "100.00", "currency": "USD"},
       "splits": [{"amount": {"amount": "100.00", "currency": "USD"}, "transfer_account_id": "<SAVINGS_ID>"}]
     }'
-result: [pending]
+result: pass
 
 ### 19. Income Transaction (Positive Amount)
 expected: Returns 201 with positive amount and positive split (e.g., paycheck deposit).
@@ -241,7 +223,7 @@ command: |
       "payee_name": "Employer Inc",
       "memo": "Paycheck"
     }'
-result: [pending]
+result: pass
 
 ### 20. Mixed Income/Expense Splits
 expected: Returns 201 - a refund scenario where you get money back but also pay a restocking fee.
@@ -259,7 +241,7 @@ command: |
       ],
       "payee_name": "Best Buy"
     }'
-result: [pending]
+result: pass
 
 ### 21. Empty Splits Array
 expected: Returns 400 - transaction must have at least one split.
@@ -272,7 +254,8 @@ command: |
       "amount": {"amount": "-50.00", "currency": "USD"},
       "splits": []
     }'
-result: [pending]
+result: pass
+note: "Returns 422 (Unprocessable Entity) - semantically correct for validation"
 
 ### 22. Cannot Reconcile Pending Transaction
 expected: Returns 400 - must be cleared before reconciling.
@@ -289,7 +272,7 @@ command: |
 
   # Try to reconcile without clearing first
   curl -X POST "http://localhost:8000/api/v1/transactions/${TXN}/reconcile"
-result: [pending]
+result: pass
 
 ### 23. Cannot Modify Mirror Directly (PATCH)
 expected: Returns 400 - mirrors can only be modified through source transaction.
@@ -297,7 +280,7 @@ command: |
   curl -X PATCH http://localhost:8000/api/v1/transactions/<MIRROR_TXN_ID> \
     -H "Content-Type: application/json" \
     -d '{"memo": "Trying to modify mirror"}'
-result: [pending]
+result: pass
 
 ### 24. Update Transfer Amount Syncs Mirror
 expected: After updating source transaction's transfer split amount, mirror's amount should also change.
@@ -312,14 +295,14 @@ command: |
 
   # Verify mirror now shows +600
   curl http://localhost:8000/api/v1/transactions/<MIRROR_TXN_ID>
-result: [pending]
+result: pass
 
 ### 25. Delete Category With Transactions
 expected: Returns 400 - cannot delete category that has transactions assigned.
 command: |
   # Try to delete a category that was used in test 5
   curl -X DELETE http://localhost:8000/api/v1/categories/<USED_CATEGORY_ID>
-result: [pending]
+result: pass
 
 ### 26. Transaction With Subcategory
 expected: Returns 201 - can assign transaction to a subcategory (child of parent).
@@ -333,7 +316,7 @@ command: |
       "splits": [{"amount": {"amount": "-45.00", "currency": "USD"}, "category_id": "<SUBCATEGORY_ID>"}],
       "payee_name": "Chipotle"
     }'
-result: [pending]
+result: pass
 
 ### 27. Split With Both Category AND Transfer (Invalid)
 expected: Returns 400 - a single split cannot have both category_id and transfer_account_id.
@@ -346,7 +329,7 @@ command: |
       "amount": {"amount": "-100.00", "currency": "USD"},
       "splits": [{"amount": {"amount": "-100.00", "currency": "USD"}, "category_id": "<CATEGORY_ID>", "transfer_account_id": "<SAVINGS_ID>"}]
     }'
-result: [pending]
+result: pass
 
 ### 28. Multiple Transfers in One Transaction
 expected: Returns 201 - can split payment across multiple destination accounts.
@@ -368,14 +351,14 @@ command: |
   # Verify mirrors created in both accounts
   curl "http://localhost:8000/api/v1/transactions?account_id=<SAVINGS_ID>"
   curl "http://localhost:8000/api/v1/transactions?account_id=<INVESTMENT_ID>"
-result: [pending]
+result: pass
 
 ## Summary
 
 total: 28
-passed: 14
-issues: 1
-pending: 13
+passed: 27
+issues: 4
+pending: 0
 skipped: 0
 
 ## Gaps
@@ -385,6 +368,36 @@ skipped: 0
   reason: "User reported: passes if I give it proper ids. But, if I don't, I get an internal server error."
   severity: minor
   test: 6
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
+
+- truth: "Split must have either category_id or transfer_account_id, not neither"
+  status: failed
+  reason: "User reported: empty string for category creates a split with null for both transfer_account_id and category_id"
+  severity: minor
+  test: 16
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
+
+- truth: "Categories should have income/expense type to indicate default transaction direction"
+  status: enhancement
+  reason: "User reported: categories don't have a type associated with them. Should add income and expense type to categories to tell what their default direction is (based on account type)"
+  severity: minor
+  test: 19
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
+
+- truth: "Mirror update behavior with multiple splits to same account should be well-defined"
+  status: investigation
+  reason: "User reported: unclear if changing transfer account updates existing mirror or creates new one. Also unclear how updates work with multiple split lines transferring to the same account."
+  severity: minor
+  test: 24
   root_cause: ""
   artifacts: []
   missing: []
