@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
-- [ ] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
+- [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
 - [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
@@ -78,13 +78,13 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Transaction domain primitives (types, enums, SplitLine, Payee, events)
-- [ ] 03-02-PLAN.md — Transaction aggregate and Category entity with repository protocols
-- [ ] 03-03-PLAN.md — Database tables and Alembic migration
-- [ ] 03-04-PLAN.md — ORM mappers and repository implementations
-- [ ] 03-05-PLAN.md — TransactionService and CategoryService application services
-- [ ] 03-06-PLAN.md — REST API endpoints for transactions and categories
-- [ ] 03-07-PLAN.md — Integration tests and verification checkpoint
+- [x] 03-01-PLAN.md — Transaction domain primitives (types, enums, SplitLine, Payee, events)
+- [x] 03-02-PLAN.md — Transaction aggregate and Category entity with repository protocols
+- [x] 03-03-PLAN.md — Database tables and Alembic migration
+- [x] 03-04-PLAN.md — ORM mappers and repository implementations
+- [x] 03-05-PLAN.md — TransactionService and CategoryService application services
+- [x] 03-06-PLAN.md — REST API endpoints for transactions and categories
+- [x] 03-07-PLAN.md — Integration tests and verification checkpoint
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -210,7 +210,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete | 2026-01-30 |
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
-| 3. Transaction Domain | 0/7 | Planned | - |
+| 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |
