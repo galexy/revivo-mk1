@@ -16,6 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [x] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
+- [ ] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
 - [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
@@ -104,6 +105,22 @@ Plans:
 - [x] 03.1-02-PLAN.md — CategoryType (full vertical slice: domain, migration, API, tests)
 - [x] 03.1-03-PLAN.md — Split identity persistence/API (migration, repos, schemas, exception handler)
 - [x] 03.1-04-PLAN.md — Split identity tests
+
+### Phase 3.2: Add Missing PATCH Test Cases (INSERTED)
+**Goal**: Add comprehensive PATCH endpoint tests for edge cases specified in 03.1-CONTEXT.md but not covered during Phase 3.1
+**Depends on**: Phase 3.1
+**Requirements**: Test coverage for PATCH modification sub-cases (M1-M6)
+**Success Criteria** (what must be TRUE):
+  1. PATCH tests cover all 6 modification sub-cases (amount change, category change, destination change, conversions)
+  2. PATCH tests cover split addition and removal scenarios
+  3. PATCH tests verify mirror lifecycle (create/update/delete) during split changes
+  4. Invalid split ID in PATCH returns 400
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03.2-01-PLAN.md — PATCH modification sub-cases (M1-M6)
+- [ ] 03.2-02-PLAN.md — Split addition and removal scenarios
+- [ ] 03.2-03-PLAN.md — PATCH-specific validation errors
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -231,6 +248,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 3.1 Split Identity & Validation | 4/4 | Complete | 2026-02-02 |
+| 3.2 Add Missing PATCH Tests | 0/3 | Not started | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |
