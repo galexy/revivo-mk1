@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 3.1 of 10 (Split Identity & Validation Fixes)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 03.1-02-PLAN.md (CategoryType Vertical Slice)
+Last activity: 2026-02-02 - Completed 03.1-03-PLAN.md (Split Identity Persistence)
 
-Progress: [█████░░░░░] ~52%
+Progress: [█████░░░░░] ~54%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
-- Average duration: 6.2 min
-- Total execution time: 2.36 hours
+- Total plans completed: 22
+- Average duration: 6.1 min
+- Total execution time: 2.43 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [█████░░░░░] ~52%
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
-| 03.1-split-identity-validation-fixes | 2 | 12 min | 6.0 min |
+| 03.1-split-identity-validation-fixes | 3 | 17 min | 5.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-06 (6 min), 03-07 (15 min), 03.1-01 (4 min), 03.1-02 (8 min)
+- Last 5 plans: 03-07 (15 min), 03.1-01 (4 min), 03.1-02 (8 min), 03.1-03 (5 min)
 - Trend: Phase 3.1 in progress
 
 *Updated after each plan completion*
@@ -107,6 +107,9 @@ Recent decisions affecting current work:
 - Transaction.source_split_id links mirror transactions to their source splits
 - CategoryType StrEnum for income/expense classification (default EXPENSE)
 - API accepts category_type in CreateCategoryRequest with Pydantic pattern validation
+- SplitIdType custom TypeDecorator for ORM mapping of source_split_id
+- TypeIDException handler returns INVALID_ID_FORMAT code with 400 status
+- Empty string validators use Pydantic field_validator (returns 422)
 
 ### Pending Todos
 
@@ -119,18 +122,18 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03.1-02-PLAN.md (CategoryType Vertical Slice)
+Stopped at: Completed 03.1-03-PLAN.md (Split Identity Persistence)
 Resume file: none
-Next action: Execute Phase 3.1 Plan 03 (Split Validation Enhancement)
+Next action: Execute Phase 3.1 Plan 04 (Integration Tests)
 
 ## Roadmap Evolution
 
 - Phase 3.1 inserted after Phase 3: Split Identity & Validation Fixes (URGENT)
   - Fixes UAT issues: invalid ID handling, split validation, category types, split-mirror linkage
   - Plan 01: SplitLine Identity - COMPLETE
-  - Plan 02: Invalid ID Handling - pending
-  - Plan 03: Database Migration for split_id - pending
-  - Plan 04: CategoryType Integration - pending
+  - Plan 02: CategoryType Vertical Slice - COMPLETE
+  - Plan 03: Split Identity Persistence - COMPLETE
+  - Plan 04: Integration Tests - pending
 
 ## Phase 1 Milestone
 
@@ -186,6 +189,7 @@ Ready for Phase 3.1: Split Identity & Validation Fixes
 
 Fixing UAT issues discovered in Phase 3:
 
-Plans completed (2 of 4):
+Plans completed (3 of 4):
 - 03.1-01: SplitLine Identity (SplitId, create() factory, source_split_id)
 - 03.1-02: CategoryType Vertical Slice (enum, migration, API, 7 tests)
+- 03.1-03: Split Identity Persistence (migration 005, repository, exception handlers)
