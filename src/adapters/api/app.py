@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.adapters.logging import configure_logging, get_logger
 from src.adapters.persistence.orm.mappers import start_mappers
 
-from .routes import accounts, health
+from .routes import accounts, categories, health, transactions
 
 logger = get_logger(__name__)
 
@@ -70,6 +70,8 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health.router)
     app.include_router(accounts.router, prefix="/api/v1")
+    app.include_router(categories.router, prefix="/api/v1")
+    app.include_router(transactions.router, prefix="/api/v1")
 
     return app
 
