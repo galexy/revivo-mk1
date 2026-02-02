@@ -288,3 +288,46 @@ class BudgetId:
     def __str__(self) -> str:
         """Return the full ID string."""
         return self.value
+
+
+@dataclass(frozen=True, slots=True)
+class PayeeId:
+    """Identifier for Payee entity.
+
+    Format: payee_01h455vb4pex5vsknk084sn02q
+    """
+
+    value: str
+
+    @classmethod
+    def generate(cls) -> Self:
+        """Generate a new PayeeId."""
+        tid = TypeID(prefix="payee")
+        return cls(value=str(tid))
+
+    @classmethod
+    def from_string(cls, value: str) -> Self:
+        """Parse and validate a PayeeId from string.
+
+        Args:
+            value: Full prefixed ID string (must start with "payee_").
+
+        Returns:
+            PayeeId with validated value.
+
+        Raises:
+            ValueError: If ID format is invalid or prefix doesn't match.
+        """
+        tid = TypeID.from_string(value)
+        if tid.prefix != "payee":
+            raise ValueError(f"Expected 'payee' prefix, got '{tid.prefix}'")
+        return cls(value=value)
+
+    @property
+    def prefix(self) -> str:
+        """Return the prefix (always 'payee')."""
+        return "payee"
+
+    def __str__(self) -> str:
+        """Return the full ID string."""
+        return self.value
