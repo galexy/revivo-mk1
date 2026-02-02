@@ -274,6 +274,7 @@ transactions = Table(
         ForeignKey("transactions.id"),
         nullable=True,
     ),
+    Column("source_split_id", String(36), nullable=True),  # Links mirror to source split
     Column("is_mirror", Boolean, nullable=False, default=False),
 
     # Audit
@@ -289,6 +290,7 @@ transactions = Table(
     Index("ix_transactions_user_effective_date", "user_id", "effective_date"),
     Index("ix_transactions_account_effective_date", "account_id", "effective_date"),
     Index("ix_transactions_source_transaction", "source_transaction_id"),
+    Index("ix_transactions_source_split_id", "source_split_id"),
     Index("ix_transactions_search", "search_vector", postgresql_using="gin"),
 )
 
@@ -300,6 +302,7 @@ split_lines = Table(
     "split_lines",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("split_id", String(36), nullable=False),  # TypeID for split identity
     Column(
         "transaction_id",
         TransactionIdType(36),
@@ -330,4 +333,5 @@ split_lines = Table(
     Index("ix_split_lines_transaction_id", "transaction_id"),
     Index("ix_split_lines_category_id", "category_id"),
     Index("ix_split_lines_transfer_account", "transfer_account_id"),
+    Index("ix_split_lines_split_id", "split_id", unique=True),
 )
