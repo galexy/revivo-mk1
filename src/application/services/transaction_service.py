@@ -117,6 +117,7 @@ class TransactionService:
                 # Create mirror (incoming to target account)
                 mirror = Transaction.create_mirror(
                     source_transaction=source_transaction,
+                    source_split=split,
                     target_account_id=split.transfer_account_id,
                     amount=split.amount,  # Will be negated to positive in create_mirror
                     effective_date=source_transaction.effective_date,
@@ -201,6 +202,7 @@ class TransactionService:
                 # Create new mirror
                 mirror = Transaction.create_mirror(
                     source_transaction=source_transaction,
+                    source_split=split,
                     target_account_id=AccountId.from_string(acct_id),
                     amount=split.amount,
                     effective_date=source_transaction.effective_date,

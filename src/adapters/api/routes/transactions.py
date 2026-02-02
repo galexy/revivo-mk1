@@ -84,7 +84,7 @@ def create_transaction(
     splits = []
     for split_req in request.splits:
         try:
-            split = SplitLine(
+            split = SplitLine.create(
                 amount=Money(split_req.amount.amount, split_req.amount.currency),
                 category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
                 transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
@@ -218,7 +218,7 @@ def update_transaction(
         new_splits = []
         for split_req in request.splits:
             try:
-                split = SplitLine(
+                split = SplitLine.create(
                     amount=Money(split_req.amount.amount, split_req.amount.currency),
                     category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
                     transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,

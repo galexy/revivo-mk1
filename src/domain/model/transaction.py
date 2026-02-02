@@ -23,7 +23,7 @@ from src.domain.events.transaction_events import (
     TransactionStatusChanged,
     TransactionUpdated,
 )
-from src.domain.model.entity_id import AccountId, PayeeId, TransactionId, UserId
+from src.domain.model.entity_id import AccountId, PayeeId, SplitId, TransactionId, UserId
 from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction_types import TransactionSource, TransactionStatus
@@ -72,6 +72,7 @@ class Transaction:
 
     # Mirror transaction link (for transfer targets)
     source_transaction_id: TransactionId | None = None  # If this is a mirror
+    source_split_id: SplitId | None = None  # Which split created this mirror
     is_mirror: bool = False
 
     # Audit
@@ -182,6 +183,7 @@ class Transaction:
     def create_mirror(
         cls,
         source_transaction: "Transaction",
+        source_split: SplitLine,
         target_account_id: AccountId,
         amount: Money,
         effective_date: date,
@@ -193,13 +195,21 @@ class Transaction:
         - Single split on mirrors for categorization
         - Inherits memo from source
         - Effective date syncs with source; posted_date independent
+        - Links to source split via source_split_id for proper matching
+
+        Args:
+            source_transaction: The source transaction containing the transfer split.
+            source_split: The specific transfer split that triggers this mirror.
+            target_account_id: Account receiving the transfer.
+            amount: Transfer amount (will be made positive for mirror).
+            effective_date: When transfer logically occurred.
         """
         # Mirror amount is positive (incoming to target account)
         if amount.is_negative():
             amount = Money(-amount.amount, amount.currency)
 
         # Create single split for categorization (Uncategorized/Transfer)
-        mirror_split = SplitLine(
+        mirror_split = SplitLine.create(
             amount=amount,
             category_id=None,  # Will be "Uncategorized" or "Transfer" meta-category
             transfer_account_id=None,  # Mirrors don't have transfer splits
@@ -220,6 +230,7 @@ class Transaction:
             payee_name=source_transaction.payee_name,
             memo=source_transaction.memo,
             source_transaction_id=source_transaction.id,
+            source_split_id=source_split.id,
             is_mirror=True,
         )
 
@@ -416,15 +427,17 @@ class Transaction:
 
         Used by TransactionService to sync mirror amounts when source splits change.
         Mirror transactions have a single split that must also be updated.
+        Split ID is preserved since SplitLine is immutable and recreated with same ID.
         """
         old_amount = self.amount
         self.amount = new_amount
 
-        # Update single split for mirrors
+        # Update single split for mirrors, preserving the split ID
         if self.is_mirror and len(self.splits) == 1:
             old_split = self.splits[0]
             self.splits = [
                 SplitLine(
+                    id=old_split.id,  # Preserve split ID across updates
                     amount=new_amount,
                     category_id=old_split.category_id,
                     transfer_account_id=old_split.transfer_account_id,

@@ -14,6 +14,7 @@ from src.domain.model.entity_id import (
     AccountId,
     CategoryId,
     PayeeId,
+    SplitId,
     TransactionId,
     UserId,
 )
@@ -41,13 +42,17 @@ class SqlAlchemyTransactionRepository:
         self._session = session
 
     def _load_splits(self, transaction_id: TransactionId) -> list[SplitLine]:
-        """Load and reconstruct SplitLine value objects for a transaction.
+        """Load and reconstruct SplitLine entities for a transaction.
 
         Args:
             transaction_id: The transaction identifier.
 
         Returns:
-            List of SplitLine value objects ordered by sort_order.
+            List of SplitLine entities ordered by sort_order.
+
+        Note:
+            SplitId is generated on load until DB migration adds split_id column.
+            This is a temporary measure - once DB stores split_id, it will be loaded.
         """
         stmt = (
             select(split_lines)
@@ -68,7 +73,9 @@ class SqlAlchemyTransactionRepository:
                 else None
             )
 
+            # Generate SplitId for now - DB migration will add split_id column
             split = SplitLine(
+                id=SplitId.generate(),
                 amount=amount,
                 category_id=category_id,
                 transfer_account_id=transfer_account_id,

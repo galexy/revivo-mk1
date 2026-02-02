@@ -1,4 +1,4 @@
-"""SplitLine value object for transaction split lines.
+"""SplitLine entity for transaction split lines.
 
 Each transaction has 1+ split lines (even single-category transactions
 have one split). Split amounts are signed:
@@ -6,11 +6,15 @@ have one split). Split amounts are signed:
 - Negative = outflow (expense)
 
 Splits must sum exactly to the transaction amount.
+
+SplitLine has identity (SplitId) for PATCH semantics - clients can reference
+specific splits by ID, and mirrors can be correctly matched to source splits.
 """
 
 from dataclasses import dataclass
+from typing import Self
 
-from src.domain.model.entity_id import AccountId, CategoryId
+from src.domain.model.entity_id import AccountId, CategoryId, SplitId
 from src.domain.model.money import Money
 
 
@@ -23,12 +27,14 @@ class SplitLine:
     Transfer splits must be negative (outgoing from source account).
 
     Attributes:
+        id: Unique identifier for this split line.
         amount: SIGNED amount (positive for inflow, negative for outflow).
         category_id: Category for expense/income splits (mutually exclusive with transfer_account_id).
         transfer_account_id: Target account for transfer splits (mutually exclusive with category_id).
         memo: Optional per-split memo.
     """
 
+    id: SplitId
     amount: Money
     category_id: CategoryId | None = None
     transfer_account_id: AccountId | None = None
@@ -48,6 +54,36 @@ class SplitLine:
         # Transfer splits must be negative (outgoing from source account)
         if self.transfer_account_id is not None and not self.amount.is_negative():
             raise ValueError("Transfer split amount must be negative (outgoing)")
+
+    @classmethod
+    def create(
+        cls,
+        amount: Money,
+        category_id: CategoryId | None = None,
+        transfer_account_id: AccountId | None = None,
+        memo: str | None = None,
+    ) -> Self:
+        """Factory method that generates ID.
+
+        Use this factory when creating new splits. The generated ID persists
+        across updates (create new SplitLine with same ID when modifying).
+
+        Args:
+            amount: SIGNED amount (positive for inflow, negative for outflow).
+            category_id: Category for expense/income splits.
+            transfer_account_id: Target account for transfer splits.
+            memo: Optional per-split memo.
+
+        Returns:
+            New SplitLine with generated ID.
+        """
+        return cls(
+            id=SplitId.generate(),
+            amount=amount,
+            category_id=category_id,
+            transfer_account_id=transfer_account_id,
+            memo=memo,
+        )
 
     @property
     def is_transfer(self) -> bool:
