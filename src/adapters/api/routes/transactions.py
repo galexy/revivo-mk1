@@ -83,12 +83,18 @@ def create_transaction(
 
     splits = []
     for split_req in request.splits:
-        split = SplitLine(
-            amount=Money(split_req.amount.amount, split_req.amount.currency),
-            category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-            transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
-            memo=split_req.memo,
-        )
+        try:
+            split = SplitLine(
+                amount=Money(split_req.amount.amount, split_req.amount.currency),
+                category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
+                transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                memo=split_req.memo,
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"code": "INVALID_SPLIT", "message": str(e)},
+            )
         splits.append(split)
 
     result = service.create_transaction(
@@ -211,12 +217,18 @@ def update_transaction(
         # Convert splits to domain objects
         new_splits = []
         for split_req in request.splits:
-            split = SplitLine(
-                amount=Money(split_req.amount.amount, split_req.amount.currency),
-                category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-                transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
-                memo=split_req.memo,
-            )
+            try:
+                split = SplitLine(
+                    amount=Money(split_req.amount.amount, split_req.amount.currency),
+                    category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
+                    transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                    memo=split_req.memo,
+                )
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={"code": "INVALID_SPLIT", "message": str(e)},
+                )
             new_splits.append(split)
 
         new_amount = Money(request.amount.amount, request.amount.currency)

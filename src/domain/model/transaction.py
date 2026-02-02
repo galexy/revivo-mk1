@@ -362,9 +362,15 @@ class Transaction:
         )
 
     def mark_reconciled(self) -> None:
-        """Mark transaction as reconciled."""
+        """Mark transaction as reconciled.
+
+        Status progression: PENDING -> CLEARED -> RECONCILED
+        Must be cleared before reconciling.
+        """
         if self.status == TransactionStatus.RECONCILED:
             raise ValueError("Transaction is already reconciled")
+        if self.status == TransactionStatus.PENDING:
+            raise ValueError("Transaction must be cleared before reconciling")
 
         old_status = self.status
         self.status = TransactionStatus.RECONCILED

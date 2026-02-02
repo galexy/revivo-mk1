@@ -581,3 +581,264 @@ class TestTransactionAPI:
         data = response.json()
         assert Decimal(data["amount"]["amount"]) == Decimal("2500.00")
         assert data["payee_name"] == "Employer Inc"
+
+    # ===== Edge Case Tests (from UAT) =====
+
+    def test_mixed_category_and_transfer_splits(self, client, test_account):
+        """Transaction with both category and transfer splits should work."""
+        # Create credit card account and category
+        cc_response = client.post(
+            "/api/v1/accounts/credit-card",
+            json={
+                "name": "Credit Card Mixed",
+                "opening_balance": {"amount": "-1000.00", "currency": "USD"},
+                "credit_limit": {"amount": "5000.00", "currency": "USD"},
+            },
+        )
+        assert cc_response.status_code == 201
+        cc_account = cc_response.json()
+
+        cashback_cat = client.post(
+            "/api/v1/categories",
+            json={"name": "Cash Back Rewards"},
+        ).json()
+
+        # Create transaction: -500 transfer to CC, +20 cash back = -480 net
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-480.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-500.00", "currency": "USD"},
+                        "transfer_account_id": cc_account["id"],
+                    },
+                    {
+                        "amount": {"amount": "20.00", "currency": "USD"},
+                        "category_id": cashback_cat["id"],
+                    },
+                ],
+            },
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert len(data["splits"]) == 2
+
+        # Verify mirror created for transfer portion
+        cc_txns = client.get(f"/api/v1/transactions?account_id={cc_account['id']}").json()
+        assert len(cc_txns["transactions"]) == 1
+        assert cc_txns["transactions"][0]["is_mirror"] is True
+
+    def test_positive_transfer_split_rejected(self, client, test_account):
+        """Transfer splits must be negative (outgoing from source)."""
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings Positive Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "100.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+
+        assert response.status_code == 400
+
+    def test_mixed_income_expense_splits(self, client, test_account):
+        """Transaction can have both positive and negative splits (refund scenario)."""
+        refund_cat = client.post("/api/v1/categories", json={"name": "Refunds"}).json()
+        fee_cat = client.post("/api/v1/categories", json={"name": "Fees"}).json()
+
+        # +100 refund, -15 restocking fee = +85 net
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "85.00", "currency": "USD"},
+                "splits": [
+                    {"amount": {"amount": "100.00", "currency": "USD"}, "category_id": refund_cat["id"]},
+                    {"amount": {"amount": "-15.00", "currency": "USD"}, "category_id": fee_cat["id"]},
+                ],
+            },
+        )
+
+        assert response.status_code == 201
+        assert len(response.json()["splits"]) == 2
+
+    def test_empty_splits_rejected(self, client, test_account):
+        """Transaction must have at least one split."""
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-50.00", "currency": "USD"},
+                "splits": [],
+            },
+        )
+
+        assert response.status_code in (400, 422)
+
+    def test_cannot_reconcile_pending_transaction(self, client, test_account, test_category):
+        """Must clear before reconciling."""
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-25.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-25.00", "currency": "USD"}, "category_id": test_category["id"]}],
+            },
+        )
+        txn_id = create_response.json()["id"]
+
+        response = client.post(f"/api/v1/transactions/{txn_id}/reconcile")
+
+        assert response.status_code == 400
+        assert "INVALID_STATUS_TRANSITION" in response.json()["detail"]["code"]
+
+    def test_cannot_patch_mirror_directly(self, client, test_account):
+        """Mirror transactions cannot be modified directly."""
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={"name": "Savings Mirror Test", "opening_balance": {"amount": "0.00", "currency": "USD"}},
+        ).json()
+
+        client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-300.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-300.00", "currency": "USD"}, "transfer_account_id": savings["id"]}],
+            },
+        )
+
+        savings_txns = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        mirror_id = savings_txns["transactions"][0]["id"]
+
+        response = client.patch(f"/api/v1/transactions/{mirror_id}", json={"memo": "Try modify"})
+
+        assert response.status_code == 400
+        assert "CANNOT_MODIFY_MIRROR" in response.json()["detail"]["code"]
+
+    def test_update_transfer_syncs_mirror(self, client, test_account):
+        """Updating source transfer amount should update mirror."""
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={"name": "Savings Sync Test", "opening_balance": {"amount": "0.00", "currency": "USD"}},
+        ).json()
+
+        source = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-500.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-500.00", "currency": "USD"}, "transfer_account_id": savings["id"]}],
+            },
+        ).json()
+
+        # Update to -600
+        client.patch(
+            f"/api/v1/transactions/{source['id']}",
+            json={
+                "amount": {"amount": "-600.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-600.00", "currency": "USD"}, "transfer_account_id": savings["id"]}],
+            },
+        )
+
+        savings_txns = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert Decimal(savings_txns["transactions"][0]["amount"]["amount"]) == Decimal("600.00")
+
+    def test_transaction_with_subcategory(self, client, test_account):
+        """Can assign transaction to subcategory."""
+        parent = client.post("/api/v1/categories", json={"name": "Food & Dining"}).json()
+        child = client.post("/api/v1/categories", json={"name": "Restaurants", "parent_id": parent["id"]}).json()
+
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-45.00", "currency": "USD"},
+                "splits": [{"amount": {"amount": "-45.00", "currency": "USD"}, "category_id": child["id"]}],
+            },
+        )
+
+        assert response.status_code == 201
+        assert response.json()["splits"][0]["category_id"] == child["id"]
+
+    def test_split_with_both_category_and_transfer_rejected(self, client, test_account):
+        """Single split cannot have both category_id and transfer_account_id."""
+        cat = client.post("/api/v1/categories", json={"name": "Invalid Split"}).json()
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={"name": "Savings Both Test", "opening_balance": {"amount": "0.00", "currency": "USD"}},
+        ).json()
+
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": cat["id"],
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+
+        assert response.status_code == 400
+
+    def test_multiple_transfers_in_transaction(self, client, test_account):
+        """Can split transfer across multiple destination accounts."""
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={"name": "Savings Multi", "opening_balance": {"amount": "0.00", "currency": "USD"}},
+        ).json()
+        investment = client.post(
+            "/api/v1/accounts/brokerage",
+            json={"name": "Investment Multi", "opening_balance": {"amount": "0.00", "currency": "USD"}},
+        ).json()
+
+        response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-1000.00", "currency": "USD"},
+                "splits": [
+                    {"amount": {"amount": "-600.00", "currency": "USD"}, "transfer_account_id": savings["id"]},
+                    {"amount": {"amount": "-400.00", "currency": "USD"}, "transfer_account_id": investment["id"]},
+                ],
+            },
+        )
+
+        assert response.status_code == 201
+
+        savings_txns = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        invest_txns = client.get(f"/api/v1/transactions?account_id={investment['id']}").json()
+
+        assert len(savings_txns["transactions"]) == 1
+        assert len(invest_txns["transactions"]) == 1

@@ -251,7 +251,7 @@ class TransactionService:
                 )
             valid, msg = self._validate_splits(user_id, account_id, splits, amount)
             if not valid:
-                return TransactionError("INVALID_SPLITS", msg)
+                return TransactionError("INVALID_SPLITS", msg or "Invalid splits")
 
             # Get or create payee
             payee_id, payee_display = self._get_or_create_payee(user_id, payee_name)
@@ -373,6 +373,13 @@ class TransactionService:
                     "NOT_OWNED", "Transaction does not belong to user"
                 )
 
+            # Cannot modify mirror transactions - must modify source
+            if txn.is_mirror:
+                return TransactionError(
+                    "CANNOT_MODIFY_MIRROR",
+                    "Cannot modify mirror transaction. Update the source transaction instead.",
+                )
+
             # Warn if reconciled (per CONTEXT)
             if txn.status == TransactionStatus.RECONCILED:
                 # Still allow, but caller should show warning
@@ -408,6 +415,13 @@ class TransactionService:
             if txn.user_id != user_id:
                 return TransactionError(
                     "NOT_OWNED", "Transaction does not belong to user"
+                )
+
+            # Cannot modify mirror transactions - must modify source
+            if txn.is_mirror:
+                return TransactionError(
+                    "CANNOT_MODIFY_MIRROR",
+                    "Cannot modify mirror transaction. Update the source transaction instead.",
                 )
 
             if effective_date:
@@ -487,7 +501,7 @@ class TransactionService:
                 user_id, txn.account_id, new_splits, new_amount
             )
             if not valid:
-                return TransactionError("INVALID_SPLITS", msg)
+                return TransactionError("INVALID_SPLITS", msg or "Invalid splits")
 
             # Store old splits for mirror sync
             old_splits = list(txn.splits)
@@ -555,7 +569,7 @@ class TransactionService:
             try:
                 txn.mark_reconciled()
             except ValueError as e:
-                return TransactionError("STATUS_ERROR", str(e))
+                return TransactionError("INVALID_STATUS_TRANSITION", str(e))
 
             self._uow.transactions.update(txn)
             self._uow.collect_events(txn.events)
