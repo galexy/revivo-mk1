@@ -97,11 +97,12 @@ Plans:
   3. Invalid account/category IDs return 400 (not 500)
   4. Split must have exactly one of category_id or transfer_account_id
   5. Categories have income/expense type
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03.1-01: TBD
-- [ ] 03.1-02: TBD
+- [ ] 03.1-01-PLAN.md — Domain model changes (SplitId, SplitLine entity, CategoryType)
+- [ ] 03.1-02-PLAN.md — Persistence and API updates (migration, repositories, schemas, exception handler)
+- [ ] 03.1-03-PLAN.md — Integration tests and verification
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -221,14 +222,14 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete | 2026-01-30 |
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
-| 3.1 Split Identity & Validation | 0/2 | Not started | - |
+| 3.1 Split Identity & Validation | 0/3 | Not started | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |
