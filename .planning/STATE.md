@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 3 of 10 (Transaction Domain)
-Plan: 4 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 03-04-PLAN.md (Transaction Repository)
+Last activity: 2026-02-02 - Completed 03-05-PLAN.md (Transaction Application Service)
 
-Progress: [████░░░░░░] ~43%
+Progress: [████░░░░░░] ~46%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 6.5 min
-- Total execution time: 1.77 hours
+- Total plans completed: 17
+- Average duration: 6.2 min
+- Total execution time: 1.81 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] ~43%
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
-| 03-transaction-domain | 4 | 12 min | 3.0 min |
+| 03-transaction-domain | 5 | 14 min | 2.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-06 (25 min), 03-01 (2 min), 03-02 (2 min), 03-03 (4 min), 03-04 (4 min)
+- Last 5 plans: 03-01 (2 min), 03-02 (2 min), 03-03 (4 min), 03-04 (4 min), 03-05 (2 min)
 - Trend: Transaction domain plans executing efficiently
 
 *Updated after each plan completion*
@@ -95,6 +95,9 @@ Recent decisions affecting current work:
 - Transaction.splits and amount excluded from mapper, handled in repository
 - SplitLine not mapped directly (frozen dataclass with Money)
 - Full-text search via PostgreSQL TSVECTOR/GIN index
+- CategoryError/TransactionError dataclasses for explicit failures (matches AccountError pattern)
+- Mirror sync handled in service layer via _sync_mirrors_for_split_update
+- Transaction.update_amount method for mirror amount sync
 
 ### Pending Todos
 
@@ -107,7 +110,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-04-PLAN.md (Transaction Repository)
+Stopped at: Completed 03-05-PLAN.md (Transaction Application Service)
 Resume file: None
 
 ## Phase 1 Milestone
@@ -163,4 +166,10 @@ Plan 04: Transaction Repository - COMPLETE
 - SqlAlchemyTransactionRepository with split line handling
 - UnitOfWork updated with all transaction domain repositories
 
-Next: Plan 05 - Transaction Application Service
+Plan 05: Transaction Application Service - COMPLETE
+- CategoryService with CRUD and hierarchy support
+- TransactionService with full CRUD, split updates, mirror sync
+- Auto-payee creation pattern
+- Transaction.update_amount for mirror sync
+
+Next: Plan 06 - Transaction REST API
