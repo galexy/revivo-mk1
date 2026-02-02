@@ -21,12 +21,14 @@ Note: Uses the placeholder user ID from the API until Phase 4 authentication.
 """
 
 import os
+from collections.abc import Generator
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.adapters.api.app import create_app
@@ -34,9 +36,12 @@ from src.adapters.persistence.orm.base import metadata
 from src.adapters.persistence.orm.mappers import clear_mappers, start_mappers
 from src.adapters.persistence.orm.tables import users
 
+# Type alias for fixture return types
+JsonDict = dict[str, Any]
+
 
 @pytest.fixture(scope="module")
-def database_url():
+def database_url() -> str:
     """Get test database URL."""
     return os.getenv(
         "TEST_DATABASE_URL",
@@ -45,13 +50,13 @@ def database_url():
 
 
 @pytest.fixture(scope="module")
-def engine(database_url):
+def engine(database_url: str) -> Engine:
     """Create database engine for tests."""
     return create_engine(database_url, echo=False)
 
 
 @pytest.fixture(scope="module")
-def setup_database(engine, database_url):
+def setup_database(engine: Engine, database_url: str) -> Generator[None, None, None]:
     """Set up test database with fresh tables."""
     os.environ["DATABASE_URL"] = database_url
 
@@ -83,14 +88,14 @@ def setup_database(engine, database_url):
 
 
 @pytest.fixture
-def client(setup_database):
+def client(setup_database: None) -> TestClient:
     """Create test client with fresh app instance."""
     app = create_app()
     return TestClient(app)
 
 
 @pytest.fixture
-def test_account(client):
+def test_account(client: TestClient) -> JsonDict:
     """Create a test account for transactions."""
     response = client.post(
         "/api/v1/accounts/checking",
@@ -104,7 +109,7 @@ def test_account(client):
 
 
 @pytest.fixture
-def test_category(client):
+def test_category(client: TestClient) -> JsonDict:
     """Create a test category for transactions."""
     response = client.post(
         "/api/v1/categories",
@@ -117,7 +122,7 @@ def test_category(client):
 class TestTransactionAPI:
     """Tests for /api/v1/transactions endpoints."""
 
-    def test_create_simple_expense(self, client, test_account, test_category):
+    def test_create_simple_expense(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """POST /transactions should create expense with single split."""
         response = client.post(
             "/api/v1/transactions",
@@ -148,7 +153,7 @@ class TestTransactionAPI:
         assert data["status"] == "pending"
         assert data["is_mirror"] is False
 
-    def test_create_split_transaction(self, client, test_account):
+    def test_create_split_transaction(self, client: TestClient, test_account: JsonDict) -> None:
         """POST /transactions should create multi-split transaction."""
         # Create two categories
         cat1 = client.post("/api/v1/categories", json={"name": "Food Items"}).json()
@@ -183,7 +188,7 @@ class TestTransactionAPI:
         assert Decimal("-70.00") in split_amounts
         assert Decimal("-30.00") in split_amounts
 
-    def test_create_transfer_creates_mirror(self, client, test_account):
+    def test_create_transfer_creates_mirror(self, client: TestClient, test_account: JsonDict) -> None:
         """POST /transactions with transfer split should create mirror."""
         # Create second account
         savings = client.post(
@@ -230,7 +235,7 @@ class TestTransactionAPI:
         # Mirror amount is positive (incoming)
         assert Decimal(mirror["amount"]["amount"]) == Decimal("500.00")
 
-    def test_splits_must_sum_to_amount(self, client, test_account, test_category):
+    def test_splits_must_sum_to_amount(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """POST /transactions should reject if splits don't sum to amount."""
         response = client.post(
             "/api/v1/transactions",
@@ -250,7 +255,7 @@ class TestTransactionAPI:
         assert response.status_code == 400
         assert "INVALID_SPLITS" in response.json()["detail"]["code"]
 
-    def test_cannot_self_transfer(self, client, test_account):
+    def test_cannot_self_transfer(self, client: TestClient, test_account: JsonDict) -> None:
         """POST /transactions should reject transfer to same account."""
         response = client.post(
             "/api/v1/transactions",
@@ -270,7 +275,7 @@ class TestTransactionAPI:
         assert response.status_code == 400
         assert "same account" in response.json()["detail"]["message"].lower()
 
-    def test_get_transaction(self, client, test_account, test_category):
+    def test_get_transaction(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """GET /transactions/{id} should return transaction with splits."""
         # Create transaction
         create_response = client.post(
@@ -297,7 +302,7 @@ class TestTransactionAPI:
         assert data["id"] == txn_id
         assert len(data["splits"]) == 1
 
-    def test_filter_by_account(self, client, test_account, test_category):
+    def test_filter_by_account(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """GET /transactions?account_id= should filter by account."""
         # Create transaction
         client.post(
@@ -318,7 +323,7 @@ class TestTransactionAPI:
         assert data["total"] >= 1
         assert all(t["account_id"] == test_account["id"] for t in data["transactions"])
 
-    def test_filter_by_date_range(self, client, test_account, test_category):
+    def test_filter_by_date_range(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """GET /transactions?date_from=&date_to= should filter by date."""
         today = date.today()
 
@@ -342,7 +347,7 @@ class TestTransactionAPI:
         data = response.json()
         assert all(t["effective_date"] == today.isoformat() for t in data["transactions"])
 
-    def test_search_transactions(self, client, test_account, test_category):
+    def test_search_transactions(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """GET /transactions?search= should full-text search."""
         # Create transaction with specific payee
         unique_payee = f"UniqueSearchPayee{date.today().isoformat().replace('-', '')}"
@@ -365,7 +370,7 @@ class TestTransactionAPI:
         assert data["total"] >= 1
         assert any(unique_payee in (t.get("payee_name") or "") for t in data["transactions"])
 
-    def test_mark_cleared(self, client, test_account, test_category):
+    def test_mark_cleared(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """POST /transactions/{id}/clear should mark as cleared."""
         # Create transaction
         create_response = client.post(
@@ -386,7 +391,7 @@ class TestTransactionAPI:
         assert response.status_code == 200
         assert response.json()["status"] == "cleared"
 
-    def test_mark_reconciled(self, client, test_account, test_category):
+    def test_mark_reconciled(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """POST /transactions/{id}/reconcile should mark as reconciled."""
         # Create and clear transaction
         create_response = client.post(
@@ -409,7 +414,7 @@ class TestTransactionAPI:
         assert response.status_code == 200
         assert response.json()["status"] == "reconciled"
 
-    def test_delete_transaction(self, client, test_account, test_category):
+    def test_delete_transaction(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """DELETE /transactions/{id} should delete transaction."""
         # Create transaction
         create_response = client.post(
@@ -431,7 +436,7 @@ class TestTransactionAPI:
         get_response = client.get(f"/api/v1/transactions/{txn_id}")
         assert get_response.status_code == 404
 
-    def test_delete_source_deletes_mirrors(self, client, test_account):
+    def test_delete_source_deletes_mirrors(self, client: TestClient, test_account: JsonDict) -> None:
         """DELETE source transaction should also delete its mirrors."""
         # Create savings account
         savings = client.post(
@@ -471,7 +476,7 @@ class TestTransactionAPI:
         mirror_response = client.get(f"/api/v1/transactions/{mirror_id}")
         assert mirror_response.status_code == 404
 
-    def test_cannot_delete_mirror_directly(self, client, test_account):
+    def test_cannot_delete_mirror_directly(self, client: TestClient, test_account: JsonDict) -> None:
         """DELETE mirror transaction should fail."""
         # Create savings and transfer
         savings = client.post(
@@ -507,7 +512,7 @@ class TestTransactionAPI:
         assert response.status_code == 400
         assert "CANNOT_DELETE_MIRROR" in response.json()["detail"]["code"]
 
-    def test_auto_creates_payee(self, client, test_account, test_category):
+    def test_auto_creates_payee(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """Creating transaction with new payee should auto-create it."""
         unique_payee = f"NewPayee_{date.today().isoformat()}"
 
@@ -528,12 +533,12 @@ class TestTransactionAPI:
         assert data["payee_id"] is not None
         assert data["payee_id"].startswith("payee_")
 
-    def test_get_nonexistent_transaction(self, client):
+    def test_get_nonexistent_transaction(self, client: TestClient) -> None:
         """GET /transactions/{id} returns 404 for nonexistent."""
         response = client.get("/api/v1/transactions/txn_01h455vb4pex5vsknk084sn02q")
         assert response.status_code == 404
 
-    def test_update_transaction_memo(self, client, test_account, test_category):
+    def test_update_transaction_memo(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """PATCH /transactions/{id} should update memo."""
         # Create transaction
         create_response = client.post(
@@ -557,7 +562,7 @@ class TestTransactionAPI:
         assert response.status_code == 200
         assert response.json()["memo"] == "Updated memo"
 
-    def test_create_income_transaction(self, client, test_account, test_category):
+    def test_create_income_transaction(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """POST /transactions should create income with positive amount."""
         response = client.post(
             "/api/v1/transactions",
@@ -584,7 +589,7 @@ class TestTransactionAPI:
 
     # ===== Edge Case Tests (from UAT) =====
 
-    def test_mixed_category_and_transfer_splits(self, client, test_account):
+    def test_mixed_category_and_transfer_splits(self, client: TestClient, test_account: JsonDict) -> None:
         """Transaction with both category and transfer splits should work."""
         # Create credit card account and category
         cc_response = client.post(
@@ -632,7 +637,7 @@ class TestTransactionAPI:
         assert len(cc_txns["transactions"]) == 1
         assert cc_txns["transactions"][0]["is_mirror"] is True
 
-    def test_positive_transfer_split_rejected(self, client, test_account):
+    def test_positive_transfer_split_rejected(self, client: TestClient, test_account: JsonDict) -> None:
         """Transfer splits must be negative (outgoing from source)."""
         savings = client.post(
             "/api/v1/accounts/savings",
@@ -659,7 +664,7 @@ class TestTransactionAPI:
 
         assert response.status_code == 400
 
-    def test_mixed_income_expense_splits(self, client, test_account):
+    def test_mixed_income_expense_splits(self, client: TestClient, test_account: JsonDict) -> None:
         """Transaction can have both positive and negative splits (refund scenario)."""
         refund_cat = client.post("/api/v1/categories", json={"name": "Refunds"}).json()
         fee_cat = client.post("/api/v1/categories", json={"name": "Fees"}).json()
@@ -681,7 +686,7 @@ class TestTransactionAPI:
         assert response.status_code == 201
         assert len(response.json()["splits"]) == 2
 
-    def test_empty_splits_rejected(self, client, test_account):
+    def test_empty_splits_rejected(self, client: TestClient, test_account: JsonDict) -> None:
         """Transaction must have at least one split."""
         response = client.post(
             "/api/v1/transactions",
@@ -695,7 +700,7 @@ class TestTransactionAPI:
 
         assert response.status_code in (400, 422)
 
-    def test_cannot_reconcile_pending_transaction(self, client, test_account, test_category):
+    def test_cannot_reconcile_pending_transaction(self, client: TestClient, test_account: JsonDict, test_category: JsonDict) -> None:
         """Must clear before reconciling."""
         create_response = client.post(
             "/api/v1/transactions",
@@ -713,7 +718,7 @@ class TestTransactionAPI:
         assert response.status_code == 400
         assert "INVALID_STATUS_TRANSITION" in response.json()["detail"]["code"]
 
-    def test_cannot_patch_mirror_directly(self, client, test_account):
+    def test_cannot_patch_mirror_directly(self, client: TestClient, test_account: JsonDict) -> None:
         """Mirror transactions cannot be modified directly."""
         savings = client.post(
             "/api/v1/accounts/savings",
@@ -738,7 +743,7 @@ class TestTransactionAPI:
         assert response.status_code == 400
         assert "CANNOT_MODIFY_MIRROR" in response.json()["detail"]["code"]
 
-    def test_update_transfer_syncs_mirror(self, client, test_account):
+    def test_update_transfer_syncs_mirror(self, client: TestClient, test_account: JsonDict) -> None:
         """Updating source transfer amount should update mirror."""
         savings = client.post(
             "/api/v1/accounts/savings",
@@ -767,7 +772,7 @@ class TestTransactionAPI:
         savings_txns = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
         assert Decimal(savings_txns["transactions"][0]["amount"]["amount"]) == Decimal("600.00")
 
-    def test_transaction_with_subcategory(self, client, test_account):
+    def test_transaction_with_subcategory(self, client: TestClient, test_account: JsonDict) -> None:
         """Can assign transaction to subcategory."""
         parent = client.post("/api/v1/categories", json={"name": "Food & Dining"}).json()
         child = client.post("/api/v1/categories", json={"name": "Restaurants", "parent_id": parent["id"]}).json()
@@ -785,7 +790,7 @@ class TestTransactionAPI:
         assert response.status_code == 201
         assert response.json()["splits"][0]["category_id"] == child["id"]
 
-    def test_split_with_both_category_and_transfer_rejected(self, client, test_account):
+    def test_split_with_both_category_and_transfer_rejected(self, client: TestClient, test_account: JsonDict) -> None:
         """Single split cannot have both category_id and transfer_account_id."""
         cat = client.post("/api/v1/categories", json={"name": "Invalid Split"}).json()
         savings = client.post(
@@ -811,7 +816,7 @@ class TestTransactionAPI:
 
         assert response.status_code == 400
 
-    def test_multiple_transfers_in_transaction(self, client, test_account):
+    def test_multiple_transfers_in_transaction(self, client: TestClient, test_account: JsonDict) -> None:
         """Can split transfer across multiple destination accounts."""
         savings = client.post(
             "/api/v1/accounts/savings",
@@ -847,7 +852,7 @@ class TestTransactionAPI:
 class TestTransactionValidationErrors:
     """Tests for proper 400/422 responses on validation errors."""
 
-    def test_invalid_account_id_returns_400(self, client, setup_database) -> None:
+    def test_invalid_account_id_returns_400(self, client: TestClient, setup_database: None) -> None:
         """Invalid account ID format should return 400, not 500."""
         response = client.post(
             "/api/v1/transactions",
@@ -861,7 +866,7 @@ class TestTransactionValidationErrors:
         assert response.status_code == 400
         assert "INVALID_ID_FORMAT" in response.json().get("detail", {}).get("code", "")
 
-    def test_invalid_category_id_returns_400(self, client, test_account) -> None:
+    def test_invalid_category_id_returns_400(self, client: TestClient, test_account: JsonDict) -> None:
         """Invalid category ID format should return 400, not 500."""
         response = client.post(
             "/api/v1/transactions",
@@ -879,7 +884,7 @@ class TestTransactionValidationErrors:
         )
         assert response.status_code == 400
 
-    def test_empty_string_category_id_returns_422(self, client, test_account) -> None:
+    def test_empty_string_category_id_returns_422(self, client: TestClient, test_account: JsonDict) -> None:
         """Empty string category_id should return 422 (Pydantic validation)."""
         response = client.post(
             "/api/v1/transactions",
@@ -900,7 +905,7 @@ class TestTransactionValidationErrors:
         assert "category_id" in str(response.json())
 
     def test_empty_string_transfer_account_id_returns_422(
-        self, client, test_account
+        self, client: TestClient, test_account: JsonDict
     ) -> None:
         """Empty string transfer_account_id should return 422."""
         response = client.post(
@@ -925,7 +930,7 @@ class TestSplitIdentity:
     """Tests for split ID persistence and PATCH semantics."""
 
     def test_transaction_response_includes_split_ids(
-        self, client, test_account
+        self, client: TestClient, test_account: JsonDict
     ) -> None:
         """Transaction response should include split IDs."""
         # Create transaction
@@ -944,7 +949,7 @@ class TestSplitIdentity:
         assert "id" in data["splits"][0]
         assert data["splits"][0]["id"].startswith("split_")
 
-    def test_split_ids_persist_across_get(self, client, test_account) -> None:
+    def test_split_ids_persist_across_get(self, client: TestClient, test_account: JsonDict) -> None:
         """Split IDs should persist when getting transaction."""
         # Create
         create_response = client.post(
@@ -965,7 +970,7 @@ class TestSplitIdentity:
         assert get_response.json()["splits"][0]["id"] == split_id
 
     def test_patch_with_split_id_updates_specific_split(
-        self, client, test_account, test_category
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
     ) -> None:
         """PATCH with split ID should update that specific split."""
         # Create transaction with two splits
@@ -1016,7 +1021,7 @@ class TestSplitIdentity:
         assert split_amounts[split1_id] == Decimal("-70.00")
         assert split_amounts[split2_id] == Decimal("-30.00")
 
-    def test_mirror_transaction_has_source_split_id(self, client, test_account) -> None:
+    def test_mirror_transaction_has_source_split_id(self, client: TestClient, test_account: JsonDict) -> None:
         """Mirror transactions should have source_split_id populated."""
         # Create savings account
         savings = client.post(
@@ -1059,7 +1064,7 @@ class TestSplitIdentity:
         assert mirror["source_split_id"] == source_split_id
 
     def test_multi_split_transaction_has_unique_split_ids(
-        self, client, test_account, test_category
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
     ) -> None:
         """Multiple splits in same transaction should each have unique IDs."""
         # Create second category
