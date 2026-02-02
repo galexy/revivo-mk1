@@ -22,7 +22,7 @@ from src.adapters.api.schemas.category import (
     UpdateCategoryRequest,
 )
 from src.application.services.category_service import CategoryError, CategoryService
-from src.domain.model.category import Category
+from src.domain.model.category import Category, CategoryType
 from src.domain.model.entity_id import CategoryId, UserId
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -35,6 +35,7 @@ def _category_to_response(category: Category) -> CategoryResponse:
         user_id=str(category.user_id),
         name=category.name,
         parent_id=str(category.parent_id) if category.parent_id else None,
+        category_type=str(category.category_type),
         is_system=category.is_system,
         is_hidden=category.is_hidden,
         sort_order=category.sort_order,
@@ -52,12 +53,14 @@ def create_category(
 ) -> CategoryResponse:
     """Create a new category."""
     parent_id = CategoryId.from_string(request.parent_id) if request.parent_id else None
+    category_type = CategoryType(request.category_type)
 
     result = service.create_category(
         user_id=user_id,
         name=request.name,
         parent_id=parent_id,
         icon=request.icon,
+        category_type=category_type,
     )
 
     if isinstance(result, CategoryError):

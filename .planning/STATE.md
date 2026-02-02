@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 - Web Interface & API
+**Current focus:** Phase 3.1 - Split Identity & Validation Fixes
 
 ## Current Position
 
-Phase: 3 of 10 (Transaction Domain) - COMPLETE
-Plan: 7 of 7 in current phase
-Status: Phase complete, ready for Phase 4
-Last activity: 2026-02-02 - Completed 03-07-PLAN.md (Integration Tests + UAT)
+Phase: 3.1 of 10 (Split Identity & Validation Fixes)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-02 - Completed 03.1-01-PLAN.md (SplitLine Identity)
 
 Progress: [█████░░░░░] ~50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 6.3 min
-- Total execution time: 2.16 hours
+- Total plans completed: 20
+- Average duration: 6.2 min
+- Total execution time: 2.23 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [█████░░░░░] ~50%
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
+| 03.1-split-identity-validation-fixes | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (4 min), 03-04 (4 min), 03-05 (2 min), 03-06 (6 min), 03-07 (15 min)
-- Trend: Phase 3 complete, ready for Phase 4
+- Last 5 plans: 03-05 (2 min), 03-06 (6 min), 03-07 (15 min), 03.1-01 (4 min)
+- Trend: Phase 3.1 in progress
 
 *Updated after each plan completion*
 
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - Transaction.update_amount method for mirror amount sync
 - Shared dependencies for services in dependencies.py (reusable across routes)
 - UpdateTransactionRequest supports optional splits/amount for full financial updates
+- SplitId follows exact pattern of other entity IDs (frozen dataclass, generate, from_string, prefix "split")
+- SplitLine.id is required first field, .create() factory generates ID
+- Repository generates SplitId on load until DB migration adds split_id column
+- Transaction.source_split_id links mirror transactions to their source splits
 
 ### Pending Todos
 
@@ -112,14 +117,18 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Phase 3.1 inserted to fix UAT issues
+Stopped at: Completed 03.1-01-PLAN.md (SplitLine Identity)
 Resume file: none
-Next action: Plan and execute Phase 3.1 (Split Identity & Validation Fixes)
+Next action: Execute Phase 3.1 Plan 02 (Invalid ID Handling)
 
 ## Roadmap Evolution
 
 - Phase 3.1 inserted after Phase 3: Split Identity & Validation Fixes (URGENT)
   - Fixes UAT issues: invalid ID handling, split validation, category types, split-mirror linkage
+  - Plan 01: SplitLine Identity - COMPLETE
+  - Plan 02: Invalid ID Handling - pending
+  - Plan 03: Database Migration for split_id - pending
+  - Plan 04: CategoryType Integration - pending
 
 ## Phase 1 Milestone
 
@@ -167,4 +176,13 @@ Plans completed (7 of 7):
 - 03-06: REST API endpoints
 - 03-07: Integration tests and UAT verification (28 tests)
 
-Ready for Phase 4: Web Interface & API
+Ready for Phase 3.1: Split Identity & Validation Fixes
+
+## Phase 3.1 Milestone
+
+**Phase 3.1: Split Identity & Validation Fixes - IN PROGRESS**
+
+Fixing UAT issues discovered in Phase 3:
+
+Plans completed (1 of 4):
+- 03.1-01: SplitLine Identity (SplitId, create() factory, source_split_id)

@@ -260,3 +260,97 @@ class TestCategoryAPI:
         """GET /categories/{id} returns 404 for nonexistent."""
         response = client.get("/api/v1/categories/cat_01h455vb4pex5vsknk084sn02q")
         assert response.status_code == 404
+
+
+class TestCategoryType:
+    """Tests for category type field."""
+
+    def test_create_category_default_expense(self, client):
+        """Category should default to expense type."""
+        response = client.post(
+            "/api/v1/categories",
+            json={"name": "Groceries Default Type"},
+        )
+        assert response.status_code == 201
+        assert response.json()["category_type"] == "expense"
+
+    def test_create_category_expense_explicit(self, client):
+        """Can create category with explicit expense type."""
+        response = client.post(
+            "/api/v1/categories",
+            json={"name": "Utilities Explicit", "category_type": "expense"},
+        )
+        assert response.status_code == 201
+        assert response.json()["category_type"] == "expense"
+
+    def test_create_category_income_type(self, client):
+        """Can create category with income type."""
+        response = client.post(
+            "/api/v1/categories",
+            json={"name": "Salary", "category_type": "income"},
+        )
+        assert response.status_code == 201
+        assert response.json()["category_type"] == "income"
+
+    def test_create_category_invalid_type_returns_422(self, client):
+        """Invalid category type should return 422."""
+        response = client.post(
+            "/api/v1/categories",
+            json={"name": "Test Invalid Type", "category_type": "invalid"},
+        )
+        assert response.status_code == 422  # Pydantic validation error
+
+    def test_get_category_includes_type(self, client):
+        """GET category should include category_type."""
+        # Create
+        create_response = client.post(
+            "/api/v1/categories",
+            json={"name": "Utilities Get Type", "category_type": "expense"},
+        )
+        cat_id = create_response.json()["id"]
+
+        # Get
+        get_response = client.get(f"/api/v1/categories/{cat_id}")
+        assert get_response.status_code == 200
+        assert get_response.json()["category_type"] == "expense"
+
+    def test_list_categories_includes_type(self, client):
+        """GET /categories list should include category_type."""
+        # Create category with income type
+        client.post(
+            "/api/v1/categories",
+            json={"name": "Interest Income", "category_type": "income"},
+        )
+
+        # List all
+        response = client.get("/api/v1/categories")
+        assert response.status_code == 200
+
+        # Find the income category
+        categories = response.json()["categories"]
+        income_cat = next((c for c in categories if c["name"] == "Interest Income"), None)
+        assert income_cat is not None
+        assert income_cat["category_type"] == "income"
+
+    def test_category_type_persisted_through_round_trip(self, client):
+        """Category type should persist through create -> get -> list."""
+        # Create income category
+        create_response = client.post(
+            "/api/v1/categories",
+            json={"name": "Dividends", "category_type": "income"},
+        )
+        assert create_response.status_code == 201
+        cat_id = create_response.json()["id"]
+        assert create_response.json()["category_type"] == "income"
+
+        # Get by ID
+        get_response = client.get(f"/api/v1/categories/{cat_id}")
+        assert get_response.status_code == 200
+        assert get_response.json()["category_type"] == "income"
+
+        # List all
+        list_response = client.get("/api/v1/categories")
+        categories = list_response.json()["categories"]
+        dividends = next((c for c in categories if c["id"] == cat_id), None)
+        assert dividends is not None
+        assert dividends["category_type"] == "income"

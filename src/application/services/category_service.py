@@ -6,7 +6,7 @@ Handles category CRUD, hierarchy management, and system category initialization.
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from src.domain.model.category import Category, SYSTEM_CATEGORY_UNCATEGORIZED
+from src.domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
 from src.domain.model.entity_id import CategoryId, UserId
 
 if TYPE_CHECKING:
@@ -44,6 +44,7 @@ class CategoryService:
         name: str,
         parent_id: CategoryId | None = None,
         icon: str | None = None,
+        category_type: CategoryType = CategoryType.EXPENSE,
     ) -> Category | CategoryError:
         """Create a new user category."""
         with self._uow:
@@ -68,6 +69,7 @@ class CategoryService:
                 name=name,
                 parent_id=parent_id,
                 icon=icon,
+                category_type=category_type,
             )
 
             self._uow.categories.add(category)
