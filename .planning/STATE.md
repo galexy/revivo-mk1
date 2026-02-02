@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 3 of 10 (Transaction Domain)
-Plan: 1 of 6 in current phase
+Plan: 2 of 6 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 03-01-PLAN.md (Transaction Domain Primitives)
+Last activity: 2026-02-02 - Completed 03-02-PLAN.md (Transaction Aggregate)
 
-Progress: [████░░░░░░] ~35%
+Progress: [████░░░░░░] ~38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 7.4 min
-- Total execution time: 1.60 hours
+- Total plans completed: 14
+- Average duration: 7.0 min
+- Total execution time: 1.63 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] ~35%
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
-| 03-transaction-domain | 1 | 2 min | 2.0 min |
+| 03-transaction-domain | 2 | 4 min | 2.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (6 min), 02-04 (3 min), 02-05 (4 min), 02-06 (25 min), 03-01 (2 min)
+- Last 5 plans: 02-04 (3 min), 02-05 (4 min), 02-06 (25 min), 03-01 (2 min), 03-02 (2 min)
 - Trend: Domain primitive plans execute quickly; verification/integration phases take longer
 
 *Updated after each plan completion*
@@ -85,6 +85,10 @@ Recent decisions affecting current work:
 - Transfer splits must be negative (outgoing from source account)
 - Payee normalized_name for case-insensitive matching
 - Payee usage tracking (last_used_at, usage_count) for autocomplete relevance
+- Always-split transaction model (every transaction has 1+ split lines)
+- Mirror transactions for transfers (source owns, mirror auto-created)
+- Two-level category hierarchy (parent/child categories)
+- System categories protected from modification/deletion (e.g., Uncategorized)
 
 ### Pending Todos
 
@@ -97,7 +101,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-01-PLAN.md (Transaction Domain Primitives)
+Stopped at: Completed 03-02-PLAN.md (Transaction Aggregate)
 Resume file: None
 
 ## Phase 1 Milestone
@@ -136,4 +140,9 @@ Plan 01: Transaction Domain Primitives - COMPLETE
 - PayeeId/Payee entity with usage tracking
 - Transaction domain events
 
-Next: Plan 02 - Transaction Aggregate
+Plan 02: Transaction Aggregate - COMPLETE
+- Transaction aggregate with always-split model
+- Category entity with hierarchical structure
+- TransactionRepository, CategoryRepository, PayeeRepository protocols
+
+Next: Plan 03 - Transaction Persistence
