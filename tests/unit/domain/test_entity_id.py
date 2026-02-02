@@ -16,6 +16,7 @@ from src.domain.model.entity_id import (
     AccountId,
     BudgetId,
     CategoryId,
+    SplitId,
     TransactionId,
     UserId,
 )
@@ -163,6 +164,50 @@ class TestBudgetId:
         assert parsed.value == bid.value
 
 
+class TestSplitId:
+    """Tests for SplitId."""
+
+    def test_generate_creates_valid_id(self):
+        """Generated ID has correct prefix."""
+        sid = SplitId.generate()
+        assert sid.value.startswith("split_")
+        assert len(sid.value) > 6  # prefix + UUID portion
+
+    def test_from_string_parses_valid_id(self):
+        """Can parse a valid split ID string."""
+        sid = SplitId.generate()
+        parsed = SplitId.from_string(sid.value)
+        assert parsed.value == sid.value
+
+    def test_from_string_rejects_wrong_prefix(self):
+        """Cannot parse transaction ID as split ID."""
+        tid = TransactionId.generate()
+        with pytest.raises(ValueError, match="Expected 'split' prefix"):
+            SplitId.from_string(tid.value)
+
+    def test_prefix_property(self):
+        """Prefix is always 'split'."""
+        sid = SplitId.generate()
+        assert sid.prefix == "split"
+
+    def test_str_returns_value(self):
+        """String representation is the ID value."""
+        sid = SplitId.generate()
+        assert str(sid) == sid.value
+
+    def test_equality(self):
+        """Same value means equal IDs."""
+        sid1 = SplitId.generate()
+        sid2 = SplitId.from_string(sid1.value)
+        assert sid1 == sid2
+
+    def test_immutable(self):
+        """Cannot modify ID after creation."""
+        sid = SplitId.generate()
+        with pytest.raises(AttributeError):
+            sid.value = "split_modified"
+
+
 class TestEntityIdUniqueness:
     """Tests verifying ID uniqueness."""
 
@@ -180,8 +225,9 @@ class TestEntityIdUniqueness:
             UserId.generate().prefix,
             CategoryId.generate().prefix,
             BudgetId.generate().prefix,
+            SplitId.generate().prefix,
         }
-        assert prefixes == {"acct", "txn", "user", "cat", "budg"}
+        assert prefixes == {"acct", "txn", "user", "cat", "budg", "split"}
 
     def test_ids_are_sortable_by_creation_time(self):
         """TypeID uses UUID7 which is time-sortable."""

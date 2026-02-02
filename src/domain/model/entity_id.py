@@ -331,3 +331,46 @@ class PayeeId:
     def __str__(self) -> str:
         """Return the full ID string."""
         return self.value
+
+
+@dataclass(frozen=True, slots=True)
+class SplitId:
+    """Identifier for SplitLine entity.
+
+    Format: split_01h455vb4pex5vsknk084sn02q
+    """
+
+    value: str
+
+    @classmethod
+    def generate(cls) -> Self:
+        """Generate a new SplitId."""
+        tid = TypeID(prefix="split")
+        return cls(value=str(tid))
+
+    @classmethod
+    def from_string(cls, value: str) -> Self:
+        """Parse and validate a SplitId from string.
+
+        Args:
+            value: Full prefixed ID string (must start with "split_").
+
+        Returns:
+            SplitId with validated value.
+
+        Raises:
+            ValueError: If ID format is invalid or prefix doesn't match.
+        """
+        tid = TypeID.from_string(value)
+        if tid.prefix != "split":
+            raise ValueError(f"Expected 'split' prefix, got '{tid.prefix}'")
+        return cls(value=value)
+
+    @property
+    def prefix(self) -> str:
+        """Return the prefix (always 'split')."""
+        return "split"
+
+    def __str__(self) -> str:
+        """Return the full ID string."""
+        return self.value
