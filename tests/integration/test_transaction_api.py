@@ -1099,3 +1099,363 @@ class TestSplitIdentity:
         # All IDs are unique
         split_ids = [s["id"] for s in splits]
         assert len(split_ids) == len(set(split_ids))
+
+
+class TestPatchSplitModifications:
+    """Tests for PATCH modification sub-cases (M1-M6)."""
+
+    def test_m1_patch_category_split_amount_change(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """M1: PATCH changing amount on category split updates amount, preserves ID."""
+        # Create transaction with -100.00 category split
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH to -150.00 with same split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-150.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-150.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 200, split ID preserved, amount changed
+        assert patch_response.status_code == 200
+        updated = patch_response.json()
+        assert updated["splits"][0]["id"] == split_id
+        assert Decimal(updated["amount"]["amount"]) == Decimal("-150.00")
+        assert Decimal(updated["splits"][0]["amount"]["amount"]) == Decimal("-150.00")
+
+    def test_m2_patch_transfer_split_amount_syncs_mirror(
+        self, client: TestClient, test_account: JsonDict
+    ) -> None:
+        """M2: PATCH changing amount on transfer split syncs mirror amount."""
+        # Create savings account
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings M2 Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create -500.00 transfer
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-500.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-500.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # Verify initial mirror
+        initial_mirror = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(initial_mirror["transactions"]) == 1
+        assert Decimal(initial_mirror["transactions"][0]["amount"]["amount"]) == Decimal("500.00")
+
+        # PATCH to -750.00 with same split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-750.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-750.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+        assert patch_response.status_code == 200
+
+        # Assert source amount updated
+        assert Decimal(patch_response.json()["amount"]["amount"]) == Decimal("-750.00")
+
+        # Assert mirror amount updated to +750.00 (positive)
+        updated_mirror = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(updated_mirror["transactions"]) == 1
+        assert Decimal(updated_mirror["transactions"][0]["amount"]["amount"]) == Decimal("750.00")
+
+    def test_m3_patch_category_change(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """M3: PATCH changing category_id on split updates category."""
+        # Create second category (cat2)
+        cat2 = client.post("/api/v1/categories", json={"name": "M3 Category 2"}).json()
+
+        # Create transaction with test_category (cat1)
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-75.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-75.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH to cat2 with same split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-75.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-75.00", "currency": "USD"},
+                        "category_id": cat2["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert category_id changed, split ID preserved
+        assert patch_response.status_code == 200
+        updated = patch_response.json()
+        assert updated["splits"][0]["id"] == split_id
+        assert updated["splits"][0]["category_id"] == cat2["id"]
+
+    def test_m4_patch_transfer_destination_change(
+        self, client: TestClient, test_account: JsonDict
+    ) -> None:
+        """M4: PATCH changing transfer destination deletes old mirror, creates new."""
+        # Create savings1 and savings2 accounts
+        savings1 = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings M4 Dest1",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+        savings2 = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings M4 Dest2",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create -500.00 transfer to savings1
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-500.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-500.00", "currency": "USD"},
+                        "transfer_account_id": savings1["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # Verify mirror exists in savings1
+        s1_txns = client.get(f"/api/v1/transactions?account_id={savings1['id']}").json()
+        assert len(s1_txns["transactions"]) == 1
+
+        # PATCH to transfer to savings2 with same split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-500.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-500.00", "currency": "USD"},
+                        "transfer_account_id": savings2["id"],
+                    }
+                ],
+            },
+        )
+        assert patch_response.status_code == 200
+
+        # Assert savings1 has 0 transactions (old mirror deleted)
+        s1_txns_after = client.get(f"/api/v1/transactions?account_id={savings1['id']}").json()
+        assert len(s1_txns_after["transactions"]) == 0
+
+        # Assert savings2 has 1 mirror transaction
+        s2_txns = client.get(f"/api/v1/transactions?account_id={savings2['id']}").json()
+        assert len(s2_txns["transactions"]) == 1
+
+        # Assert new mirror has correct amount and is_mirror=True
+        new_mirror = s2_txns["transactions"][0]
+        assert new_mirror["is_mirror"] is True
+        assert Decimal(new_mirror["amount"]["amount"]) == Decimal("500.00")
+
+    def test_m5_patch_category_to_transfer_creates_mirror(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """M5: PATCH converting category split to transfer creates mirror."""
+        # Create savings account
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings M5 Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create -200.00 transaction with category split
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-200.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-200.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # Verify savings has 0 transactions
+        s_txns_before = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(s_txns_before["transactions"]) == 0
+
+        # PATCH split to be transfer (remove category_id, add transfer_account_id), keep split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-200.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-200.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 200
+        assert patch_response.status_code == 200
+        updated = patch_response.json()
+
+        # Assert split now has transfer_account_id, no category_id
+        assert updated["splits"][0]["id"] == split_id
+        assert updated["splits"][0]["transfer_account_id"] == savings["id"]
+        assert updated["splits"][0].get("category_id") is None
+
+        # Assert savings now has 1 mirror transaction with +200.00
+        s_txns_after = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(s_txns_after["transactions"]) == 1
+        mirror = s_txns_after["transactions"][0]
+        assert mirror["is_mirror"] is True
+        assert Decimal(mirror["amount"]["amount"]) == Decimal("200.00")
+
+    def test_m6_patch_transfer_to_category_deletes_mirror(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """M6: PATCH converting transfer split to category deletes mirror."""
+        # Create savings account
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings M6 Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create -300.00 transfer to savings
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-300.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-300.00", "currency": "USD"},
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # Verify mirror exists in savings
+        s_txns_before = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(s_txns_before["transactions"]) == 1
+
+        # PATCH split to be category (remove transfer_account_id, add category_id), keep split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-300.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-300.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 200
+        assert patch_response.status_code == 200
+        updated = patch_response.json()
+
+        # Assert split now has category_id, no transfer_account_id
+        assert updated["splits"][0]["id"] == split_id
+        assert updated["splits"][0]["category_id"] == test_category["id"]
+        assert updated["splits"][0].get("transfer_account_id") is None
+
+        # Assert savings now has 0 transactions (mirror deleted)
+        s_txns_after = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
+        assert len(s_txns_after["transactions"]) == 0
