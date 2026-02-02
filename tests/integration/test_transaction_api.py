@@ -78,7 +78,7 @@ def setup_database(engine, database_url):
 
     yield
 
-    metadata.drop_all(engine)
+    # Note: Don't drop tables on cleanup - other tests depend on them
     clear_mappers()
 
 

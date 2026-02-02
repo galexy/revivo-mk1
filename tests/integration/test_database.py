@@ -17,17 +17,20 @@ class TestDatabaseTables:
     def test_outbox_table_exists(self, session):
         """Outbox table can be queried."""
         result = session.execute(select(outbox)).fetchall()
-        assert result == []  # Empty but queryable
+        # Table exists and is queryable (may contain data from other tests)
+        assert isinstance(result, list)
 
     def test_users_table_exists(self, session):
         """Users table can be queried."""
         result = session.execute(select(users)).fetchall()
-        assert result == []
+        # Table exists and is queryable (may contain data from other tests)
+        assert isinstance(result, list)
 
     def test_encrypted_secrets_table_exists(self, session):
         """Encrypted secrets table can be queried."""
         result = session.execute(select(encrypted_secrets)).fetchall()
-        assert result == []
+        # Table exists and is queryable (may contain data from other tests)
+        assert isinstance(result, list)
 
 
 class TestOutboxPattern:
@@ -89,7 +92,7 @@ class TestOutboxPattern:
             insert(outbox).values(
                 event_type="ProcessedEvent",
                 aggregate_type="Test",
-                aggregate_id="processed_1",
+                aggregate_id="processed_test_idx",
                 payload="{}",
                 created_at=datetime.now(UTC),
                 processed_at=datetime.now(UTC),
@@ -100,7 +103,7 @@ class TestOutboxPattern:
             insert(outbox).values(
                 event_type="UnprocessedEvent",
                 aggregate_type="Test",
-                aggregate_id="unprocessed_1",
+                aggregate_id="unprocessed_test_idx",
                 payload="{}",
                 created_at=datetime.now(UTC),
                 processed_at=None,
@@ -108,13 +111,28 @@ class TestOutboxPattern:
         )
         session.commit()
 
-        # Query for unprocessed events
-        result = session.execute(
-            select(outbox).where(outbox.c.processed_at.is_(None))
-        ).fetchall()
+        # Query for our specific test events
+        processed_result = session.execute(
+            select(outbox).where(outbox.c.aggregate_id == "processed_test_idx")
+        ).fetchone()
+        unprocessed_result = session.execute(
+            select(outbox).where(outbox.c.aggregate_id == "unprocessed_test_idx")
+        ).fetchone()
 
-        assert len(result) == 1
-        assert result[0].aggregate_id == "unprocessed_1"
+        # Verify processed event has processed_at set
+        assert processed_result.processed_at is not None
+        # Verify unprocessed event appears in NULL filter
+        assert unprocessed_result.processed_at is None
+
+        # Verify the partial index filters correctly by checking our unprocessed event
+        # is in the set of events with processed_at = NULL
+        unprocessed_ids = [
+            r.aggregate_id for r in session.execute(
+                select(outbox).where(outbox.c.processed_at.is_(None))
+            ).fetchall()
+        ]
+        assert "unprocessed_test_idx" in unprocessed_ids
+        assert "processed_test_idx" not in unprocessed_ids
 
 
 class TestUserTable:
