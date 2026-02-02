@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 3.1 - Split Identity & Validation Fixes
+**Current focus:** Phase 4 - Web Interface & API
 
 ## Current Position
 
-Phase: 3.1 of 10 (Split Identity & Validation Fixes)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-02 - Completed 03.1-03-PLAN.md (Split Identity Persistence)
+Phase: 4 of 10 (Web Interface & API)
+Plan: Ready to start
+Status: Phase 3.1 complete
+Last activity: 2026-02-02 - Completed 03.1-04-PLAN.md (Split Identity Tests)
 
-Progress: [█████░░░░░] ~54%
+Progress: [██████░░░░] ~57%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
-- Average duration: 6.1 min
-- Total execution time: 2.43 hours
+- Total plans completed: 23
+- Average duration: 5.9 min
+- Total execution time: 2.5 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [█████░░░░░] ~54%
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
-| 03.1-split-identity-validation-fixes | 3 | 17 min | 5.7 min |
+| 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-07 (15 min), 03.1-01 (4 min), 03.1-02 (8 min), 03.1-03 (5 min)
-- Trend: Phase 3.1 in progress
+- Last 5 plans: 03.1-01 (4 min), 03.1-02 (8 min), 03.1-03 (5 min), 03.1-04 (4 min)
+- Trend: Phase 3.1 complete, ready for Phase 4
 
 *Updated after each plan completion*
 
@@ -103,13 +103,14 @@ Recent decisions affecting current work:
 - UpdateTransactionRequest supports optional splits/amount for full financial updates
 - SplitId follows exact pattern of other entity IDs (frozen dataclass, generate, from_string, prefix "split")
 - SplitLine.id is required first field, .create() factory generates ID
-- Repository generates SplitId on load until DB migration adds split_id column
 - Transaction.source_split_id links mirror transactions to their source splits
 - CategoryType StrEnum for income/expense classification (default EXPENSE)
 - API accepts category_type in CreateCategoryRequest with Pydantic pattern validation
 - SplitIdType custom TypeDecorator for ORM mapping of source_split_id
 - TypeIDException handler returns INVALID_ID_FORMAT code with 400 status
 - Empty string validators use Pydantic field_validator (returns 422)
+- PATCH endpoint preserves split IDs when provided in request (new splits get generated IDs)
+- TransactionResponse includes source_split_id field for mirror linkage
 
 ### Pending Todos
 
@@ -122,9 +123,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03.1-03-PLAN.md (Split Identity Persistence)
+Stopped at: Completed 03.1-04-PLAN.md (Split Identity Tests)
 Resume file: none
-Next action: Execute Phase 3.1 Plan 04 (Integration Tests)
+Next action: Begin Phase 4 planning
 
 ## Roadmap Evolution
 
@@ -133,7 +134,7 @@ Next action: Execute Phase 3.1 Plan 04 (Integration Tests)
   - Plan 01: SplitLine Identity - COMPLETE
   - Plan 02: CategoryType Vertical Slice - COMPLETE
   - Plan 03: Split Identity Persistence - COMPLETE
-  - Plan 04: Integration Tests - pending
+  - Plan 04: Integration Tests - COMPLETE
 
 ## Phase 1 Milestone
 
@@ -185,11 +186,18 @@ Ready for Phase 3.1: Split Identity & Validation Fixes
 
 ## Phase 3.1 Milestone
 
-**Phase 3.1: Split Identity & Validation Fixes - IN PROGRESS**
+**Phase 3.1: Split Identity & Validation Fixes - COMPLETE**
 
-Fixing UAT issues discovered in Phase 3:
+All success criteria met:
+1. SplitLine has unique ID; PATCH can update specific splits by ID
+2. Mirror transactions link to source split via source_split_id
+3. Invalid account/category IDs return 400 (not 500)
+4. Empty strings return 422 (Pydantic validation)
 
-Plans completed (3 of 4):
+Plans completed (4 of 4):
 - 03.1-01: SplitLine Identity (SplitId, create() factory, source_split_id)
 - 03.1-02: CategoryType Vertical Slice (enum, migration, API, 7 tests)
 - 03.1-03: Split Identity Persistence (migration 005, repository, exception handlers)
+- 03.1-04: Integration Tests (9 unit + 9 integration, fixed PATCH ID preservation)
+
+Ready for Phase 4: Web Interface & API
