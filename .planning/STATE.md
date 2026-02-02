@@ -123,9 +123,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Phase 3.1 UAT complete (10/10 passed)
-Resume file: none
-Next action: Begin Phase 4 planning
+Stopped at: Phase 3.1 complete, test gap analysis done
+Resume file: .planning/phases/03.1-split-identity-validation-fixes/.continue-here.md
+Next action: Begin Phase 4 planning (or optionally add missing PATCH tests)
 
 ## Roadmap Evolution
 
