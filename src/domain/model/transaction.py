@@ -405,6 +405,38 @@ class Transaction:
             )
         )
 
+    def update_amount(self, new_amount: Money) -> None:
+        """Update transaction amount (for mirror sync).
+
+        Used by TransactionService to sync mirror amounts when source splits change.
+        Mirror transactions have a single split that must also be updated.
+        """
+        old_amount = self.amount
+        self.amount = new_amount
+
+        # Update single split for mirrors
+        if self.is_mirror and len(self.splits) == 1:
+            old_split = self.splits[0]
+            self.splits = [
+                SplitLine(
+                    amount=new_amount,
+                    category_id=old_split.category_id,
+                    transfer_account_id=old_split.transfer_account_id,
+                    memo=old_split.memo,
+                )
+            ]
+
+        self.updated_at = datetime.now(UTC)
+        self._events.append(
+            TransactionUpdated(
+                aggregate_id=str(self.id),
+                aggregate_type="Transaction",
+                field="amount",
+                old_value=str(old_amount.amount),
+                new_value=str(new_amount.amount),
+            )
+        )
+
     def delete(self) -> None:
         """Mark transaction for deletion (emits event)."""
         self._events.append(
