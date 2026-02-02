@@ -16,6 +16,10 @@ from typing import TYPE_CHECKING, Protocol, Self
 
 if TYPE_CHECKING:
     from src.domain.events.base import DomainEvent
+    from src.domain.ports.account_repository import AccountRepository
+    from src.domain.ports.category_repository import CategoryRepository
+    from src.domain.ports.payee_repository import PayeeRepository
+    from src.domain.ports.transaction_repository import TransactionRepository
 
 
 class UnitOfWork(Protocol):
@@ -31,10 +35,32 @@ class UnitOfWork(Protocol):
             uow.collect_events(account.events)
             uow.commit()
 
-    Concrete implementations will add repository accessors as attributes
-    (e.g., `accounts: AccountRepository`, `transactions: TransactionRepository`).
-    These are added when the concrete repositories are created in later phases.
+    Repository accessors:
+    - accounts: AccountRepository
+    - categories: CategoryRepository
+    - payees: PayeeRepository
+    - transactions: TransactionRepository
     """
+
+    @property
+    def accounts(self) -> "AccountRepository":
+        """Access to Account repository."""
+        ...
+
+    @property
+    def categories(self) -> "CategoryRepository":
+        """Access to Category repository."""
+        ...
+
+    @property
+    def payees(self) -> "PayeeRepository":
+        """Access to Payee repository."""
+        ...
+
+    @property
+    def transactions(self) -> "TransactionRepository":
+        """Access to Transaction repository."""
+        ...
 
     def __enter__(self) -> Self:
         """Enter the UoW context and begin a transaction.

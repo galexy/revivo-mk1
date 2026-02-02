@@ -23,6 +23,9 @@ from .orm.tables import outbox
 
 if TYPE_CHECKING:
     from .repositories.account import SqlAlchemyAccountRepository
+    from .repositories.category import SqlAlchemyCategoryRepository
+    from .repositories.payee import SqlAlchemyPayeeRepository
+    from .repositories.transaction import SqlAlchemyTransactionRepository
 
 
 class SqlAlchemyUnitOfWork:
@@ -43,6 +46,9 @@ class SqlAlchemyUnitOfWork:
     """
 
     _accounts: SqlAlchemyAccountRepository | None
+    _categories: SqlAlchemyCategoryRepository | None
+    _payees: SqlAlchemyPayeeRepository | None
+    _transactions: SqlAlchemyTransactionRepository | None
 
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         """Initialize Unit of Work.
@@ -54,6 +60,9 @@ class SqlAlchemyUnitOfWork:
         self._events: list[DomainEvent] = []
         self._session: Session | None = None
         self._accounts: SqlAlchemyAccountRepository | None = None
+        self._categories: SqlAlchemyCategoryRepository | None = None
+        self._payees: SqlAlchemyPayeeRepository | None = None
+        self._transactions: SqlAlchemyTransactionRepository | None = None
 
     def __enter__(self) -> Self:
         """Start a new unit of work (transaction).
@@ -64,6 +73,9 @@ class SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
         # Reset repository instances for fresh session
         self._accounts = None
+        self._categories = None
+        self._payees = None
+        self._transactions = None
         return self
 
     def __exit__(
@@ -109,6 +121,51 @@ class SqlAlchemyUnitOfWork:
 
             self._accounts = SqlAlchemyAccountRepository(self.session)
         return self._accounts
+
+    @property
+    def categories(self) -> SqlAlchemyCategoryRepository:
+        """Access to Category repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            SqlAlchemyCategoryRepository for category persistence.
+        """
+        if self._categories is None:
+            from .repositories.category import SqlAlchemyCategoryRepository
+
+            self._categories = SqlAlchemyCategoryRepository(self.session)
+        return self._categories
+
+    @property
+    def payees(self) -> SqlAlchemyPayeeRepository:
+        """Access to Payee repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            SqlAlchemyPayeeRepository for payee persistence.
+        """
+        if self._payees is None:
+            from .repositories.payee import SqlAlchemyPayeeRepository
+
+            self._payees = SqlAlchemyPayeeRepository(self.session)
+        return self._payees
+
+    @property
+    def transactions(self) -> SqlAlchemyTransactionRepository:
+        """Access to Transaction repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            SqlAlchemyTransactionRepository for transaction persistence.
+        """
+        if self._transactions is None:
+            from .repositories.transaction import SqlAlchemyTransactionRepository
+
+            self._transactions = SqlAlchemyTransactionRepository(self.session)
+        return self._transactions
 
     def collect_events(self, events: list[DomainEvent]) -> None:
         """Collect domain events to be persisted with commit.
