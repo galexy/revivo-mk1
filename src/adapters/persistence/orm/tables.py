@@ -188,6 +188,9 @@ categories = Table(
     # Hierarchy - parent_id is None for top-level categories
     Column("parent_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True),
 
+    # Type - income or expense (defaults to expense)
+    Column("category_type", String(10), nullable=False, server_default="expense"),
+
     # Metadata
     Column("is_system", Boolean, nullable=False, default=False),
     Column("is_hidden", Boolean, nullable=False, default=False),

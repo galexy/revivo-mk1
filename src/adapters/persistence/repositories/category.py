@@ -6,7 +6,7 @@ Handles persistence of Category entity with value object reconstruction.
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.domain.model.category import Category, SYSTEM_CATEGORY_UNCATEGORIZED
+from src.domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
 from src.domain.model.entity_id import CategoryId, UserId
 from src.adapters.persistence.orm.tables import categories, split_lines
 
@@ -188,6 +188,12 @@ class SqlAlchemyCategoryRepository:
         if category.parent_id is not None and isinstance(category.parent_id, str):
             object.__setattr__(
                 category, "parent_id", CategoryId.from_string(category.parent_id)
+            )
+
+        # Reconstruct CategoryType enum from string
+        if isinstance(category.category_type, str):
+            object.__setattr__(
+                category, "category_type", CategoryType(category.category_type)
             )
 
         # Ensure _events list exists (transient field, not loaded from DB)

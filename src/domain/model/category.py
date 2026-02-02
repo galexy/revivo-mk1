@@ -5,10 +5,12 @@ CONTEXT DECISIONS:
 2. Transactions can be assigned to any level (parent or leaf)
 3. System category "Uncategorized" always exists, cannot be modified/deleted
 4. Two-level hierarchy (parent categories and child categories)
+5. CategoryType (income/expense) for default transaction direction
 """
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import StrEnum, auto
 from typing import Self
 
 from src.domain.events.base import DomainEvent
@@ -22,6 +24,17 @@ from src.domain.model.entity_id import CategoryId, UserId
 
 # System category names that cannot be modified
 SYSTEM_CATEGORY_UNCATEGORIZED = "Uncategorized"
+
+
+class CategoryType(StrEnum):
+    """Category type for default transaction direction.
+
+    INCOME: Categories for money coming in (salary, interest, etc.)
+    EXPENSE: Categories for money going out (food, utilities, etc.)
+    """
+
+    INCOME = auto()
+    EXPENSE = auto()
 
 
 @dataclass(eq=False)
@@ -40,6 +53,7 @@ class Category:
     parent_id: CategoryId | None = None
 
     # Category metadata
+    category_type: CategoryType = CategoryType.EXPENSE  # Income or expense
     is_system: bool = False  # System categories are protected
     is_hidden: bool = False  # Hide from normal views
     sort_order: int = 0
@@ -74,6 +88,7 @@ class Category:
         parent_id: CategoryId | None = None,
         icon: str | None = None,
         sort_order: int = 0,
+        category_type: CategoryType = CategoryType.EXPENSE,
     ) -> Self:
         """Create a new user category."""
         if not name or not name.strip():
@@ -84,6 +99,7 @@ class Category:
             user_id=user_id,
             name=name.strip(),
             parent_id=parent_id,
+            category_type=category_type,
             is_system=False,
             icon=icon,
             sort_order=sort_order,
@@ -105,6 +121,7 @@ class Category:
         cls,
         user_id: UserId,
         name: str,
+        category_type: CategoryType = CategoryType.EXPENSE,
     ) -> Self:
         """Create a system category (protected, cannot be modified).
 
@@ -115,6 +132,7 @@ class Category:
             user_id=user_id,
             name=name,
             parent_id=None,  # System categories are always top-level
+            category_type=category_type,
             is_system=True,
             is_hidden=False,
             sort_order=-1,  # Sort first
