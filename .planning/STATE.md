@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 - Web Interface & API
+**Current focus:** Phase 3.2 - Add Missing PATCH Test Cases
 
 ## Current Position
 
-Phase: 4 of 10 (Web Interface & API)
-Plan: Ready to start
-Status: Phase 3.1 complete
-Last activity: 2026-02-02 - Completed 03.1-04-PLAN.md (Split Identity Tests)
+Phase: 3.2 of 10 (Add Missing PATCH Test Cases)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-02-02 - Completed 03.2-01-PLAN.md (PATCH Split Modifications M1-M6)
 
-Progress: [██████░░░░] ~57%
+Progress: [██████░░░░] ~58%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 5.9 min
+- Total plans completed: 24
+- Average duration: 5.7 min
 - Total execution time: 2.5 hours
 
 **By Phase:**
@@ -31,10 +31,11 @@ Progress: [██████░░░░] ~57%
 | 02-account-domain | 6 | 62 min | 10.3 min |
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
+| 03.2-add-missing-patch-test-cases | 1 | 1 min | 1.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-01 (4 min), 03.1-02 (8 min), 03.1-03 (5 min), 03.1-04 (4 min)
-- Trend: Phase 3.1 complete, ready for Phase 4
+- Last 5 plans: 03.1-02 (8 min), 03.1-03 (5 min), 03.1-04 (4 min), 03.2-01 (1 min)
+- Trend: Phase 3.2 plan 1 complete
 
 *Updated after each plan completion*
 
@@ -123,18 +124,17 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Phase 3.1 complete, test gap analysis done
-Resume file: .planning/phases/03.1-split-identity-validation-fixes/.continue-here.md
-Next action: Begin Phase 4 planning (or optionally add missing PATCH tests)
+Stopped at: Completed 03.2-01-PLAN.md (PATCH Split Modifications M1-M6)
+Resume file: None
+Next action: Execute 03.2-02-PLAN.md (Split Addition/Removal tests)
 
 ## Roadmap Evolution
 
 - Phase 3.1 inserted after Phase 3: Split Identity & Validation Fixes (URGENT)
-  - Fixes UAT issues: invalid ID handling, split validation, category types, split-mirror linkage
-  - Plan 01: SplitLine Identity - COMPLETE
-  - Plan 02: CategoryType Vertical Slice - COMPLETE
-  - Plan 03: Split Identity Persistence - COMPLETE
-  - Plan 04: Integration Tests - COMPLETE
+- Phase 3.2 inserted after Phase 3.1: Add Missing PATCH Test Cases (test coverage gaps from 03.1-CONTEXT.md)
+  - Plan 01: PATCH Split Modifications (M1-M6) - COMPLETE
+  - Plan 02: Split Addition/Removal - pending
+  - Plan 03: Validation Errors - pending
 
 ## Phase 1 Milestone
 
