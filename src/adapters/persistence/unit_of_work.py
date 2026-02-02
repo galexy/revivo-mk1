@@ -198,6 +198,15 @@ class SqlAlchemyUnitOfWork:
         self.session.commit()
         self._events.clear()
 
+    def flush(self) -> None:
+        """Flush pending changes to database without committing.
+
+        Used to ensure ORM-tracked entities are visible to raw SQL operations
+        within the same transaction (e.g., payee must exist before transaction
+        insert that references it via FK).
+        """
+        self.session.flush()
+
     def rollback(self) -> None:
         """Rollback transaction and discard events.
 

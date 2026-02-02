@@ -468,6 +468,11 @@ class SqlAlchemyTransactionRepository:
         Args:
             transaction_id: The transaction identifier to delete.
         """
+        # Expunge any loaded transaction from session to prevent StaleDataError
+        txn = self._session.get(Transaction, str(transaction_id))
+        if txn:
+            self._session.expunge(txn)
+
         delete_stmt = transactions.delete().where(
             transactions.c.id == str(transaction_id)
         )

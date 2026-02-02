@@ -256,6 +256,10 @@ class TransactionService:
             # Get or create payee
             payee_id, payee_display = self._get_or_create_payee(user_id, payee_name)
 
+            # Flush to ensure payee exists in DB before transaction insert (FK constraint)
+            if payee_id:
+                self._uow.flush()
+
             # Create transaction
             try:
                 txn = Transaction.create(
