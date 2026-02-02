@@ -10,7 +10,8 @@ from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.types import TypeDecorator
 
 from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId, CategoryId, PayeeId, TransactionId, UserId
+from src.domain.model.transaction_types import TransactionSource, TransactionStatus
 
 
 class AccountIdType(TypeDecorator):
@@ -122,4 +123,124 @@ class AccountSubtypeEnum(TypeDecorator):
 
     def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
         """Return string value - conversion to AccountSubtype done in repository."""
+        return value
+
+
+class TransactionIdType(TypeDecorator):
+    """SQLAlchemy type for TransactionId value objects.
+
+    Converts TransactionId to/from string for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: TransactionId | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert TransactionId to string for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return str(value)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to TransactionId done in repository."""
+        return value
+
+
+class CategoryIdType(TypeDecorator):
+    """SQLAlchemy type for CategoryId value objects.
+
+    Converts CategoryId to/from string for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: CategoryId | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert CategoryId to string for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return str(value)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to CategoryId done in repository."""
+        return value
+
+
+class PayeeIdType(TypeDecorator):
+    """SQLAlchemy type for PayeeId value objects.
+
+    Converts PayeeId to/from string for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: PayeeId | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert PayeeId to string for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return str(value)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to PayeeId done in repository."""
+        return value
+
+
+class TransactionStatusEnum(TypeDecorator):
+    """SQLAlchemy type for TransactionStatus enum.
+
+    Converts TransactionStatus to/from string value for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: TransactionStatus | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert TransactionStatus to string value for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return value.value
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to TransactionStatus done in repository."""
+        return value
+
+
+class TransactionSourceEnum(TypeDecorator):
+    """SQLAlchemy type for TransactionSource enum.
+
+    Converts TransactionSource to/from string value for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: TransactionSource | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert TransactionSource to string value for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return value.value
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to TransactionSource done in repository."""
         return value
