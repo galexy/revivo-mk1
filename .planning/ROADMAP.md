@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Domain primitives, clean architecture scaffolding, devcontainer setup
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
+- [ ] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
 - [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
@@ -85,6 +86,22 @@ Plans:
 - [x] 03-05-PLAN.md — TransactionService and CategoryService application services
 - [x] 03-06-PLAN.md — REST API endpoints for transactions and categories
 - [x] 03-07-PLAN.md — Integration tests and verification checkpoint
+
+### Phase 3.1: Split Identity & Validation Fixes (INSERTED)
+**Goal**: Fix UAT issues from Phase 3 - add split identity for proper PATCH semantics, improve validation, add category types
+**Depends on**: Phase 3
+**Requirements**: Fixes for UAT issues 6, 16, 19, 24
+**Success Criteria** (what must be TRUE):
+  1. SplitLine has unique ID; PATCH can update specific splits by ID
+  2. Mirror transactions link to source split via source_split_id
+  3. Invalid account/category IDs return 400 (not 500)
+  4. Split must have exactly one of category_id or transfer_account_id
+  5. Categories have income/expense type
+**Plans**: TBD
+
+Plans:
+- [ ] 03.1-01: TBD
+- [ ] 03.1-02: TBD
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -211,6 +228,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Foundation | 6/6 | Complete | 2026-01-30 |
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
+| 3.1 Split Identity & Validation | 0/2 | Not started | - |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |

@@ -112,9 +112,14 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Phase 3 verification checkpoint - edge case tests added, manual UAT pending
-Resume file: .planning/phases/03-transaction-domain/.continue-here.md
-Next action: Complete manual UAT verification, then Phase 4
+Stopped at: Phase 3.1 inserted to fix UAT issues
+Resume file: none
+Next action: Plan and execute Phase 3.1 (Split Identity & Validation Fixes)
+
+## Roadmap Evolution
+
+- Phase 3.1 inserted after Phase 3: Split Identity & Validation Fixes (URGENT)
+  - Fixes UAT issues: invalid ID handling, split validation, category types, split-mirror linkage
 
 ## Phase 1 Milestone
 
