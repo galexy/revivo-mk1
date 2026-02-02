@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 3 of 10 (Transaction Domain)
-Plan: 3 of 6 in current phase
+Plan: 4 of 6 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 03-03-PLAN.md (Transaction Domain Database Tables)
+Last activity: 2026-02-02 - Completed 03-04-PLAN.md (Transaction Repository)
 
-Progress: [████░░░░░░] ~40%
+Progress: [████░░░░░░] ~43%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 6.8 min
-- Total execution time: 1.70 hours
+- Total plans completed: 16
+- Average duration: 6.5 min
+- Total execution time: 1.77 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] ~40%
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
-| 03-transaction-domain | 3 | 8 min | 2.7 min |
+| 03-transaction-domain | 4 | 12 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-05 (4 min), 02-06 (25 min), 03-01 (2 min), 03-02 (2 min), 03-03 (4 min)
-- Trend: Domain primitive and database table plans execute quickly
+- Last 5 plans: 02-06 (25 min), 03-01 (2 min), 03-02 (2 min), 03-03 (4 min), 03-04 (4 min)
+- Trend: Transaction domain plans executing efficiently
 
 *Updated after each plan completion*
 
@@ -92,6 +92,9 @@ Recent decisions affecting current work:
 - Date type (not DateTime) for effective_date and posted_date
 - TSVECTOR with GIN index for full-text search on transactions
 - CASCADE delete on split_lines when transaction deleted
+- Transaction.splits and amount excluded from mapper, handled in repository
+- SplitLine not mapped directly (frozen dataclass with Money)
+- Full-text search via PostgreSQL TSVECTOR/GIN index
 
 ### Pending Todos
 
@@ -104,7 +107,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-03-PLAN.md (Transaction Domain Database Tables)
+Stopped at: Completed 03-04-PLAN.md (Transaction Repository)
 Resume file: None
 
 ## Phase 1 Milestone
@@ -153,4 +156,11 @@ Plan 03: Transaction Domain Database Tables - COMPLETE
 - Table definitions for categories, payees, transactions, split_lines
 - Alembic migration 003 with FK constraints and GIN index
 
-Next: Plan 04 - Transaction Repository
+Plan 04: Transaction Repository - COMPLETE
+- ORM mappers for Category, Payee, Transaction
+- SqlAlchemyCategoryRepository with hierarchy and get_or_create_uncategorized
+- SqlAlchemyPayeeRepository with autocomplete search
+- SqlAlchemyTransactionRepository with split line handling
+- UnitOfWork updated with all transaction domain repositories
+
+Next: Plan 05 - Transaction Application Service
