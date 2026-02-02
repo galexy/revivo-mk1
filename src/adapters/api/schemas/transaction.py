@@ -37,6 +37,7 @@ class MoneySchema(BaseModel):
 class SplitLineRequest(BaseModel):
     """Request schema for a split line."""
 
+    id: str | None = Field(default=None, description="Split ID (omit for new splits)")
     amount: MoneySchema
     category_id: str | None = Field(
         default=None, description="Category for expense/income splits"
@@ -46,10 +47,27 @@ class SplitLineRequest(BaseModel):
     )
     memo: str | None = Field(default=None, max_length=500)
 
+    @field_validator("category_id", mode="before")
+    @classmethod
+    def validate_category_id(cls, v: str | None) -> str | None:
+        """Reject empty strings for category_id."""
+        if v == "":
+            raise ValueError("category_id cannot be empty string")
+        return v if v else None
+
+    @field_validator("transfer_account_id", mode="before")
+    @classmethod
+    def validate_transfer_account_id(cls, v: str | None) -> str | None:
+        """Reject empty strings for transfer_account_id."""
+        if v == "":
+            raise ValueError("transfer_account_id cannot be empty string")
+        return v if v else None
+
 
 class SplitLineResponse(BaseModel):
     """Response schema for a split line."""
 
+    id: str  # Always present in response
     amount: MoneySchema
     category_id: str | None
     transfer_account_id: str | None

@@ -10,7 +10,14 @@ from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.types import TypeDecorator
 
 from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, CategoryId, PayeeId, TransactionId, UserId
+from src.domain.model.entity_id import (
+    AccountId,
+    CategoryId,
+    PayeeId,
+    SplitId,
+    TransactionId,
+    UserId,
+)
 from src.domain.model.transaction_types import TransactionSource, TransactionStatus
 
 
@@ -243,4 +250,28 @@ class TransactionSourceEnum(TypeDecorator):
 
     def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
         """Return string value - conversion to TransactionSource done in repository."""
+        return value
+
+
+class SplitIdType(TypeDecorator):
+    """SQLAlchemy type for SplitId value objects.
+
+    Converts SplitId to/from string for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: SplitId | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert SplitId to string for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return str(value)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to SplitId done in repository."""
         return value

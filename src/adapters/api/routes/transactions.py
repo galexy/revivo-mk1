@@ -40,6 +40,7 @@ router = APIRouter(prefix="/transactions", tags=["transactions"])
 def _split_to_response(split: SplitLine) -> SplitLineResponse:
     """Convert domain SplitLine to response schema."""
     return SplitLineResponse(
+        id=str(split.id),
         amount=MoneySchema(amount=split.amount.amount, currency=split.amount.currency),
         category_id=str(split.category_id) if split.category_id else None,
         transfer_account_id=str(split.transfer_account_id) if split.transfer_account_id else None,

@@ -37,6 +37,7 @@ from .types import (
     AccountTypeEnum,
     CategoryIdType,
     PayeeIdType,
+    SplitIdType,
     TransactionIdType,
     TransactionSourceEnum,
     TransactionStatusEnum,
@@ -274,7 +275,7 @@ transactions = Table(
         ForeignKey("transactions.id"),
         nullable=True,
     ),
-    Column("source_split_id", String(36), nullable=True),  # Links mirror to source split
+    Column("source_split_id", SplitIdType(36), nullable=True),  # Links mirror to source split
     Column("is_mirror", Boolean, nullable=False, default=False),
 
     # Audit

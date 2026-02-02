@@ -49,10 +49,6 @@ class SqlAlchemyTransactionRepository:
 
         Returns:
             List of SplitLine entities ordered by sort_order.
-
-        Note:
-            SplitId is generated on load until DB migration adds split_id column.
-            This is a temporary measure - once DB stores split_id, it will be loaded.
         """
         stmt = (
             select(split_lines)
@@ -73,9 +69,9 @@ class SqlAlchemyTransactionRepository:
                 else None
             )
 
-            # Generate SplitId for now - DB migration will add split_id column
+            # Load SplitId from database
             split = SplitLine(
-                id=SplitId.generate(),
+                id=SplitId.from_string(row.split_id),
                 amount=amount,
                 category_id=category_id,
                 transfer_account_id=transfer_account_id,
@@ -101,6 +97,7 @@ class SqlAlchemyTransactionRepository:
         # Insert new splits
         for i, split in enumerate(transaction.splits):
             insert_stmt = split_lines.insert().values(
+                split_id=str(split.id),
                 transaction_id=str(transaction.id),
                 amount=split.amount.amount,
                 currency=split.amount.currency,
@@ -170,6 +167,12 @@ class SqlAlchemyTransactionRepository:
                 TransactionId.from_string(txn.source_transaction_id),
             )
 
+        # Reconstruct source_split_id from string
+        if txn.source_split_id is not None and isinstance(txn.source_split_id, str):
+            object.__setattr__(
+                txn, "source_split_id", SplitId.from_string(txn.source_split_id)
+            )
+
         # Reconstruct enums from string values
         if isinstance(txn.status, str):
             object.__setattr__(txn, "status", TransactionStatus(txn.status))
@@ -221,6 +224,11 @@ class SqlAlchemyTransactionRepository:
             source_transaction_id=(
                 str(transaction.source_transaction_id)
                 if transaction.source_transaction_id
+                else None
+            ),
+            source_split_id=(
+                str(transaction.source_split_id)
+                if transaction.source_split_id
                 else None
             ),
             is_mirror=transaction.is_mirror,
