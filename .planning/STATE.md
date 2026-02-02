@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 2 - Account Domain (in progress)
+**Current focus:** Phase 3 - Transaction Domain (in progress)
 
 ## Current Position
 
-Phase: 2 of 10 (Account Domain)
-Plan: 6 of 6 in current phase
-Status: Complete
-Last activity: 2026-01-30 - Completed Phase 2 (Account Domain)
+Phase: 3 of 10 (Transaction Domain)
+Plan: 1 of 6 in current phase
+Status: In progress
+Last activity: 2026-02-02 - Completed 03-01-PLAN.md (Transaction Domain Primitives)
 
-Progress: [███░░░░░░░] ~30%
+Progress: [████░░░░░░] ~35%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 7.8 min
-- Total execution time: 1.57 hours
+- Total plans completed: 13
+- Average duration: 7.4 min
+- Total execution time: 1.60 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [███░░░░░░░] ~30%
 |-------|-------|-------|----------|
 | 01-foundation | 6 | 32 min | 5.3 min |
 | 02-account-domain | 6 | 62 min | 10.3 min |
+| 03-transaction-domain | 1 | 2 min | 2.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (8 min), 02-03 (6 min), 02-04 (3 min), 02-05 (4 min), 02-06 (25 min)
-- Trend: Testing and verification phases take longer due to manual verification checkpoints
+- Last 5 plans: 02-03 (6 min), 02-04 (3 min), 02-05 (4 min), 02-06 (25 min), 03-01 (2 min)
+- Trend: Domain primitive plans execute quickly; verification/integration phases take longer
 
 *Updated after each plan completion*
 
@@ -80,6 +81,10 @@ Recent decisions affecting current work:
 - Account number masking - show only last 4 digits in responses
 - Sync database operations for Phase 2 (async FastAPI routes with sync service/repository layer using psycopg2, full async migration deferred to Phase 4)
 - Smart DATABASE_URL handling - prefers DATABASE_URL_SYNC when DATABASE_URL contains asyncpg
+- Signed amounts for SplitLine (positive=inflow, negative=outflow)
+- Transfer splits must be negative (outgoing from source account)
+- Payee normalized_name for case-insensitive matching
+- Payee usage tracking (last_used_at, usage_count) for autocomplete relevance
 
 ### Pending Todos
 
@@ -91,32 +96,44 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-30
-Stopped at: Completed Phase 2 (Account Domain)
+Last session: 2026-02-02
+Stopped at: Completed 03-01-PLAN.md (Transaction Domain Primitives)
 Resume file: None
 
 ## Phase 1 Milestone
 
-**Phase 1: Foundation - COMPLETE** ✓
+**Phase 1: Foundation - COMPLETE**
 
 All success criteria met:
-1. ✓ Developer can open project in devcontainer and run tests with single command
-2. ✓ Domain layer has zero infrastructure imports (verified by lint-imports)
-3. ✓ Money arithmetic without precision loss (verified by property tests)
-4. ✓ Database schema with migrations applies to fresh database
-5. ✓ Security infrastructure encrypts sensitive fields (verified by integration tests)
+1. Developer can open project in devcontainer and run tests with single command
+2. Domain layer has zero infrastructure imports (verified by lint-imports)
+3. Money arithmetic without precision loss (verified by property tests)
+4. Database schema with migrations applies to fresh database
+5. Security infrastructure encrypts sensitive fields (verified by integration tests)
 
 Ready for Phase 2: Account Domain
 
 ## Phase 2 Milestone
 
-**Phase 2: Account Domain - COMPLETE** ✓
+**Phase 2: Account Domain - COMPLETE**
 
 All success criteria met:
-1. ✓ User can create checking, savings, credit card, loan, brokerage, IRA, and rewards accounts with starting balances
-2. ✓ User can edit account name and properties after creation
-3. ✓ User can delete an account (system prevents deletion if transactions exist)
-4. ✓ User can view current balance for each account
-5. ✓ Historical balance tracking ready (balance = opening_balance + transactions, Phase 3)
+1. User can create checking, savings, credit card, loan, brokerage, IRA, and rewards accounts with starting balances
+2. User can edit account name and properties after creation
+3. User can delete an account (system prevents deletion if transactions exist)
+4. User can view current balance for each account
+5. Historical balance tracking ready (balance = opening_balance + transactions, Phase 3)
 
 Ready for Phase 3: Transaction Domain
+
+## Phase 3 Progress
+
+**Phase 3: Transaction Domain - IN PROGRESS**
+
+Plan 01: Transaction Domain Primitives - COMPLETE
+- TransactionStatus/TransactionSource enums
+- SplitLine value object with signed amounts
+- PayeeId/Payee entity with usage tracking
+- Transaction domain events
+
+Next: Plan 02 - Transaction Aggregate
