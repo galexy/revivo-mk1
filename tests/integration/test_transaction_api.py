@@ -973,7 +973,10 @@ class TestSplitIdentity:
         self, client: TestClient, test_account: JsonDict, test_category: JsonDict
     ) -> None:
         """PATCH with split ID should update that specific split."""
-        # Create transaction with two splits
+        # Create second category for the second split
+        cat2 = client.post("/api/v1/categories", json={"name": "Split ID Test Cat"}).json()
+
+        # Create transaction with two splits (both categorized)
         create_response = client.post(
             "/api/v1/transactions",
             json={
@@ -981,8 +984,8 @@ class TestSplitIdentity:
                 "effective_date": "2026-01-15",
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
-                    {"amount": {"amount": "-60.00", "currency": "USD"}},
-                    {"amount": {"amount": "-40.00", "currency": "USD"}},
+                    {"amount": {"amount": "-60.00", "currency": "USD"}, "category_id": test_category["id"]},
+                    {"amount": {"amount": "-40.00", "currency": "USD"}, "category_id": cat2["id"]},
                 ],
             },
         )
@@ -992,7 +995,7 @@ class TestSplitIdentity:
         split1_id = splits[0]["id"]
         split2_id = splits[1]["id"]
 
-        # PATCH - update first split, keep second
+        # PATCH - update first split amount, keep second split
         patch_response = client.patch(
             f"/api/v1/transactions/{txn_id}",
             json={
@@ -1006,6 +1009,7 @@ class TestSplitIdentity:
                     {
                         "id": split2_id,
                         "amount": {"amount": "-30.00", "currency": "USD"},
+                        "category_id": cat2["id"],
                     },
                 ],
             },
@@ -1867,3 +1871,264 @@ class TestPatchSplitAddRemove:
         # Assert savings has 0 transactions (transfer mirror deleted)
         s_txns_after = client.get(f"/api/v1/transactions?account_id={savings['id']}").json()
         assert len(s_txns_after["transactions"]) == 0
+
+
+class TestPatchValidationErrors:
+    """Tests for PATCH-specific validation error handling."""
+
+    def test_patch_invalid_split_id_format_returns_400(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH with invalid split ID format returns 400."""
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+
+        # PATCH with invalid split ID format
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": "invalid_format",
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 400 with INVALID_ID_FORMAT
+        assert patch_response.status_code == 400
+        assert "INVALID_ID_FORMAT" in patch_response.json().get("detail", {}).get("code", "")
+
+    def test_patch_nonexistent_split_id_returns_400(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH with non-existent split ID returns 400."""
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+
+        # PATCH with valid format but non-existent split ID
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": "split_01h455vb4pex5vsknk084sn02q",
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 400 (split not found)
+        assert patch_response.status_code == 400
+
+    def test_patch_split_with_neither_category_nor_transfer_returns_400(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH split with neither category nor transfer returns 400."""
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH with split having neither category_id nor transfer_account_id
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        # No category_id, no transfer_account_id
+                    }
+                ],
+            },
+        )
+
+        # Assert 400
+        assert patch_response.status_code == 400
+
+    def test_patch_split_with_both_category_and_transfer_returns_400(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH split with both category and transfer returns 400."""
+        # Create savings account
+        savings = client.post(
+            "/api/v1/accounts/savings",
+            json={
+                "name": "Savings PATCH Both Test",
+                "opening_balance": {"amount": "0.00", "currency": "USD"},
+            },
+        ).json()
+
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH with split having both category_id and transfer_account_id
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                        "transfer_account_id": savings["id"],
+                    }
+                ],
+            },
+        )
+
+        # Assert 400
+        assert patch_response.status_code == 400
+
+    def test_patch_empty_string_category_id_returns_422(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH with empty string category_id returns 422."""
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH with empty string category_id
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": "",
+                    }
+                ],
+            },
+        )
+
+        # Assert 422 (Pydantic validation)
+        assert patch_response.status_code == 422
+        assert "category_id" in str(patch_response.json())
+
+    def test_patch_invalid_category_id_format_returns_400(
+        self, client: TestClient, test_account: JsonDict, test_category: JsonDict
+    ) -> None:
+        """PATCH with invalid category_id format returns 400."""
+        # Create transaction
+        create_response = client.post(
+            "/api/v1/transactions",
+            json={
+                "account_id": test_account["id"],
+                "effective_date": date.today().isoformat(),
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": test_category["id"],
+                    }
+                ],
+            },
+        )
+        assert create_response.status_code == 201
+        txn_id = create_response.json()["id"]
+        split_id = create_response.json()["splits"][0]["id"]
+
+        # PATCH with invalid category_id format
+        patch_response = client.patch(
+            f"/api/v1/transactions/{txn_id}",
+            json={
+                "amount": {"amount": "-100.00", "currency": "USD"},
+                "splits": [
+                    {
+                        "id": split_id,
+                        "amount": {"amount": "-100.00", "currency": "USD"},
+                        "category_id": "invalid_format",
+                    }
+                ],
+            },
+        )
+
+        # Assert 400 with INVALID_ID_FORMAT
+        assert patch_response.status_code == 400
+        assert "INVALID_ID_FORMAT" in patch_response.json().get("detail", {}).get("code", "")

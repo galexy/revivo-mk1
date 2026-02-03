@@ -216,14 +216,48 @@ def update_transaction(
                 detail={"code": "MISSING_AMOUNT", "message": "amount is required when updating splits"},
             )
 
+        # Validate each split has category or transfer (no uncategorized via API)
+        for split_req in request.splits:
+            if not split_req.category_id and not split_req.transfer_account_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "code": "INVALID_SPLIT",
+                        "message": "Split must have either category_id or transfer_account_id",
+                    },
+                )
+
+        # Fetch transaction to validate split IDs
+        existing_txn = service.get_transaction(user_id, txn_id)
+        if isinstance(existing_txn, TransactionError):
+            status_code = status.HTTP_400_BAD_REQUEST
+            if existing_txn.code == "NOT_FOUND":
+                status_code = status.HTTP_404_NOT_FOUND
+            raise HTTPException(
+                status_code=status_code,
+                detail={"code": existing_txn.code, "message": existing_txn.message},
+            )
+
         # Convert splits to domain objects, preserving IDs if provided
+        # Also validate provided split IDs exist on this transaction
+        existing_split_ids = {str(s.id) for s in existing_txn.splits}
         new_splits = []
         for split_req in request.splits:
             try:
-                # If split ID provided, preserve it; otherwise generate new one
+                # If split ID provided, parse it first (validates format) then check existence
                 if split_req.id:
+                    split_id = SplitId.from_string(split_req.id)
+                    # After parsing succeeds, check if this ID exists on the transaction
+                    if split_req.id not in existing_split_ids:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail={
+                                "code": "INVALID_SPLIT_ID",
+                                "message": f"Split ID {split_req.id} does not exist on this transaction",
+                            },
+                        )
                     split = SplitLine(
-                        id=SplitId.from_string(split_req.id),
+                        id=split_id,
                         amount=Money(split_req.amount.amount, split_req.amount.currency),
                         category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
                         transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
