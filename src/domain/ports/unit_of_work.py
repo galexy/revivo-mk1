@@ -113,3 +113,11 @@ class UnitOfWork(Protocol):
             events: List of domain events to persist.
         """
         ...
+
+    def flush(self) -> None:
+        """Flush pending changes to the database without committing.
+
+        Used to ensure entities are visible for subsequent operations
+        within the same transaction (e.g., FK constraint satisfaction).
+        """
+        ...

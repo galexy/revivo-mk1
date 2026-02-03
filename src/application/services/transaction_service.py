@@ -244,7 +244,7 @@ class TransactionService:
             # Validate account
             valid, msg = self._validate_account(user_id, account_id)
             if not valid:
-                return TransactionError("INVALID_ACCOUNT", msg)
+                return TransactionError("INVALID_ACCOUNT", msg or "Invalid account")
 
             # Validate splits
             if not splits:
@@ -319,7 +319,7 @@ class TransactionService:
             # Validate account
             valid, msg = self._validate_account(user_id, account_id)
             if not valid:
-                return TransactionError("INVALID_ACCOUNT", msg)
+                return TransactionError("INVALID_ACCOUNT", msg or "Invalid account")
 
             return self._uow.transactions.get_by_account(account_id, limit, offset)
 
