@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [x] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
-- [ ] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
+- [x] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
 - [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
 - [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
 - [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
@@ -118,9 +118,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03.2-01-PLAN.md — PATCH modification sub-cases (M1-M6)
-- [ ] 03.2-02-PLAN.md — Split addition and removal scenarios
-- [ ] 03.2-03-PLAN.md — PATCH-specific validation errors
+- [x] 03.2-01-PLAN.md — PATCH modification sub-cases (M1-M6)
+- [x] 03.2-02-PLAN.md — Split addition and removal scenarios
+- [x] 03.2-03-PLAN.md — PATCH-specific validation errors
 
 ### Phase 4: Web Interface & API
 **Goal**: Users can access the application through web browser and external tools can access via REST API
@@ -248,7 +248,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 3.1 Split Identity & Validation | 4/4 | Complete | 2026-02-02 |
-| 3.2 Add Missing PATCH Tests | 0/3 | Not started | - |
+| 3.2 Add Missing PATCH Tests | 3/3 | Complete | 2026-02-03 |
 | 4. Web Interface & API | 0/3 | Not started | - |
 | 5. Scheduled Transactions | 0/2 | Not started | - |
 | 6. Bank Sync | 0/3 | Not started | - |
