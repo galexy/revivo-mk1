@@ -2,7 +2,7 @@
 
 ## Overview
 
-A 20-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then authentication, then frontend infrastructure, then UI features, then integrations (bank sync), then financial features (budgeting, reporting, investments), and finally migration from legacy systems. Each phase delivers a coherent, verifiable capability.
+A 26-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then authentication, then frontend infrastructure, then UI features, then integrations (bank sync), then financial features (budgeting, reporting, investments), migration from legacy systems, and finally platform hardening with multi-user household support. Phases 1-20 deliver the core platform; Phases 21-26 are a future milestone for security hardening and multi-user features. Each phase delivers a coherent, verifiable capability.
 
 ## Phases
 
@@ -34,6 +34,19 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 18: Reporting** - Spending reports, net worth, and trend analysis
 - [ ] **Phase 19: Investment Tracking** - Securities, holdings, cost basis, and gains
 - [ ] **Phase 20: Migration & Polish** - Quicken import, observability dashboards, comprehensive testing
+
+---
+
+### Future Milestone: Platform Hardening & Multi-User
+
+*These phases address deferred items from Phase 4 (Authentication Infrastructure) and complete the multi-user vision.*
+
+- [ ] **Phase 21: Password Reset** - Email-based password recovery flow
+- [ ] **Phase 22: Auth Security Hardening** - Rate limiting, account lockout, brute force protection
+- [ ] **Phase 23: Session Management** - View active sessions, logout all devices, token revocation
+- [ ] **Phase 24: OIDC & Social Login** - Google OAuth and other identity providers
+- [ ] **Phase 25: Multi-User Households** - Invite users to join existing households
+- [ ] **Phase 26: User Preferences & Profile** - Timezone, currency, date format, avatar, profile data
 
 ## Phase Details
 
@@ -408,10 +421,112 @@ Plans:
 - [ ] 20-02: TBD
 - [ ] 20-03: TBD
 
+---
+
+## Future Milestone: Platform Hardening & Multi-User
+
+*Phases 21-26 address deferred items from Phase 4 and complete the multi-user household vision. These phases can be executed after the core platform is functional.*
+
+### Phase 21: Password Reset
+**Goal**: Users can recover account access via email-based password reset
+**Depends on**: Phase 20 (or can be pulled earlier if email infrastructure exists)
+**Requirements**: AUTH-RESET-01, AUTH-RESET-02
+**Success Criteria** (what must be TRUE):
+  1. User can request password reset via email
+  2. Reset link expires after 24 hours
+  3. User can set new password via reset link
+  4. Old sessions invalidated after password change
+  5. Rate limiting on reset requests prevents abuse
+**Plans**: TBD
+
+Plans:
+- [ ] 21-01: TBD
+- [ ] 21-02: TBD
+
+### Phase 22: Auth Security Hardening
+**Goal**: Protect authentication endpoints from brute force and credential stuffing attacks
+**Depends on**: Phase 21
+**Requirements**: SEC-01, SEC-02, SEC-03
+**Success Criteria** (what must be TRUE):
+  1. Login endpoint rate limited per IP and per email
+  2. Account locks temporarily after N failed attempts
+  3. Lockout duration increases with repeated failures
+  4. Admin can unlock accounts manually
+  5. Failed login attempts logged for security monitoring
+**Plans**: TBD
+
+Plans:
+- [ ] 22-01: TBD
+- [ ] 22-02: TBD
+
+### Phase 23: Session Management
+**Goal**: Users can view and control their active sessions across devices
+**Depends on**: Phase 22
+**Requirements**: AUTH-SESSION-01, AUTH-SESSION-02, AUTH-SESSION-03
+**Success Criteria** (what must be TRUE):
+  1. User can view list of active sessions (device, location, last active)
+  2. User can logout individual sessions
+  3. User can logout all other sessions ("logout everywhere")
+  4. Session terminated immediately on logout (refresh token revoked)
+  5. Sessions auto-expire after inactivity period
+**Plans**: TBD
+
+Plans:
+- [ ] 23-01: TBD
+- [ ] 23-02: TBD
+
+### Phase 24: OIDC & Social Login
+**Goal**: Users can authenticate via external identity providers (Google, etc.)
+**Depends on**: Phase 23
+**Requirements**: AUTH-OIDC-01, AUTH-OIDC-02, AUTH-OIDC-03
+**Success Criteria** (what must be TRUE):
+  1. User can sign up and log in via Google OAuth
+  2. OAuth accounts linked to existing email accounts automatically
+  3. User can link/unlink OAuth providers from settings
+  4. Users with only OAuth can add password later
+  5. OAuth tokens stored securely and refreshed as needed
+**Plans**: TBD
+
+Plans:
+- [ ] 24-01: TBD
+- [ ] 24-02: TBD
+
+### Phase 25: Multi-User Households
+**Goal**: Multiple users can share access to a household's financial data
+**Depends on**: Phase 24
+**Requirements**: HOUSEHOLD-01, HOUSEHOLD-02, HOUSEHOLD-03
+**Success Criteria** (what must be TRUE):
+  1. User can invite others to join their household via email
+  2. Invited user receives email with join link
+  3. Invited user can accept/decline invitation
+  4. All household members see same accounts and transactions
+  5. Household owner can remove members
+**Plans**: TBD
+
+Plans:
+- [ ] 25-01: TBD
+- [ ] 25-02: TBD
+
+### Phase 26: User Preferences & Profile
+**Goal**: Users can customize their experience and manage profile information
+**Depends on**: Phase 25
+**Requirements**: USER-PREF-01, USER-PREF-02, USER-PROFILE-01
+**Success Criteria** (what must be TRUE):
+  1. User can set timezone (affects date display)
+  2. User can set preferred currency (affects amount display)
+  3. User can set date format preference
+  4. User can upload profile avatar
+  5. User can update display name and contact info
+**Plans**: TBD
+
+Plans:
+- [ ] 26-01: TBD
+- [ ] 26-02: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 20
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 20 -> 21 -> ... -> 26
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -437,3 +552,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 2
 | 18. Reporting | 0/2 | Not started | - |
 | 19. Investment Tracking | 0/2 | Not started | - |
 | 20. Migration & Polish | 0/3 | Not started | - |
+| **Future Milestone** | | | |
+| 21. Password Reset | 0/2 | Not started | - |
+| 22. Auth Security Hardening | 0/2 | Not started | - |
+| 23. Session Management | 0/2 | Not started | - |
+| 24. OIDC & Social Login | 0/2 | Not started | - |
+| 25. Multi-User Households | 0/2 | Not started | - |
+| 26. User Preferences & Profile | 0/2 | Not started | - |

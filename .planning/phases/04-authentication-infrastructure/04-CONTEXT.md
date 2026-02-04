@@ -95,21 +95,20 @@ E2E tests should exercise the real authentication flow rather than using mocks o
 <deferred>
 ## Deferred Ideas
 
-**OIDC and social login** will be added in a future phase after email/password authentication is stable. The User model should accommodate this—users might eventually authenticate via Google but still have a local User record.
+These items are captured in the Future Milestone (Phases 21-26) in the roadmap:
 
-**Password reset** requires the same email infrastructure as verification. Once email sending is proven, adding a reset flow is straightforward.
+| Deferred Item | Phase | Notes |
+|---------------|-------|-------|
+| Password reset | Phase 21 | Email-based recovery flow |
+| Rate limiting | Phase 22 | Per-IP and per-email limits on login |
+| Account lockout | Phase 22 | Temporary lock after failed attempts |
+| Session management | Phase 23 | View sessions, logout all devices |
+| OIDC & social login | Phase 24 | Google OAuth, identity providers |
+| User invitations | Phase 25 | Invite others to join household |
+| User preferences | Phase 26 | Timezone, currency, date format |
+| User profile | Phase 26 | Avatar, display name, contact info |
 
-**User invitations to households** enable the multi-user scenario this architecture anticipates. Deferred until email infrastructure is stable and we have a UI for managing household membership.
-
-**Rate limiting** on login endpoints prevents brute force attacks. Requires either Redis or careful database-backed counting. Important for production but not critical for development.
-
-**Account lockout** after failed attempts is another brute force protection. Often combined with rate limiting. Can be added when hardening for production.
-
-**Session management** (viewing active sessions, logging out other devices) becomes possible with database-backed refresh tokens. The infrastructure will support it; the UI and endpoints can come later.
-
-**User preferences** (timezone, currency, date format) belong on the User entity but aren't needed for authentication. Add when the UI needs them.
-
-**User profile** (avatar, phone number) is similarly deferred until there's a UI that displays this information.
+The User model and Household model designed in this phase accommodate these future capabilities. Database-backed refresh tokens enable session management. The household foreign key on accounts/transactions supports multi-user access.
 
 </deferred>
 
