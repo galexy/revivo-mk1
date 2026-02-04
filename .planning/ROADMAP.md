@@ -155,7 +155,7 @@ Plans:
   3. Protected API routes reject requests without valid JWT (401)
   4. Protected API routes accept requests with valid JWT and identify user
   5. Existing E2E tests updated to work with authentication
-**Plans**: 8 plans
+**Plans**: 9 plans
 
 Plans:
 - [ ] 04-01-PLAN.md — User and Household domain entities with HouseholdId
@@ -165,7 +165,8 @@ Plans:
 - [ ] 04-05-PLAN.md — AuthService application service
 - [ ] 04-06-PLAN.md — Auth API routes and get_current_user dependency
 - [ ] 04-07-PLAN.md — Update existing routes and services for household scoping
-- [ ] 04-08-PLAN.md — Auth tests and update E2E tests for real auth flow
+- [ ] 04-08-PLAN.md — Auth endpoint tests and fixtures
+- [ ] 04-09-PLAN.md — Update existing E2E tests for auth and household isolation
 
 ### Phase 5: Nx Monorepo Restructure
 **Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
@@ -540,7 +541,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 2
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 3.1 Split Identity & Validation | 4/4 | Complete | 2026-02-02 |
 | 3.2 Add Missing PATCH Tests | 3/3 | Complete | 2026-02-03 |
-| 4. Authentication Infrastructure | 0/8 | Not started | - |
+| 4. Authentication Infrastructure | 0/9 | Not started | - |
 | 5. Nx Monorepo Restructure | 0/2 | Not started | - |
 | 6. Frontend Infrastructure | 0/2 | Not started | - |
 | 7. Login UI | 0/2 | Not started | - |
