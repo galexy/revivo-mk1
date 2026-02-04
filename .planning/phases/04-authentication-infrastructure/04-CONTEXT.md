@@ -27,7 +27,7 @@ Registration requires email verification, and users cannot log in until verified
 
 ### Household Model
 
-The Household entity introduces multi-user data ownership from the start. Rather than scoping accounts and transactions directly to a user, they belong to a household, and users belong to households. This design anticipates the common use case of families or couples managing finances together, where multiple people need access to the same set of accounts.
+The Household entity introduces multi-user data ownership from the start. Rather than scoping accounts and transactions directly to a user, they belong to a household, and users belong to households. This design anticipates the common use case of families or couples managing finances together, where multiple people need access to the same set of accounts. **Existing domain models and service layers need to be update as approrirate.**
 
 For this phase, the model is deliberately simple: one household per user, created automatically during registration. When a user registers, the system creates both a User and a Household in a single transaction, linking them together. The household has a display name (e.g., "Smith Family") for UI purposes. User invitations—allowing someone to join an existing household—are deferred to a future phase when we have email infrastructure proven and can handle the invitation flow properly.
 
@@ -38,6 +38,8 @@ Existing test data in the database needs a migration path. The migration will cr
 The authenticated user context flows through the application via dependency injection. A `CurrentUser` dataclass holds the `user_id` and `household_id` extracted from the JWT. FastAPI's `Depends()` mechanism injects this into route handlers, which pass it to services. This approach keeps authentication concerns at the API boundary while giving services the information they need for data scoping and audit logging.
 
 The `CurrentUser` dataclass is intentionally minimal—just two IDs. The service layer primarily needs `household_id` to filter queries (ensuring users only see their household's data) and `user_id` for audit trails (recording who performed an action). Loading the full User entity from the database on every request would add latency without providing information the services actually need. If a route needs additional user details, it can explicitly load them.
+
+This is separate, but directly related to, the User and Household domain models.
 
 ### Token Strategy
 
@@ -64,6 +66,8 @@ Public routes are limited to authentication endpoints (`/auth/*`), health checks
 All authentication failures return HTTP 401 with a JSON error body `{"detail": "Not authenticated"}`. This applies whether the token is missing, malformed, expired, or invalid. The client doesn't need to distinguish these cases—any 401 means "get a new token" (via refresh) or "log in again" (if refresh also fails).
 
 Cross-household access attempts return 404 rather than 403. If a user requests an account that exists but belongs to another household, the response is "not found" rather than "forbidden." This prevents information leakage—attackers cannot probe for the existence of resources they don't own.
+
+Login and route protection should follow idomatic fastapi - see https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 
 ### API Changes for Household Scoping
 
