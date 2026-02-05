@@ -161,6 +161,12 @@ None yet.
 
 None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Add chokepoint testing guardrails (CLAUDE.md + GSD agent updates) | 2026-02-05 | ff9f765 | [001-add-chokepoint-testing-guardrails](./quick/001-add-chokepoint-testing-guardrails/) |
+
 ## Session Continuity
 
 Last session: 2026-02-05
