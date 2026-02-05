@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 04 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 06 complete
 
 ## Current Position
 
 Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 5 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05)
+Plan: 6 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06)
 Status: In progress
-Last activity: 2026-02-05 - Completed 04-04-PLAN.md (Auth Repositories & Unit of Work)
+Last activity: 2026-02-05 - Completed 04-06-PLAN.md (Auth API Routes & Integration Tests)
 
-Progress: [█████░░░░░] ~35%
+Progress: [██████░░░░] ~38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 4.9 min
-- Total execution time: 3.0 hours
+- Total execution time: 3.1 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [█████░░░░░] ~35%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 5 | 22 min | 4.4 min |
+| 04-authentication-infrastructure | 6 | 29 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (3 min), 04-02 (4 min), 04-03 (7 min), 04-05 (4 min), 04-04 (4 min)
-- Trend: Phase 4 wave 3 complete, repositories and UoW integrated
+- Last 5 plans: 04-02 (4 min), 04-03 (7 min), 04-05 (4 min), 04-04 (4 min), 04-06 (7 min)
+- Trend: Auth API endpoints complete, TDD tests passing
 
 *Updated after each plan completion*
 
@@ -138,6 +138,12 @@ Recent decisions affecting current work:
 - RefreshTokenRepository uses SQLAlchemy Core (not ORM) for infrastructure records
 - RefreshTokenRepository typed as Any in UoW port (domain should not import adapter types)
 - User._events excluded from ORM mapping, re-initialized in repository after load
+- Cookie secure flag environment-aware (production=True, dev/test=False) for TestClient compatibility
+- Auth routes at /auth prefix (no /api/v1) since auth is cross-cutting infrastructure
+- UnitOfWork commit skips non-DomainEvent protocol events (UserRegistered is standalone dataclass)
+- Registration always returns 202 with generic user_id on duplicate email (enumeration protection)
+- OAuth2 login via OAuth2PasswordRequestForm, refresh via HttpOnly cookie at /auth/refresh path
+- CurrentUser frozen dataclass with user_id + household_id injected from JWT
 
 ### Pending Todos
 
@@ -150,9 +156,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-04-PLAN.md (Auth Repositories & Unit of Work)
+Stopped at: Completed 04-06-PLAN.md (Auth API Routes & Integration Tests)
 Resume file: None
-Next action: Continue Phase 4 (04-06 TDD registration, 04-07 TDD login, 04-08 integration)
+Next action: Continue Phase 4 plan 07 (wire existing routes to use auth)
 
 ## Roadmap Evolution
 
