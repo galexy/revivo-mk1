@@ -19,8 +19,8 @@ Progress: [█████░░░░░] ~35%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
-- Average duration: 5.0 min
+- Total plans completed: 31
+- Average duration: 4.9 min
 - Total execution time: 3.0 hours
 
 **By Phase:**
@@ -32,11 +32,11 @@ Progress: [█████░░░░░] ~35%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 4 | 18 min | 4.5 min |
+| 04-authentication-infrastructure | 5 | 22 min | 4.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (3 min), 04-02 (4 min), 04-03 (7 min), 04-05 (4 min)
-- Trend: Phase 4 wave 3 progressing, AuthService TDD complete
+- Last 5 plans: 04-01 (3 min), 04-02 (4 min), 04-03 (7 min), 04-05 (4 min), 04-04 (4 min)
+- Trend: Phase 4 wave 3 complete, repositories and UoW integrated
 
 *Updated after each plan completion*
 
@@ -134,6 +134,10 @@ Recent decisions affecting current work:
 - login() returns same INVALID_CREDENTIALS for bad email and bad password (prevent enumeration)
 - EMAIL_NOT_VERIFIED is separate error code (user can take action)
 - verify_email() validates token stateless first, then DB lookup (no unnecessary queries)
+- Separate port files per entity (user_repository.py, household_repository.py) following existing project pattern
+- RefreshTokenRepository uses SQLAlchemy Core (not ORM) for infrastructure records
+- RefreshTokenRepository typed as Any in UoW port (domain should not import adapter types)
+- User._events excluded from ORM mapping, re-initialized in repository after load
 
 ### Pending Todos
 
@@ -146,9 +150,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-05-PLAN.md (AuthService Application Service)
+Stopped at: Completed 04-04-PLAN.md (Auth Repositories & Unit of Work)
 Resume file: None
-Next action: Continue Phase 4 wave 3 (04-04, 04-06 remaining)
+Next action: Continue Phase 4 (04-06 TDD registration, 04-07 TDD login, 04-08 integration)
 
 ## Roadmap Evolution
 
