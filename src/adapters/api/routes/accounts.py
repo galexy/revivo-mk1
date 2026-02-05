@@ -10,6 +10,7 @@ Provides REST endpoints for account management:
 - DELETE /accounts/{id} - Delete account (without transactions only)
 
 All endpoints use dependency injection for AccountService and current user.
+Routes are protected by JWT authentication via get_current_user dependency.
 """
 
 from typing import Annotated
@@ -17,11 +18,15 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typeid.core.errors import SuffixValidationException
 
-from src.adapters.persistence.database import create_sync_session_factory
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_current_user,
+    get_unit_of_work,
+)
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
 from src.application.services.account_service import AccountError, AccountService
 from src.domain.model.account_types import AccountStatus, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId
 from src.domain.model.institution import InstitutionDetails
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
@@ -45,19 +50,6 @@ router = APIRouter(prefix="/accounts", tags=["accounts"])
 # --- Dependencies ---
 
 
-def get_unit_of_work() -> SqlAlchemyUnitOfWork:
-    """Provide Unit of Work for the request.
-
-    Creates a new UnitOfWork with a sync session factory.
-    The UnitOfWork manages its own transaction lifecycle.
-
-    Returns:
-        SqlAlchemyUnitOfWork instance.
-    """
-    session_factory = create_sync_session_factory()
-    return SqlAlchemyUnitOfWork(session_factory)
-
-
 def get_account_service(
     uow: Annotated[SqlAlchemyUnitOfWork, Depends(get_unit_of_work)],
 ) -> AccountService:
@@ -72,23 +64,9 @@ def get_account_service(
     return AccountService(uow)
 
 
-def get_current_user_id() -> UserId:
-    """Provide current user ID.
-
-    TODO (Phase 4): Replace with actual authentication.
-    For now, returns a placeholder user ID for development.
-
-    Returns:
-        UserId for the current user.
-    """
-    # Placeholder user for development - will be replaced with auth in Phase 4
-    return UserId.from_string("user_01h455vb4pex5vsknk084sn02q")
-
-
 # Type aliases for cleaner signatures
-UnitOfWorkDep = Annotated[SqlAlchemyUnitOfWork, Depends(get_unit_of_work)]
 AccountServiceDep = Annotated[AccountService, Depends(get_account_service)]
-CurrentUserDep = Annotated[UserId, Depends(get_current_user_id)]
+CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
 
 # --- Helper Functions ---
@@ -154,7 +132,7 @@ async def create_checking_account(
     Args:
         request: Checking account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -172,12 +150,13 @@ async def create_checking_account(
         )
 
     result = service.create_checking(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
             request.opening_balance.currency,
         ),
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         account_number=request.account_number,
@@ -206,7 +185,7 @@ async def create_savings_account(
     Args:
         request: Savings account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -224,12 +203,13 @@ async def create_savings_account(
         )
 
     result = service.create_savings(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
             request.opening_balance.currency,
         ),
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         account_number=request.account_number,
@@ -258,7 +238,7 @@ async def create_credit_card_account(
     Args:
         request: Credit card account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -276,7 +256,7 @@ async def create_credit_card_account(
         )
 
     result = service.create_credit_card(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
@@ -286,6 +266,7 @@ async def create_credit_card_account(
             request.credit_limit.amount,
             request.credit_limit.currency,
         ),
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         notes=request.notes,
@@ -313,7 +294,7 @@ async def create_loan_account(
     Args:
         request: Loan account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -331,7 +312,7 @@ async def create_loan_account(
         )
 
     result = service.create_loan(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
@@ -341,6 +322,7 @@ async def create_loan_account(
         apr=request.apr,
         term_months=request.term_months,
         due_date=request.due_date,
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         notes=request.notes,
@@ -368,7 +350,7 @@ async def create_brokerage_account(
     Args:
         request: Brokerage account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -386,12 +368,13 @@ async def create_brokerage_account(
         )
 
     result = service.create_brokerage(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
             request.opening_balance.currency,
         ),
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         notes=request.notes,
@@ -419,7 +402,7 @@ async def create_ira_account(
     Args:
         request: IRA account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -437,13 +420,14 @@ async def create_ira_account(
         )
 
     result = service.create_ira(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
             request.opening_balance.amount,
             request.opening_balance.currency,
         ),
         subtype=request.subtype,
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         notes=request.notes,
@@ -471,7 +455,7 @@ async def create_rewards_account(
     Args:
         request: Rewards account creation data.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Created account details.
@@ -489,12 +473,13 @@ async def create_rewards_account(
         )
 
     result = service.create_rewards(
-        user_id=current_user,
+        user_id=current_user.user_id,
         name=request.name,
         rewards_balance=RewardsBalance(
             value=request.rewards_balance.value,
             unit=request.rewards_balance.unit,
         ),
+        household_id=current_user.household_id,
         institution=institution,
         opening_date=request.opening_date,
         notes=request.notes,
@@ -512,7 +497,7 @@ async def create_rewards_account(
 @router.get(
     "",
     response_model=AccountListResponse,
-    summary="List user accounts",
+    summary="List household accounts",
 )
 async def list_accounts(
     service: AccountServiceDep,
@@ -526,19 +511,19 @@ async def list_accounts(
         Query(alias="type", description="Filter by account type"),
     ] = None,
 ) -> AccountListResponse:
-    """List all accounts for the current user.
+    """List all accounts for the current user's household.
 
     Args:
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
         status_filter: Optional status filter (active, closed).
         type_filter: Optional account type filter.
 
     Returns:
         List of matching accounts.
     """
-    accounts = service.get_user_accounts(
-        user_id=current_user,
+    accounts = service.get_household_accounts(
+        household_id=current_user.household_id,
         status=status_filter,
         account_type=type_filter,
     )
@@ -561,16 +546,18 @@ async def get_account(
 ) -> AccountResponse:
     """Get a single account by ID.
 
+    Verifies the account belongs to the user's household.
+
     Args:
         account_id: The account identifier.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Account details.
 
     Raises:
-        HTTPException: If account not found.
+        HTTPException: If account not found or belongs to different household.
     """
     try:
         parsed_id = AccountId.from_string(account_id)
@@ -580,12 +567,11 @@ async def get_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.get_account(parsed_id)
+    result = service.get_account(parsed_id, household_id=current_user.household_id)
 
     if isinstance(result, AccountError):
         _handle_error(result)
 
-    # TODO (Phase 4): Verify current_user owns this account
     return AccountResponse.from_domain(result)
 
 
@@ -612,7 +598,7 @@ async def update_account(
         account_id: The account identifier.
         request: Fields to update.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Updated account details.
@@ -628,14 +614,21 @@ async def update_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    # Get account to verify it exists
-    account_result = service.get_account(parsed_id)
+    # Get account to verify it exists and belongs to household
+    account_result = service.get_account(
+        parsed_id, household_id=current_user.household_id
+    )
     if isinstance(account_result, AccountError):
         _handle_error(account_result)
 
     # Apply updates (only name is supported via service for now)
     if request.name is not None:
-        result = service.update_account_name(parsed_id, request.name, current_user)
+        result = service.update_account_name(
+            parsed_id,
+            request.name,
+            current_user.user_id,
+            household_id=current_user.household_id,
+        )
         if isinstance(result, AccountError):
             _handle_error(result)
         account_result = result
@@ -666,7 +659,7 @@ async def close_account(
     Args:
         account_id: The account identifier.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Closed account details.
@@ -682,7 +675,11 @@ async def close_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.close_account(parsed_id, current_user)
+    result = service.close_account(
+        parsed_id,
+        current_user.user_id,
+        household_id=current_user.household_id,
+    )
 
     if isinstance(result, AccountError):
         _handle_error(result)
@@ -707,7 +704,7 @@ async def reopen_account(
     Args:
         account_id: The account identifier.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Returns:
         Reopened account details.
@@ -723,7 +720,11 @@ async def reopen_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.reopen_account(parsed_id, current_user)
+    result = service.reopen_account(
+        parsed_id,
+        current_user.user_id,
+        household_id=current_user.household_id,
+    )
 
     if isinstance(result, AccountError):
         _handle_error(result)
@@ -749,7 +750,7 @@ async def delete_account(
     Args:
         account_id: The account identifier.
         service: AccountService from dependency injection.
-        current_user: Current user ID from authentication.
+        current_user: Authenticated user context from JWT.
 
     Raises:
         HTTPException: If account not found or has transactions.
@@ -762,7 +763,7 @@ async def delete_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.delete_account(parsed_id)
+    result = service.delete_account(parsed_id, household_id=current_user.household_id)
 
     if isinstance(result, AccountError):
         _handle_error(result)

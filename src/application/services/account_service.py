@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 from src.domain.events.account_events import AccountDeleted
 from src.domain.model.account import Account
 from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId, HouseholdId, UserId
 from src.domain.model.institution import InstitutionDetails
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
@@ -82,6 +82,7 @@ class AccountService:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         account_number: str | None = None,
@@ -106,6 +107,7 @@ class AccountService:
                 user_id=user_id,
                 name=name,
                 opening_balance=opening_balance,
+                household_id=household_id,
                 institution=institution,
                 opening_date=opening_date,
                 account_number=account_number,
@@ -122,6 +124,7 @@ class AccountService:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         account_number: str | None = None,
@@ -146,6 +149,7 @@ class AccountService:
                 user_id=user_id,
                 name=name,
                 opening_balance=opening_balance,
+                household_id=household_id,
                 institution=institution,
                 opening_date=opening_date,
                 account_number=account_number,
@@ -163,6 +167,7 @@ class AccountService:
         name: str,
         opening_balance: Money,
         credit_limit: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -188,6 +193,7 @@ class AccountService:
                     name=name,
                     opening_balance=opening_balance,
                     credit_limit=credit_limit,
+                    household_id=household_id,
                     institution=institution,
                     opening_date=opening_date,
                     notes=notes,
@@ -209,6 +215,7 @@ class AccountService:
         apr: Decimal | None = None,
         term_months: int | None = None,
         due_date: datetime | None = None,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -239,6 +246,7 @@ class AccountService:
                 apr=apr,
                 term_months=term_months,
                 due_date=due_date,
+                household_id=household_id,
                 institution=institution,
                 opening_date=opening_date,
                 notes=notes,
@@ -254,6 +262,7 @@ class AccountService:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -276,6 +285,7 @@ class AccountService:
                 user_id=user_id,
                 name=name,
                 opening_balance=opening_balance,
+                household_id=household_id,
                 institution=institution,
                 opening_date=opening_date,
                 notes=notes,
@@ -292,6 +302,7 @@ class AccountService:
         name: str,
         opening_balance: Money,
         subtype: AccountSubtype | None = None,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -317,6 +328,7 @@ class AccountService:
                     name=name,
                     opening_balance=opening_balance,
                     subtype=subtype,
+                    household_id=household_id,
                     institution=institution,
                     opening_date=opening_date,
                     notes=notes,
@@ -334,6 +346,7 @@ class AccountService:
         user_id: UserId,
         name: str,
         rewards_balance: RewardsBalance,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -356,6 +369,7 @@ class AccountService:
                 user_id=user_id,
                 name=name,
                 rewards_balance=rewards_balance,
+                household_id=household_id,
                 institution=institution,
                 opening_date=opening_date,
                 notes=notes,
@@ -368,11 +382,20 @@ class AccountService:
 
     # --- Read Operations ---
 
-    def get_account(self, account_id: AccountId) -> Account | AccountError:
+    def get_account(
+        self,
+        account_id: AccountId,
+        household_id: HouseholdId | None = None,
+    ) -> Account | AccountError:
         """Get account by ID.
+
+        If household_id is provided, verifies the account belongs to
+        that household. Cross-household access returns NOT_FOUND (not FORBIDDEN)
+        to prevent information leaking.
 
         Args:
             account_id: The account identifier.
+            household_id: Optional household for ownership verification.
 
         Returns:
             The Account or AccountError if not found.
@@ -384,7 +407,36 @@ class AccountService:
                     code="NOT_FOUND",
                     message=f"Account {account_id} not found",
                 )
+            # Cross-household access returns 404 (security: prevents probing)
+            if household_id is not None and account.household_id != household_id:
+                return AccountError(
+                    code="NOT_FOUND",
+                    message=f"Account {account_id} not found",
+                )
             return account
+
+    def get_household_accounts(
+        self,
+        household_id: HouseholdId,
+        status: AccountStatus | None = None,
+        account_type: AccountType | None = None,
+    ) -> list[Account]:
+        """Get all accounts for a household with optional filters.
+
+        Args:
+            household_id: The household identifier for data scoping.
+            status: Optional status filter (ACTIVE, CLOSED).
+            account_type: Optional account type filter.
+
+        Returns:
+            List of matching accounts, sorted by sort_order then name.
+        """
+        with self._uow:
+            return self._uow.accounts.get_by_household(
+                household_id=household_id,
+                status=status,
+                account_type=account_type,
+            )
 
     def get_user_accounts(
         self,
@@ -412,13 +464,17 @@ class AccountService:
     # --- Lifecycle Operations ---
 
     def close_account(
-        self, account_id: AccountId, closed_by: UserId | None = None
+        self,
+        account_id: AccountId,
+        closed_by: UserId | None = None,
+        household_id: HouseholdId | None = None,
     ) -> Account | AccountError:
         """Close an account.
 
         Args:
             account_id: The account to close.
             closed_by: Optional user who performed the close.
+            household_id: Optional household for ownership verification.
 
         Returns:
             The closed Account or AccountError on failure.
@@ -426,6 +482,11 @@ class AccountService:
         with self._uow:
             account = self._uow.accounts.get(account_id)
             if account is None:
+                return AccountError(
+                    code="NOT_FOUND",
+                    message=f"Account {account_id} not found",
+                )
+            if household_id is not None and account.household_id != household_id:
                 return AccountError(
                     code="NOT_FOUND",
                     message=f"Account {account_id} not found",
@@ -440,13 +501,17 @@ class AccountService:
                 return AccountError(code="ALREADY_CLOSED", message=str(e))
 
     def reopen_account(
-        self, account_id: AccountId, reopened_by: UserId | None = None
+        self,
+        account_id: AccountId,
+        reopened_by: UserId | None = None,
+        household_id: HouseholdId | None = None,
     ) -> Account | AccountError:
         """Reopen a closed account.
 
         Args:
             account_id: The account to reopen.
             reopened_by: Optional user who performed the reopen.
+            household_id: Optional household for ownership verification.
 
         Returns:
             The reopened Account or AccountError on failure.
@@ -454,6 +519,11 @@ class AccountService:
         with self._uow:
             account = self._uow.accounts.get(account_id)
             if account is None:
+                return AccountError(
+                    code="NOT_FOUND",
+                    message=f"Account {account_id} not found",
+                )
+            if household_id is not None and account.household_id != household_id:
                 return AccountError(
                     code="NOT_FOUND",
                     message=f"Account {account_id} not found",
@@ -467,13 +537,18 @@ class AccountService:
             except ValueError as e:
                 return AccountError(code="NOT_CLOSED", message=str(e))
 
-    def delete_account(self, account_id: AccountId) -> bool | AccountError:
+    def delete_account(
+        self,
+        account_id: AccountId,
+        household_id: HouseholdId | None = None,
+    ) -> bool | AccountError:
         """Delete an account without transactions.
 
         Accounts with transactions cannot be deleted - they should be closed.
 
         Args:
             account_id: The account to delete.
+            household_id: Optional household for ownership verification.
 
         Returns:
             True on success, AccountError on failure.
@@ -481,6 +556,11 @@ class AccountService:
         with self._uow:
             account = self._uow.accounts.get(account_id)
             if account is None:
+                return AccountError(
+                    code="NOT_FOUND",
+                    message=f"Account {account_id} not found",
+                )
+            if household_id is not None and account.household_id != household_id:
                 return AccountError(
                     code="NOT_FOUND",
                     message=f"Account {account_id} not found",
@@ -509,6 +589,7 @@ class AccountService:
         account_id: AccountId,
         new_name: str,
         updated_by: UserId | None = None,
+        household_id: HouseholdId | None = None,
     ) -> Account | AccountError:
         """Update account name.
 
@@ -523,6 +604,11 @@ class AccountService:
         with self._uow:
             account = self._uow.accounts.get(account_id)
             if account is None:
+                return AccountError(
+                    code="NOT_FOUND",
+                    message=f"Account {account_id} not found",
+                )
+            if household_id is not None and account.household_id != household_id:
                 return AccountError(
                     code="NOT_FOUND",
                     message=f"Account {account_id} not found",

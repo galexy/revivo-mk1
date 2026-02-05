@@ -10,9 +10,11 @@ from decimal import Decimal
 from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
+from src.adapters.persistence.orm.tables import split_lines, transactions
 from src.domain.model.entity_id import (
     AccountId,
     CategoryId,
+    HouseholdId,
     PayeeId,
     SplitId,
     TransactionId,
@@ -22,7 +24,6 @@ from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction import Transaction
 from src.domain.model.transaction_types import TransactionSource, TransactionStatus
-from src.adapters.persistence.orm.tables import split_lines, transactions
 
 
 class SqlAlchemyTransactionRepository:
@@ -103,7 +104,9 @@ class SqlAlchemyTransactionRepository:
                 currency=split.amount.currency,
                 category_id=str(split.category_id) if split.category_id else None,
                 transfer_account_id=(
-                    str(split.transfer_account_id) if split.transfer_account_id else None
+                    str(split.transfer_account_id)
+                    if split.transfer_account_id
+                    else None
                 ),
                 memo=split.memo,
                 sort_order=i,
@@ -149,6 +152,12 @@ class SqlAlchemyTransactionRepository:
         if isinstance(txn.user_id, str):
             object.__setattr__(txn, "user_id", UserId.from_string(txn.user_id))
 
+        # Reconstruct HouseholdId from string
+        if hasattr(txn, "household_id") and isinstance(txn.household_id, str):
+            object.__setattr__(
+                txn, "household_id", HouseholdId.from_string(txn.household_id)
+            )
+
         # Reconstruct AccountId from string
         if isinstance(txn.account_id, str):
             object.__setattr__(txn, "account_id", AccountId.from_string(txn.account_id))
@@ -189,9 +198,7 @@ class SqlAlchemyTransactionRepository:
         Args:
             transaction: Transaction with payee_name and memo.
         """
-        searchable = " ".join(
-            filter(None, [transaction.payee_name, transaction.memo])
-        )
+        searchable = " ".join(filter(None, [transaction.payee_name, transaction.memo]))
         if searchable:
             update_stmt = (
                 transactions.update()
@@ -210,6 +217,7 @@ class SqlAlchemyTransactionRepository:
         insert_stmt = transactions.insert().values(
             id=str(transaction.id),
             user_id=str(transaction.user_id),
+            household_id=str(transaction.household_id),
             account_id=str(transaction.account_id),
             effective_date=transaction.effective_date,
             posted_date=transaction.posted_date,

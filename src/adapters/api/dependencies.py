@@ -9,7 +9,6 @@ Provides shared dependencies for API routes:
 
 Dependencies:
 - get_current_user: Extracts and validates JWT, returns CurrentUser dataclass
-- get_current_user_id: Legacy placeholder (backward compatibility, removed in plan 07)
 - get_auth_service: Creates AuthService with UnitOfWork
 """
 
@@ -129,19 +128,6 @@ def get_current_user(
         raise credentials_exception from exc
     except (ValueError, Exception) as exc:
         raise credentials_exception from exc
-
-
-def get_current_user_id() -> UserId:
-    """Provide current user ID.
-
-    TODO (Phase 4, Plan 07): Replace with get_current_user dependency.
-    Kept for backward compatibility with existing routes.
-
-    Returns:
-        UserId for the current user.
-    """
-    # Placeholder user for development - will be replaced with auth in Phase 4
-    return UserId.from_string("user_01h455vb4pex5vsknk084sn02q")
 
 
 def get_auth_service(

@@ -9,11 +9,18 @@ Provides REST endpoints for category management:
 - DELETE /categories/{id} - Delete category (with optional reassignment)
 
 All endpoints use dependency injection for CategoryService and current user.
+Routes are protected by JWT authentication via get_current_user dependency.
 """
+
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from src.adapters.api.dependencies import get_category_service, get_current_user_id
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_category_service,
+    get_current_user,
+)
 from src.adapters.api.schemas.category import (
     CategoryListResponse,
     CategoryResponse,
@@ -23,9 +30,12 @@ from src.adapters.api.schemas.category import (
 )
 from src.application.services.category_service import CategoryError, CategoryService
 from src.domain.model.category import Category, CategoryType
-from src.domain.model.entity_id import CategoryId, UserId
+from src.domain.model.entity_id import CategoryId
 
 router = APIRouter(prefix="/categories", tags=["categories"])
+
+# Type alias for cleaner signatures
+CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
 
 def _category_to_response(category: Category) -> CategoryResponse:
@@ -49,14 +59,14 @@ def _category_to_response(category: Category) -> CategoryResponse:
 def create_category(
     request: CreateCategoryRequest,
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryResponse:
     """Create a new category."""
     parent_id = CategoryId.from_string(request.parent_id) if request.parent_id else None
     category_type = CategoryType(request.category_type)
 
     result = service.create_category(
-        user_id=user_id,
+        user_id=current_user.user_id,
         name=request.name,
         parent_id=parent_id,
         icon=request.icon,
@@ -75,9 +85,11 @@ def create_category(
 @router.get("", response_model=CategoryListResponse)
 def list_categories(
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryListResponse:
     """List all categories for the current user."""
+    user_id = current_user.user_id
+
     # Ensure system categories exist
     service.ensure_system_categories(user_id)
 
@@ -91,9 +103,11 @@ def list_categories(
 @router.get("/tree", response_model=CategoryTreeResponse)
 def get_category_tree(
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryTreeResponse:
     """Get categories organized as a tree structure."""
+    user_id = current_user.user_id
+
     service.ensure_system_categories(user_id)
     tree = service.get_category_tree(user_id)
 
@@ -110,17 +124,22 @@ def get_category_tree(
 def get_category(
     category_id: str,
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryResponse:
     """Get a category by ID."""
     cat_id = CategoryId.from_string(category_id)
     category = service.get_category(cat_id)
 
     if category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Category not found"
+        )
 
-    if category.user_id != user_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+    if category.user_id != current_user.user_id:
+        # Cross-household access returns 404 (security: prevents probing)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Category not found"
+        )
 
     return _category_to_response(category)
 
@@ -130,10 +149,11 @@ def update_category(
     category_id: str,
     request: UpdateCategoryRequest,
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryResponse:
     """Update a category."""
     cat_id = CategoryId.from_string(category_id)
+    user_id = current_user.user_id
 
     # Update name if provided
     if request.name is not None:
@@ -146,7 +166,9 @@ def update_category(
 
     # Update parent if provided (including setting to None for top-level)
     if request.parent_id is not None or "parent_id" in request.model_fields_set:
-        parent_id = CategoryId.from_string(request.parent_id) if request.parent_id else None
+        parent_id = (
+            CategoryId.from_string(request.parent_id) if request.parent_id else None
+        )
         result = service.update_category_parent(user_id, cat_id, parent_id)
         if isinstance(result, CategoryError):
             raise HTTPException(
@@ -157,22 +179,26 @@ def update_category(
     # Fetch updated category
     category = service.get_category(cat_id)
     if category is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Category not found"
+        )
     return _category_to_response(category)
 
 
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(
     category_id: str,
-    reassign_to: str | None = Query(default=None, description="Category to reassign transactions to"),
+    reassign_to: str | None = Query(
+        default=None, description="Category to reassign transactions to"
+    ),
     service: CategoryService = Depends(get_category_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> None:
     """Delete a category."""
     cat_id = CategoryId.from_string(category_id)
     reassign_id = CategoryId.from_string(reassign_to) if reassign_to else None
 
-    result = service.delete_category(user_id, cat_id, reassign_id)
+    result = service.delete_category(current_user.user_id, cat_id, reassign_id)
 
     if isinstance(result, CategoryError):
         status_code = status.HTTP_400_BAD_REQUEST

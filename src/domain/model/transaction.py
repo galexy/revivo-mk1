@@ -23,7 +23,14 @@ from src.domain.events.transaction_events import (
     TransactionStatusChanged,
     TransactionUpdated,
 )
-from src.domain.model.entity_id import AccountId, PayeeId, SplitId, TransactionId, UserId
+from src.domain.model.entity_id import (
+    AccountId,
+    HouseholdId,
+    PayeeId,
+    SplitId,
+    TransactionId,
+    UserId,
+)
 from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction_types import TransactionSource, TransactionStatus
@@ -44,6 +51,7 @@ class Transaction:
 
     id: TransactionId
     user_id: UserId
+    household_id: HouseholdId
     account_id: AccountId  # Primary account
 
     # Dates per CONTEXT
@@ -124,6 +132,7 @@ class Transaction:
         effective_date: date,
         amount: Money,
         splits: list[SplitLine],
+        household_id: HouseholdId | None = None,
         payee_id: PayeeId | None = None,
         payee_name: str | None = None,
         memo: str | None = None,
@@ -149,6 +158,8 @@ class Transaction:
         txn = cls(
             id=TransactionId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             account_id=account_id,
             effective_date=effective_date,
             posted_date=posted_date or effective_date,  # Default per CONTEXT
@@ -219,6 +230,7 @@ class Transaction:
         mirror = cls(
             id=TransactionId.generate(),
             user_id=source_transaction.user_id,
+            household_id=source_transaction.household_id,
             account_id=target_account_id,
             effective_date=effective_date,
             posted_date=None,  # Independent from source per CONTEXT

@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from src.domain.exceptions import EntityNotFoundError
 from src.domain.model.account import Account
 from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId, HouseholdId, UserId
 from src.domain.model.institution import InstitutionDetails
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
@@ -115,6 +115,39 @@ class SqlAlchemyAccountRepository:
 
         return accounts
 
+    def get_by_household(
+        self,
+        household_id: HouseholdId,
+        status: AccountStatus | None = None,
+        account_type: AccountType | None = None,
+    ) -> list[Account]:
+        """Get all accounts for a household with optional filters.
+
+        Args:
+            household_id: The household identifier for data scoping.
+            status: Optional filter by account status.
+            account_type: Optional filter by account type.
+
+        Returns:
+            List of Account entities with reconstructed value objects.
+        """
+        stmt = select(Account).where(Account.household_id == str(household_id))
+
+        if status is not None:
+            stmt = stmt.where(Account.status == status.value)
+        if account_type is not None:
+            stmt = stmt.where(Account.account_type == account_type.value)
+
+        stmt = stmt.order_by(Account.sort_order, Account.name)
+
+        result = self._session.execute(stmt)
+        accounts = list(result.scalars().all())
+
+        for account in accounts:
+            self._reconstruct_value_objects(account)
+
+        return accounts
+
     def delete(self, account: Account) -> None:
         """Delete account from session.
 
@@ -157,9 +190,17 @@ class SqlAlchemyAccountRepository:
         if isinstance(account.user_id, str):
             object.__setattr__(account, "user_id", UserId.from_string(account.user_id))
 
+        # Reconstruct HouseholdId from string
+        if hasattr(account, "household_id") and isinstance(account.household_id, str):
+            object.__setattr__(
+                account, "household_id", HouseholdId.from_string(account.household_id)
+            )
+
         # Reconstruct enums from string values
         if isinstance(account.account_type, str):
-            object.__setattr__(account, "account_type", AccountType(account.account_type))
+            object.__setattr__(
+                account, "account_type", AccountType(account.account_type)
+            )
         if isinstance(account.status, str):
             object.__setattr__(account, "status", AccountStatus(account.status))
         if account.subtype is not None and isinstance(account.subtype, str):
@@ -167,9 +208,13 @@ class SqlAlchemyAccountRepository:
 
         # Reconstruct created_by and updated_by UserId
         if account.created_by is not None and isinstance(account.created_by, str):
-            object.__setattr__(account, "created_by", UserId.from_string(account.created_by))
+            object.__setattr__(
+                account, "created_by", UserId.from_string(account.created_by)
+            )
         if account.updated_by is not None and isinstance(account.updated_by, str):
-            object.__setattr__(account, "updated_by", UserId.from_string(account.updated_by))
+            object.__setattr__(
+                account, "updated_by", UserId.from_string(account.updated_by)
+            )
 
         # Reconstruct Money - opening_balance (required field)
         # SQLAlchemy maps to opening_balance_amount and opening_balance_currency columns

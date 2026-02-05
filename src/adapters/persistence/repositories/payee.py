@@ -6,7 +6,7 @@ Handles persistence of Payee entity with autocomplete support.
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.domain.model.entity_id import CategoryId, PayeeId, UserId
+from src.domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
 from src.domain.model.payee import Payee
 
 
@@ -154,7 +154,6 @@ class SqlAlchemyPayeeRepository:
             so this method exists primarily for protocol compliance.
         """
         # Changes are tracked by SQLAlchemy session
-        pass
 
     def delete(self, payee_id: PayeeId) -> None:
         """Delete a payee.
@@ -179,6 +178,12 @@ class SqlAlchemyPayeeRepository:
         # Reconstruct UserId from string
         if isinstance(payee.user_id, str):
             object.__setattr__(payee, "user_id", UserId.from_string(payee.user_id))
+
+        # Reconstruct HouseholdId from string
+        if hasattr(payee, "household_id") and isinstance(payee.household_id, str):
+            object.__setattr__(
+                payee, "household_id", HouseholdId.from_string(payee.household_id)
+            )
 
         # Reconstruct default_category_id CategoryId from string
         if payee.default_category_id is not None and isinstance(

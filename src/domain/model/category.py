@@ -19,8 +19,7 @@ from src.domain.events.transaction_events import (
     CategoryDeleted,
     CategoryUpdated,
 )
-from src.domain.model.entity_id import CategoryId, UserId
-
+from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 # System category names that cannot be modified
 SYSTEM_CATEGORY_UNCATEGORIZED = "Uncategorized"
@@ -47,6 +46,7 @@ class Category:
 
     id: CategoryId
     user_id: UserId
+    household_id: HouseholdId
     name: str
 
     # Hierarchy - parent_id is None for top-level categories
@@ -89,6 +89,7 @@ class Category:
         icon: str | None = None,
         sort_order: int = 0,
         category_type: CategoryType = CategoryType.EXPENSE,
+        household_id: HouseholdId | None = None,
     ) -> Self:
         """Create a new user category."""
         if not name or not name.strip():
@@ -97,6 +98,8 @@ class Category:
         category = cls(
             id=CategoryId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name.strip(),
             parent_id=parent_id,
             category_type=category_type,
@@ -122,6 +125,7 @@ class Category:
         user_id: UserId,
         name: str,
         category_type: CategoryType = CategoryType.EXPENSE,
+        household_id: HouseholdId | None = None,
     ) -> Self:
         """Create a system category (protected, cannot be modified).
 
@@ -130,6 +134,8 @@ class Category:
         category = cls(
             id=CategoryId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             parent_id=None,  # System categories are always top-level
             category_type=category_type,

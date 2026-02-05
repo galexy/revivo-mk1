@@ -10,15 +10,21 @@ Provides REST endpoints for transaction management:
 - DELETE /transactions/{id} - Delete transaction
 
 All endpoints use dependency injection for TransactionService and current user.
+Routes are protected by JWT authentication via get_current_user dependency.
 Supports split transactions with automatic mirror creation for transfers.
 """
 
 from datetime import date
 from decimal import Decimal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from src.adapters.api.dependencies import get_current_user_id, get_transaction_service
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_current_user,
+    get_transaction_service,
+)
 from src.adapters.api.schemas.transaction import (
     CreateTransactionRequest,
     MarkClearedRequest,
@@ -28,13 +34,19 @@ from src.adapters.api.schemas.transaction import (
     TransactionResponse,
     UpdateTransactionRequest,
 )
-from src.application.services.transaction_service import TransactionError, TransactionService
-from src.domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId, UserId
+from src.application.services.transaction_service import (
+    TransactionError,
+    TransactionService,
+)
+from src.domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId
 from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction import Transaction
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
+
+# Type alias for cleaner signatures
+CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
 
 def _split_to_response(split: SplitLine) -> SplitLineResponse:
@@ -43,7 +55,9 @@ def _split_to_response(split: SplitLine) -> SplitLineResponse:
         id=str(split.id),
         amount=MoneySchema(amount=split.amount.amount, currency=split.amount.currency),
         category_id=str(split.category_id) if split.category_id else None,
-        transfer_account_id=str(split.transfer_account_id) if split.transfer_account_id else None,
+        transfer_account_id=str(split.transfer_account_id)
+        if split.transfer_account_id
+        else None,
         memo=split.memo,
     )
 
@@ -65,18 +79,22 @@ def _transaction_to_response(txn: Transaction) -> TransactionResponse:
         memo=txn.memo,
         check_number=txn.check_number,
         is_mirror=txn.is_mirror,
-        source_transaction_id=str(txn.source_transaction_id) if txn.source_transaction_id else None,
+        source_transaction_id=str(txn.source_transaction_id)
+        if txn.source_transaction_id
+        else None,
         source_split_id=str(txn.source_split_id) if txn.source_split_id else None,
         created_at=txn.created_at,
         updated_at=txn.updated_at,
     )
 
 
-@router.post("", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED
+)
 def create_transaction(
     request: CreateTransactionRequest,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionResponse:
     """Create a new transaction with splits."""
     # Convert request to domain objects
@@ -88,8 +106,12 @@ def create_transaction(
         try:
             split = SplitLine.create(
                 amount=Money(split_req.amount.amount, split_req.amount.currency),
-                category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-                transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                category_id=CategoryId.from_string(split_req.category_id)
+                if split_req.category_id
+                else None,
+                transfer_account_id=AccountId.from_string(split_req.transfer_account_id)
+                if split_req.transfer_account_id
+                else None,
                 memo=split_req.memo,
             )
         except ValueError as e:
@@ -100,7 +122,7 @@ def create_transaction(
         splits.append(split)
 
     result = service.create_transaction(
-        user_id=user_id,
+        user_id=current_user.user_id,
         account_id=account_id,
         effective_date=request.effective_date,
         amount=amount,
@@ -132,9 +154,11 @@ def list_transactions(
     limit: int = Query(default=100, le=500),
     offset: int = Query(default=0, ge=0),
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionListResponse:
     """List transactions with filtering and search."""
+    user_id = current_user.user_id
+
     # If search provided, use full-text search
     if search:
         txns = service.search_transactions(user_id, search, limit)
@@ -173,15 +197,17 @@ def list_transactions(
 def get_transaction(
     transaction_id: str,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionResponse:
     """Get a transaction by ID."""
     txn_id = TransactionId.from_string(transaction_id)
-    result = service.get_transaction(user_id, txn_id)
+    result = service.get_transaction(current_user.user_id, txn_id)
 
     if isinstance(result, TransactionError):
         if result.code == "NOT_FOUND":
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found"
+            )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"code": result.code, "message": result.message},
@@ -195,7 +221,7 @@ def update_transaction(
     transaction_id: str,
     request: UpdateTransactionRequest,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionResponse:
     """Update transaction fields.
 
@@ -206,6 +232,7 @@ def update_transaction(
     When updating splits, mirror transactions are automatically synced.
     """
     txn_id = TransactionId.from_string(transaction_id)
+    user_id = current_user.user_id
 
     # Handle splits update if provided
     if request.splits is not None:
@@ -213,7 +240,10 @@ def update_transaction(
         if request.amount is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail={"code": "MISSING_AMOUNT", "message": "amount is required when updating splits"},
+                detail={
+                    "code": "MISSING_AMOUNT",
+                    "message": "amount is required when updating splits",
+                },
             )
 
         # Validate each split has category or transfer (no uncategorized via API)
@@ -258,16 +288,32 @@ def update_transaction(
                         )
                     split = SplitLine(
                         id=split_id,
-                        amount=Money(split_req.amount.amount, split_req.amount.currency),
-                        category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-                        transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                        amount=Money(
+                            split_req.amount.amount, split_req.amount.currency
+                        ),
+                        category_id=CategoryId.from_string(split_req.category_id)
+                        if split_req.category_id
+                        else None,
+                        transfer_account_id=AccountId.from_string(
+                            split_req.transfer_account_id
+                        )
+                        if split_req.transfer_account_id
+                        else None,
                         memo=split_req.memo,
                     )
                 else:
                     split = SplitLine.create(
-                        amount=Money(split_req.amount.amount, split_req.amount.currency),
-                        category_id=CategoryId.from_string(split_req.category_id) if split_req.category_id else None,
-                        transfer_account_id=AccountId.from_string(split_req.transfer_account_id) if split_req.transfer_account_id else None,
+                        amount=Money(
+                            split_req.amount.amount, split_req.amount.currency
+                        ),
+                        category_id=CategoryId.from_string(split_req.category_id)
+                        if split_req.category_id
+                        else None,
+                        transfer_account_id=AccountId.from_string(
+                            split_req.transfer_account_id
+                        )
+                        if split_req.transfer_account_id
+                        else None,
                         memo=split_req.memo,
                     )
             except ValueError as e:
@@ -279,7 +325,9 @@ def update_transaction(
 
         new_amount = Money(request.amount.amount, request.amount.currency)
 
-        result = service.update_transaction_splits(user_id, txn_id, new_splits, new_amount)
+        result = service.update_transaction_splits(
+            user_id, txn_id, new_splits, new_amount
+        )
         if isinstance(result, TransactionError):
             status_code = status.HTTP_400_BAD_REQUEST
             if result.code == "NOT_FOUND":
@@ -312,7 +360,9 @@ def update_transaction(
     # Fetch updated transaction
     result = service.get_transaction(user_id, txn_id)
     if isinstance(result, TransactionError):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found"
+        )
 
     return _transaction_to_response(result)
 
@@ -322,13 +372,13 @@ def mark_transaction_cleared(
     transaction_id: str,
     request: MarkClearedRequest | None = None,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionResponse:
     """Mark transaction as cleared."""
     txn_id = TransactionId.from_string(transaction_id)
     posted_date = request.posted_date if request else None
 
-    result = service.mark_transaction_cleared(user_id, txn_id, posted_date)
+    result = service.mark_transaction_cleared(current_user.user_id, txn_id, posted_date)
 
     if isinstance(result, TransactionError):
         raise HTTPException(
@@ -343,12 +393,12 @@ def mark_transaction_cleared(
 def mark_transaction_reconciled(
     transaction_id: str,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> TransactionResponse:
     """Mark transaction as reconciled."""
     txn_id = TransactionId.from_string(transaction_id)
 
-    result = service.mark_transaction_reconciled(user_id, txn_id)
+    result = service.mark_transaction_reconciled(current_user.user_id, txn_id)
 
     if isinstance(result, TransactionError):
         raise HTTPException(
@@ -363,12 +413,12 @@ def mark_transaction_reconciled(
 def delete_transaction(
     transaction_id: str,
     service: TransactionService = Depends(get_transaction_service),
-    user_id: UserId = Depends(get_current_user_id),
+    current_user: CurrentUser = Depends(get_current_user),
 ) -> None:
     """Delete a transaction (and its mirrors if source)."""
     txn_id = TransactionId.from_string(transaction_id)
 
-    result = service.delete_transaction(user_id, txn_id)
+    result = service.delete_transaction(current_user.user_id, txn_id)
 
     if isinstance(result, TransactionError):
         status_code = status.HTTP_400_BAD_REQUEST

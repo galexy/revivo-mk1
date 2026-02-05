@@ -9,7 +9,7 @@ from typing import Protocol
 
 from src.domain.model.account import Account
 from src.domain.model.account_types import AccountStatus, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId, HouseholdId, UserId
 
 
 class AccountRepository(Protocol):
@@ -62,6 +62,24 @@ class AccountRepository(Protocol):
 
         Args:
             user_id: The user identifier.
+            status: Optional status filter (ACTIVE, CLOSED).
+            account_type: Optional account type filter.
+
+        Returns:
+            List of matching accounts, sorted by sort_order then name.
+        """
+        ...
+
+    def get_by_household(
+        self,
+        household_id: HouseholdId,
+        status: AccountStatus | None = None,
+        account_type: AccountType | None = None,
+    ) -> list[Account]:
+        """Get all accounts for a household with optional filters.
+
+        Args:
+            household_id: The household identifier for data scoping.
             status: Optional status filter (ACTIVE, CLOSED).
             account_type: Optional account type filter.
 

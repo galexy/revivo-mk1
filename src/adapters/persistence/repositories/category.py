@@ -6,9 +6,13 @@ Handles persistence of Category entity with value object reconstruction.
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
-from src.domain.model.entity_id import CategoryId, UserId
-from src.adapters.persistence.orm.tables import categories, split_lines
+from src.adapters.persistence.orm.tables import split_lines
+from src.domain.model.category import (
+    SYSTEM_CATEGORY_UNCATEGORIZED,
+    Category,
+    CategoryType,
+)
+from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 
 class SqlAlchemyCategoryRepository:
@@ -125,7 +129,9 @@ class SqlAlchemyCategoryRepository:
         if existing:
             return existing
 
-        category = Category.create_system_category(user_id, SYSTEM_CATEGORY_UNCATEGORIZED)
+        category = Category.create_system_category(
+            user_id, SYSTEM_CATEGORY_UNCATEGORIZED
+        )
         self._session.add(category)
         return category
 
@@ -140,7 +146,6 @@ class SqlAlchemyCategoryRepository:
             so this method exists primarily for protocol compliance.
         """
         # Changes are tracked by SQLAlchemy session
-        pass
 
     def delete(self, category_id: CategoryId) -> None:
         """Delete a category.
@@ -182,7 +187,15 @@ class SqlAlchemyCategoryRepository:
 
         # Reconstruct UserId from string
         if isinstance(category.user_id, str):
-            object.__setattr__(category, "user_id", UserId.from_string(category.user_id))
+            object.__setattr__(
+                category, "user_id", UserId.from_string(category.user_id)
+            )
+
+        # Reconstruct HouseholdId from string
+        if hasattr(category, "household_id") and isinstance(category.household_id, str):
+            object.__setattr__(
+                category, "household_id", HouseholdId.from_string(category.household_id)
+            )
 
         # Reconstruct parent_id CategoryId from string
         if category.parent_id is not None and isinstance(category.parent_id, str):
@@ -197,5 +210,8 @@ class SqlAlchemyCategoryRepository:
             )
 
         # Ensure _events list exists (transient field, not loaded from DB)
-        if not hasattr(category, "_events") or getattr(category, "_events", None) is None:
+        if (
+            not hasattr(category, "_events")
+            or getattr(category, "_events", None) is None
+        ):
             object.__setattr__(category, "_events", [])

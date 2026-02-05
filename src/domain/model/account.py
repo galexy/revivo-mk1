@@ -24,7 +24,7 @@ from src.domain.events.account_events import (
 )
 from src.domain.events.base import DomainEvent
 from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, UserId
+from src.domain.model.entity_id import AccountId, HouseholdId, UserId
 from src.domain.model.institution import InstitutionDetails
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
@@ -45,6 +45,7 @@ class Account:
     # Identity
     id: AccountId
     user_id: UserId
+    household_id: HouseholdId
     name: str
     account_type: AccountType
     status: AccountStatus
@@ -114,6 +115,7 @@ class Account:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         account_number: str | None = None,
@@ -123,6 +125,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.CHECKING,
             status=AccountStatus.ACTIVE,
@@ -148,6 +152,7 @@ class Account:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         account_number: str | None = None,
@@ -157,6 +162,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.SAVINGS,
             status=AccountStatus.ACTIVE,
@@ -183,6 +190,7 @@ class Account:
         name: str,
         opening_balance: Money,
         credit_limit: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -194,6 +202,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.CREDIT_CARD,
             status=AccountStatus.ACTIVE,
@@ -223,6 +233,7 @@ class Account:
         apr: Decimal | None = None,
         term_months: int | None = None,
         due_date: datetime | None = None,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -231,6 +242,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.LOAN,
             status=AccountStatus.ACTIVE,
@@ -259,6 +272,7 @@ class Account:
         user_id: UserId,
         name: str,
         opening_balance: Money,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -267,6 +281,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.BROKERAGE,
             status=AccountStatus.ACTIVE,
@@ -292,6 +308,7 @@ class Account:
         name: str,
         opening_balance: Money,
         subtype: AccountSubtype | None = None,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -312,6 +329,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.IRA,
             status=AccountStatus.ACTIVE,
@@ -337,6 +356,7 @@ class Account:
         user_id: UserId,
         name: str,
         rewards_balance: RewardsBalance,
+        household_id: HouseholdId | None = None,
         institution: InstitutionDetails | None = None,
         opening_date: datetime | None = None,
         notes: str | None = None,
@@ -348,6 +368,8 @@ class Account:
         account = cls(
             id=AccountId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=name,
             account_type=AccountType.REWARDS,
             status=AccountStatus.ACTIVE,

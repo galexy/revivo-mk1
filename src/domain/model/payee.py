@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Self
 
-from src.domain.model.entity_id import CategoryId, PayeeId, UserId
+from src.domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
 
 
 @dataclass(eq=False)
@@ -42,6 +42,7 @@ class Payee:
 
     id: PayeeId
     user_id: UserId
+    household_id: HouseholdId
     name: str
     normalized_name: str
     default_category_id: CategoryId | None = None
@@ -60,6 +61,7 @@ class Payee:
         user_id: UserId,
         name: str,
         default_category_id: CategoryId | None = None,
+        household_id: HouseholdId | None = None,
     ) -> Self:
         """Create a new payee with normalized name for matching.
 
@@ -81,6 +83,8 @@ class Payee:
         return cls(
             id=PayeeId.generate(),
             user_id=user_id,
+            household_id=household_id
+            or HouseholdId.from_string("hh_00000000000000000000000000"),
             name=stripped_name,
             normalized_name=stripped_name.lower(),
             default_category_id=default_category_id,
