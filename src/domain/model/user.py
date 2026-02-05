@@ -24,6 +24,7 @@ class User:
         display_name: User's display name
         password_hash: Argon2 password hash (set by infrastructure)
         household_id: Household this user belongs to
+        role: User role within household ("owner" or "member")
         email_verified: Whether email has been verified
         email_verified_at: When email was verified (None if not verified)
         created_at: When user was created
@@ -35,6 +36,7 @@ class User:
     display_name: str
     password_hash: str
     household_id: HouseholdId
+    role: str = "member"
     email_verified: bool = False
     email_verified_at: datetime | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
@@ -50,6 +52,7 @@ class User:
         display_name: str,
         password_hash: str,
         household_id: HouseholdId,
+        role: str = "owner",
     ) -> Self:
         """Create a new user.
 
@@ -61,6 +64,7 @@ class User:
             display_name: User's display name (will be stripped)
             password_hash: Pre-hashed password (Argon2)
             household_id: Household this user belongs to
+            role: User role ("owner" for registration, "member" for invites)
 
         Returns:
             New User instance with generated ID and UserRegistered event
@@ -74,6 +78,7 @@ class User:
             display_name=display_name.strip(),
             password_hash=password_hash,
             household_id=household_id,
+            role=role,
             email_verified=False,
             email_verified_at=None,
             created_at=now,

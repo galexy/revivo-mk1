@@ -81,7 +81,6 @@ households = Table(
     metadata,
     Column("id", HouseholdIdType(36), primary_key=True),  # hh_xxx
     Column("name", String(255), nullable=False),
-    Column("owner_id", UserIdType(36), nullable=False),  # FK added after users table
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
 )
@@ -102,6 +101,7 @@ users = Table(
         ForeignKey("households.id"),
         nullable=False,
     ),
+    Column("role", String(20), nullable=False, default="member"),
     Column("email_verified", Boolean, nullable=False, default=False),
     Column("email_verified_at", DateTime(timezone=True), nullable=True),
     Column(

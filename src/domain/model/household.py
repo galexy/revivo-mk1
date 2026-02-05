@@ -3,13 +3,16 @@
 A Household owns all financial data (accounts, transactions, categories).
 Users belong to households. Initially one household per user, but the
 model supports multiple users per household (future Phase 25).
+
+Ownership is tracked via the user's role field (role="owner") rather than
+a separate owner_id on the household, avoiding circular FK dependencies.
 """
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Self
 
-from .entity_id import HouseholdId, UserId
+from .entity_id import HouseholdId
 
 
 @dataclass(eq=False)
@@ -21,14 +24,12 @@ class Household:
     Attributes:
         id: Unique household identifier
         name: Display name (e.g., "Smith Family")
-        owner_id: UserId of the household creator/owner
         created_at: When household was created
         updated_at: Last modification timestamp
     """
 
     id: HouseholdId
     name: str
-    owner_id: UserId
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
@@ -36,13 +37,11 @@ class Household:
     def create(
         cls,
         name: str,
-        owner_id: UserId,
     ) -> Self:
         """Create a new household.
 
         Args:
             name: Display name for the household
-            owner_id: User who owns/created the household
 
         Returns:
             New Household instance with generated ID
@@ -51,7 +50,6 @@ class Household:
         return cls(
             id=HouseholdId.generate(),
             name=name,
-            owner_id=owner_id,
             created_at=now,
             updated_at=now,
         )

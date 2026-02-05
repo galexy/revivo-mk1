@@ -33,7 +33,6 @@ def household_id(session):
         households.insert().values(
             id=str(hh_id),
             name="Test Household",
-            owner_id=str(UserId.generate()),
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
         )
@@ -55,6 +54,7 @@ def user_id(session, household_id):
             display_name="Test User",
             password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
             household_id=str(household_id),
+            role="owner",
             email_verified=True,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),

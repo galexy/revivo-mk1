@@ -137,24 +137,15 @@ class AuthService:
             # Hash password (infrastructure concern)
             password_hash = hash_password(password)
 
-            # Create household first (need household_id for user)
-            # Use a placeholder owner_id, will be updated after user creation
-            placeholder_owner = UserId.generate()
-            household = Household.create(
-                name=f"{display_name}'s Household",
-                owner_id=placeholder_owner,
-            )
-
-            # Create user with household_id
+            # Create household and user (no circular FK dependency)
+            household = Household.create(name=f"{display_name}'s Household")
             user = User.create(
                 email=normalized_email,
                 display_name=display_name,
                 password_hash=password_hash,
                 household_id=household.id,
+                role="owner",
             )
-
-            # Update household owner to actual user
-            household.owner_id = user.id
 
             # Persist
             self._uow.households.add(household)

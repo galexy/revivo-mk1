@@ -102,7 +102,7 @@ def start_mappers() -> None:
     - Transaction: Maps Transaction class to transactions table.
       splits and amount excluded - handled manually in repository.
     - Household: Maps Household class to households table.
-      Simple entity with owner reference.
+      Simple entity with name and timestamps.
     - User: Maps User class to users table.
       _events excluded (transient domain event list).
     """
