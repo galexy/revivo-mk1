@@ -500,3 +500,72 @@ class TestUpdateEndpoints:
         )
 
         assert response.status_code == 404
+
+
+class TestHouseholdIsolation:
+    """Verify that users cannot access data from other households."""
+
+    def _create_second_user(self, client: TestClient) -> dict:
+        """Register and authenticate a second user (different household)."""
+        user_data = {
+            "email": f"other_{uuid.uuid4().hex[:8]}@example.com",
+            "password": "OtherPassword123!",
+            "display_name": "Other User",
+        }
+        # Register
+        client.post("/auth/register", json=user_data)
+        # Verify email
+        token = generate_verification_token(user_data["email"])
+        client.get(f"/auth/verify?token={token}")
+        # Login
+        response = client.post(
+            "/auth/token",
+            data={"username": user_data["email"], "password": user_data["password"]},
+        )
+        return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+    def test_cannot_access_other_household_account(
+        self, client: TestClient, auth_headers: dict
+    ) -> None:
+        """Accessing another household's account returns 404."""
+        # Create account with first user
+        response = client.post(
+            "/api/v1/accounts/checking",
+            json={
+                "name": "My Account",
+                "opening_balance": {"amount": "100.00", "currency": "USD"},
+            },
+            headers=auth_headers,
+        )
+        account_id = response.json()["id"]
+
+        # Login as second user (different household)
+        other_headers = self._create_second_user(client)
+
+        # Try to access first user's account -> 404
+        response = client.get(
+            f"/api/v1/accounts/{account_id}", headers=other_headers
+        )
+        assert response.status_code == 404
+
+    def test_cannot_list_other_household_accounts(
+        self, client: TestClient, auth_headers: dict
+    ) -> None:
+        """Listing accounts only shows own household's accounts."""
+        # Create account with first user
+        client.post(
+            "/api/v1/accounts/checking",
+            json={
+                "name": "Hidden Account",
+                "opening_balance": {"amount": "50.00", "currency": "USD"},
+            },
+            headers=auth_headers,
+        )
+
+        # Login as second user
+        other_headers = self._create_second_user(client)
+
+        # List accounts as second user -> should be empty
+        response = client.get("/api/v1/accounts", headers=other_headers)
+        assert response.status_code == 200
+        assert response.json()["total"] == 0
