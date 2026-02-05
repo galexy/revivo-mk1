@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 07 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - COMPLETE
 
 ## Current Position
 
-Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 7 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06, 04-07)
-Status: In progress
-Last activity: 2026-02-05 - Completed 04-07-PLAN.md (Route Protection & Household Scoping)
+Phase: 4 of 20 (Authentication Infrastructure) - COMPLETE
+Plan: 8 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06, 04-07, 04-08)
+Status: Phase complete
+Last activity: 2026-02-05 - Completed 04-08-PLAN.md (Update Integration Tests for Auth)
 
-Progress: [██████░░░░] ~39%
+Progress: [██████░░░░] ~40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33
+- Total plans completed: 34
 - Average duration: 4.9 min
-- Total execution time: 3.2 hours
+- Total execution time: 3.35 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██████░░░░] ~39%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 7 | 37 min | 5.3 min |
+| 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (7 min), 04-05 (4 min), 04-04 (4 min), 04-06 (7 min), 04-07 (8 min)
-- Trend: Route protection and household scoping complete, one plan remaining
+- Last 5 plans: 04-05 (4 min), 04-04 (4 min), 04-06 (7 min), 04-07 (8 min), 04-08 (9 min)
+- Trend: Phase 4 complete, all 8 plans executed
 
 *Updated after each plan completion*
 
@@ -148,6 +148,8 @@ Recent decisions affecting current work:
 - Cross-household access returns 404 (not 403) to prevent resource probing
 - Routes extract both user_id and household_id from CurrentUser JWT claims
 - Removed placeholder get_current_user_id; all routes use real JWT auth
+- Auth fixture chain per test file (not shared conftest) for test module independence
+- household_id must be threaded through all service layers to domain entity creation (category, transaction, payee)
 
 ### Pending Todos
 
@@ -155,14 +157,14 @@ None yet.
 
 ### Blockers/Concerns
 
-- Old integration tests (test_account_api.py, test_transaction_api.py, etc.) need updating to use auth fixtures and new schema (plan 04-08)
+- Pre-existing test_account_repository.py (16 errors) and test_database.py (4 failures) need updating for users table schema changes (display_name NOT NULL from auth migration)
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-07-PLAN.md (Route Protection & Household Scoping)
+Stopped at: Completed 04-08-PLAN.md (Update Integration Tests for Auth) - Phase 4 COMPLETE
 Resume file: None
-Next action: Continue Phase 4 plan 08 (update old integration tests for auth)
+Next action: Begin Phase 5 (Import Pipeline) or milestone audit for Phase 4
 
 ## Roadmap Evolution
 
@@ -255,4 +257,33 @@ Plans completed (3 of 3):
 Total new tests: 21 (55 total transaction API tests)
 Bugs fixed: 2 (uncategorized splits validation, non-existent split ID validation)
 
-Ready for Phase 4: Web Interface & API
+Ready for Phase 4: Authentication Infrastructure
+
+## Phase 4 Milestone
+
+**Phase 4: Authentication Infrastructure - COMPLETE**
+
+All success criteria met:
+1. User can register with email/password and verify email via signed token
+2. User can login and receive JWT access token + HttpOnly refresh cookie
+3. All API endpoints require valid JWT authentication
+4. Users can only access data within their own household (cross-household returns 404)
+5. All 111 API integration tests pass with real JWT auth flow (24 account + 55 transaction + 17 category + 15 auth)
+
+Plans completed (8 of 8):
+- 04-01: User Domain Model (User entity, events, password hashing with Argon2)
+- 04-02: JWT Token Infrastructure (PyJWT access tokens, itsdangerous verification tokens)
+- 04-03: Household & User Persistence (migration 006, ORM mappers, repositories)
+- 04-04: Auth Service (register, login, verify_email, refresh with token rotation)
+- 04-05: Auth API Endpoints (register, token, verify, refresh routes)
+- 04-06: Auth Integration Tests (15 tests covering full auth flow)
+- 04-07: Route Protection & Household Scoping (JWT middleware, CurrentUser injection, household_id FK on all tables)
+- 04-08: Update Integration Tests for Auth (96 tests migrated to real auth, 2 household isolation tests, household_id bug fix)
+
+Key stats:
+- 111 API integration tests total
+- 255 unit tests (no regressions)
+- 11 files modified in final plan (8 source + 3 test files)
+- 1 critical bug fixed (household_id not threaded through category/transaction services)
+
+Ready for Phase 5: Import Pipeline
