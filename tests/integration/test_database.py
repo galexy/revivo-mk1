@@ -7,8 +7,25 @@ import pytest
 from sqlalchemy import insert, select, text
 from sqlalchemy.exc import IntegrityError
 
-from src.adapters.persistence.orm.tables import encrypted_secrets, outbox, users
-from src.domain.model.entity_id import UserId
+from src.adapters.persistence.orm.tables import encrypted_secrets, households, outbox, users
+from src.domain.model.entity_id import HouseholdId, UserId
+
+
+@pytest.fixture
+def household_id(session):
+    """Create a test household and return its string ID."""
+    hh_id = HouseholdId.generate()
+    session.execute(
+        insert(households).values(
+            id=str(hh_id),
+            name="Test Household",
+            owner_id=str(UserId.generate()),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        )
+    )
+    session.commit()
+    return str(hh_id)
 
 
 class TestDatabaseTables:
@@ -138,13 +155,16 @@ class TestOutboxPattern:
 class TestUserTable:
     """Test users table operations."""
 
-    def test_can_insert_user(self, session):
+    def test_can_insert_user(self, session, household_id):
         """Users can be inserted."""
         user_id = UserId.generate()
         session.execute(
             insert(users).values(
                 id=user_id.value,
                 email="test@example.com",
+                display_name="Test User",
+                password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
+                household_id=household_id,
                 email_verified=False,
                 created_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),
@@ -160,7 +180,7 @@ class TestUserTable:
         assert result.email == "test@example.com"
         assert result.id.startswith("user_")
 
-    def test_email_must_be_unique(self, session):
+    def test_email_must_be_unique(self, session, household_id):
         """Email uniqueness constraint is enforced."""
         user_id_1 = UserId.generate()
         user_id_2 = UserId.generate()
@@ -169,6 +189,9 @@ class TestUserTable:
             insert(users).values(
                 id=user_id_1.value,
                 email="duplicate@example.com",
+                display_name="User One",
+                password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
+                household_id=household_id,
                 email_verified=False,
                 created_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),
@@ -181,6 +204,9 @@ class TestUserTable:
                 insert(users).values(
                     id=user_id_2.value,
                     email="duplicate@example.com",  # Same email
+                    display_name="User Two",
+                    password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
+                    household_id=household_id,
                     email_verified=False,
                     created_at=datetime.now(UTC),
                     updated_at=datetime.now(UTC),
@@ -192,7 +218,7 @@ class TestUserTable:
 class TestEncryptedSecretsTable:
     """Test encrypted secrets storage."""
 
-    def test_can_store_encrypted_secret(self, session, field_encryption):
+    def test_can_store_encrypted_secret(self, session, household_id, field_encryption):
         """Encrypted secrets can be stored."""
         user_id = UserId.generate()
 
@@ -201,6 +227,9 @@ class TestEncryptedSecretsTable:
             insert(users).values(
                 id=user_id.value,
                 email="secrets@example.com",
+                display_name="Secrets User",
+                password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
+                household_id=household_id,
                 email_verified=False,
                 created_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),
@@ -234,7 +263,7 @@ class TestEncryptedSecretsTable:
         decrypted = field_encryption.decrypt(result.encrypted_value)
         assert decrypted == "plaid_access_token_xxx"
 
-    def test_user_secret_type_unique_constraint(self, session, field_encryption):
+    def test_user_secret_type_unique_constraint(self, session, household_id, field_encryption):
         """Each user can have only one secret of each type."""
         user_id = UserId.generate()
 
@@ -242,6 +271,9 @@ class TestEncryptedSecretsTable:
             insert(users).values(
                 id=user_id.value,
                 email="unique@example.com",
+                display_name="Unique User",
+                password_hash="$argon2id$v=19$m=65536,t=3,p=4$placeholder",
+                household_id=household_id,
                 email_verified=False,
                 created_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),
