@@ -241,17 +241,23 @@ class SqlAlchemyUnitOfWork:
         Events are written to the outbox table as part of the same
         transaction. This ensures atomicity - events are only visible
         if the business data commit succeeds.
+
+        Events that don't conform to the DomainEvent protocol (missing
+        event_type, aggregate_type, aggregate_id, to_dict) are skipped.
+        This handles standalone event dataclasses (e.g., UserRegistered).
         """
         # Write collected events to outbox
         for event in self._events:
-            self.session.execute(
-                insert(outbox).values(
-                    event_type=event.event_type,
-                    aggregate_type=event.aggregate_type,
-                    aggregate_id=event.aggregate_id,
-                    payload=json.dumps(event.to_dict(), default=str),
+            # Only write events that conform to DomainEvent protocol
+            if hasattr(event, "event_type") and hasattr(event, "aggregate_type"):
+                self.session.execute(
+                    insert(outbox).values(
+                        event_type=event.event_type,
+                        aggregate_type=event.aggregate_type,
+                        aggregate_id=event.aggregate_id,
+                        payload=json.dumps(event.to_dict(), default=str),
+                    )
                 )
-            )
         self.session.commit()
         self._events.clear()
 

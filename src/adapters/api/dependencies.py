@@ -4,23 +4,50 @@ Provides shared dependencies for API routes:
 - Settings and encryption from environment/secrets
 - Unit of Work for database transactions
 - Service layer factories for domain operations
-- Current user resolution (placeholder until Phase 4 auth)
+- Current user resolution via JWT authentication
+- Auth service factory
+
+Dependencies:
+- get_current_user: Extracts and validates JWT, returns CurrentUser dataclass
+- get_current_user_id: Legacy placeholder (backward compatibility, removed in plan 07)
+- get_auth_service: Creates AuthService with UnitOfWork
 """
 
 import os
+from dataclasses import dataclass
 from functools import lru_cache
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 
 from src.adapters.logging import get_logger
 from src.adapters.persistence.database import create_sync_session_factory
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
 from src.adapters.security.encryption import FieldEncryption
+from src.adapters.security.jwt import TokenError, decode_access_token
+from src.application.services.auth_service import AuthService
 from src.application.services.category_service import CategoryService
 from src.application.services.transaction_service import TransactionService
-from src.domain.model.entity_id import UserId
+from src.domain.model.entity_id import HouseholdId, UserId
 
 logger = get_logger(__name__)
+
+
+# OAuth2 scheme for extracting Bearer token from Authorization header
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+
+
+@dataclass(frozen=True, slots=True)
+class CurrentUser:
+    """Authenticated user context extracted from JWT.
+
+    Attributes:
+        user_id: The authenticated user's ID.
+        household_id: The user's household ID for data scoping.
+    """
+
+    user_id: UserId
+    household_id: HouseholdId
 
 
 @lru_cache
@@ -63,17 +90,72 @@ def get_unit_of_work() -> SqlAlchemyUnitOfWork:
     return SqlAlchemyUnitOfWork(session_factory)
 
 
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+) -> CurrentUser:
+    """Extract and validate current user from JWT access token.
+
+    Decodes the JWT, extracts user_id and household_id claims,
+    and returns a CurrentUser dataclass.
+
+    Args:
+        token: JWT access token from Authorization header.
+
+    Returns:
+        CurrentUser with user_id and household_id.
+
+    Raises:
+        HTTPException: 401 if token is invalid, expired, or missing claims.
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = decode_access_token(token)
+        user_id_str: str | None = payload.get("sub")
+        household_id_str: str | None = payload.get("household_id")
+
+        if user_id_str is None or household_id_str is None:
+            raise credentials_exception
+
+        return CurrentUser(
+            user_id=UserId.from_string(user_id_str),
+            household_id=HouseholdId.from_string(household_id_str),
+        )
+    except TokenError as exc:
+        raise credentials_exception from exc
+    except (ValueError, Exception) as exc:
+        raise credentials_exception from exc
+
+
 def get_current_user_id() -> UserId:
     """Provide current user ID.
 
-    TODO (Phase 4): Replace with actual authentication.
-    For now, returns a placeholder user ID for development.
+    TODO (Phase 4, Plan 07): Replace with get_current_user dependency.
+    Kept for backward compatibility with existing routes.
 
     Returns:
         UserId for the current user.
     """
     # Placeholder user for development - will be replaced with auth in Phase 4
     return UserId.from_string("user_01h455vb4pex5vsknk084sn02q")
+
+
+def get_auth_service(
+    uow: SqlAlchemyUnitOfWork = Depends(get_unit_of_work),
+) -> AuthService:
+    """Provide AuthService with UnitOfWork.
+
+    Args:
+        uow: Unit of Work from dependency injection.
+
+    Returns:
+        AuthService configured with the UnitOfWork.
+    """
+    return AuthService(uow)
 
 
 def get_category_service(
