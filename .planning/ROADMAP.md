@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [x] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
 - [x] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
-- [ ] **Phase 4: Authentication Infrastructure** - User domain model, JWT issuance, protected routes
+- [x] **Phase 4: Authentication Infrastructure** - User domain model, JWT issuance, protected routes
 - [ ] **Phase 5: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [ ] **Phase 6: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 7: Login UI** - Login page, session/token management, logout
@@ -158,14 +158,14 @@ Plans:
 **Plans**: 8 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — User and Household domain entities with HouseholdId
-- [ ] 04-02-PLAN.md — Security infrastructure (PyJWT, pwdlib/Argon2, itsdangerous)
-- [ ] 04-03-PLAN.md — Database migration for auth tables and household scoping
-- [ ] 04-04-PLAN.md — ORM mappers and repositories (User, Household, RefreshToken)
-- [ ] 04-05-PLAN.md — AuthService application service (TDD)
-- [ ] 04-06-PLAN.md — Auth API routes, schemas, dependencies, and endpoint tests (TDD)
-- [ ] 04-07-PLAN.md — Route protection and household scoping (TDD)
-- [ ] 04-08-PLAN.md — Update existing E2E tests for auth and household isolation
+- [x] 04-01-PLAN.md — User and Household domain entities with HouseholdId
+- [x] 04-02-PLAN.md — Security infrastructure (PyJWT, pwdlib/Argon2, itsdangerous)
+- [x] 04-03-PLAN.md — Database migration for auth tables and household scoping
+- [x] 04-04-PLAN.md — ORM mappers and repositories (User, Household, RefreshToken)
+- [x] 04-05-PLAN.md — AuthService application service (TDD)
+- [x] 04-06-PLAN.md — Auth API routes, schemas, dependencies, and endpoint tests (TDD)
+- [x] 04-07-PLAN.md — Route protection and household scoping (TDD)
+- [x] 04-08-PLAN.md — Update existing E2E tests for auth and household isolation
 
 ### Phase 5: Nx Monorepo Restructure
 **Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
