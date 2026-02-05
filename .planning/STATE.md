@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 02 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 03 complete
 
 ## Current Position
 
 Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 2 of 8 complete
+Plan: 3 of 8 complete
 Status: In progress
-Last activity: 2026-02-05 - Completed 04-02-PLAN.md (Security Primitives)
+Last activity: 2026-02-05 - Completed 04-03-PLAN.md (Database Tables & Migration)
 
-Progress: [███░░░░░░░] ~28%
+Progress: [████░░░░░░] ~31%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
+- Total plans completed: 29
 - Average duration: 5.1 min
-- Total execution time: 2.8 hours
+- Total execution time: 2.9 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [███░░░░░░░] ~28%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 2 | 7 min | 3.5 min |
+| 04-authentication-infrastructure | 3 | 14 min | 4.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.2-02 (2 min), 03.2-03 (4 min), 04-01 (3 min), 04-02 (4 min)
-- Trend: Phase 4 progressing, TDD security primitives
+- Last 5 plans: 03.2-03 (4 min), 04-01 (3 min), 04-02 (4 min), 04-03 (7 min)
+- Trend: Phase 4 progressing, database migration for auth tables
 
 *Updated after each plan completion*
 
@@ -126,6 +126,10 @@ Recent decisions affecting current work:
 - Explicit algorithm list in jwt.decode() to prevent algorithm confusion attacks
 - JWT_SECRET from os.environ with fallback default for development
 - Required claims (exp, sub, household_id) enforced in JWT decode
+- Default household ID is well-known constant hh_00000000000000000000000000 (valid TypeID)
+- Circular FK bootstrap: create households.owner_id nullable, populate, then add NOT NULL
+- All user-owned data tables (accounts, transactions, categories, payees) have household_id FK
+- HouseholdIdType TypeDecorator for ORM mapping of HouseholdId
 
 ### Pending Todos
 
@@ -133,14 +137,14 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- Integration tests fail between 04-03 and 04-07/04-08 (NOT NULL household_id on tables without matching domain model updates yet)
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-02-PLAN.md (Security Primitives)
+Stopped at: Completed 04-03-PLAN.md (Database Tables & Migration)
 Resume file: None
-Next action: Continue Phase 4 plan 03 (Database Tables & Migration)
+Next action: Continue Phase 4 plan 04 (Auth Repositories & Unit of Work)
 
 ## Roadmap Evolution
 
