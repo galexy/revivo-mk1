@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 06 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 07 complete
 
 ## Current Position
 
 Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 6 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06)
+Plan: 7 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06, 04-07)
 Status: In progress
-Last activity: 2026-02-05 - Completed 04-06-PLAN.md (Auth API Routes & Integration Tests)
+Last activity: 2026-02-05 - Completed 04-07-PLAN.md (Route Protection & Household Scoping)
 
-Progress: [██████░░░░] ~38%
+Progress: [██████░░░░] ~39%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 33
 - Average duration: 4.9 min
-- Total execution time: 3.1 hours
+- Total execution time: 3.2 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██████░░░░] ~38%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 6 | 29 min | 4.8 min |
+| 04-authentication-infrastructure | 7 | 37 min | 5.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (4 min), 04-03 (7 min), 04-05 (4 min), 04-04 (4 min), 04-06 (7 min)
-- Trend: Auth API endpoints complete, TDD tests passing
+- Last 5 plans: 04-03 (7 min), 04-05 (4 min), 04-04 (4 min), 04-06 (7 min), 04-07 (8 min)
+- Trend: Route protection and household scoping complete, one plan remaining
 
 *Updated after each plan completion*
 
@@ -144,6 +144,10 @@ Recent decisions affecting current work:
 - Registration always returns 202 with generic user_id on duplicate email (enumeration protection)
 - OAuth2 login via OAuth2PasswordRequestForm, refresh via HttpOnly cookie at /auth/refresh path
 - CurrentUser frozen dataclass with user_id + household_id injected from JWT
+- All domain model factory methods accept optional household_id with fallback to well-known default
+- Cross-household access returns 404 (not 403) to prevent resource probing
+- Routes extract both user_id and household_id from CurrentUser JWT claims
+- Removed placeholder get_current_user_id; all routes use real JWT auth
 
 ### Pending Todos
 
@@ -151,14 +155,14 @@ None yet.
 
 ### Blockers/Concerns
 
-- Integration tests fail between 04-03 and 04-07/04-08 (NOT NULL household_id on tables without matching domain model updates yet)
+- Old integration tests (test_account_api.py, test_transaction_api.py, etc.) need updating to use auth fixtures and new schema (plan 04-08)
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-06-PLAN.md (Auth API Routes & Integration Tests)
+Stopped at: Completed 04-07-PLAN.md (Route Protection & Household Scoping)
 Resume file: None
-Next action: Continue Phase 4 plan 07 (wire existing routes to use auth)
+Next action: Continue Phase 4 plan 08 (update old integration tests for auth)
 
 ## Roadmap Evolution
 
