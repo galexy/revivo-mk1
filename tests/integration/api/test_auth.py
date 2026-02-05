@@ -288,3 +288,25 @@ class TestEmailVerification:
         """Invalid token returns 400."""
         response = client.get("/auth/verify?token=invalid-token-value")
         assert response.status_code == 400
+
+
+class TestProtectedRoutes:
+    """Verify that non-auth routes require valid JWT."""
+
+    def test_accounts_requires_auth(self, client) -> None:
+        """GET /api/v1/accounts without token returns 401."""
+        response = client.get("/api/v1/accounts")
+        assert response.status_code == 401
+
+    def test_accounts_with_valid_token(self, client, auth_headers) -> None:
+        """GET /api/v1/accounts with valid token returns 200."""
+        response = client.get("/api/v1/accounts", headers=auth_headers)
+        assert response.status_code == 200
+
+    def test_accounts_with_invalid_token(self, client) -> None:
+        """GET /api/v1/accounts with invalid token returns 401."""
+        response = client.get(
+            "/api/v1/accounts",
+            headers={"Authorization": "Bearer invalid-token"},
+        )
+        assert response.status_code == 401
