@@ -24,8 +24,11 @@ from .orm.tables import outbox
 if TYPE_CHECKING:
     from .repositories.account import SqlAlchemyAccountRepository
     from .repositories.category import SqlAlchemyCategoryRepository
+    from .repositories.household import HouseholdRepository
     from .repositories.payee import SqlAlchemyPayeeRepository
+    from .repositories.refresh_token import RefreshTokenRepository
     from .repositories.transaction import SqlAlchemyTransactionRepository
+    from .repositories.user import UserRepository
 
 
 class SqlAlchemyUnitOfWork:
@@ -47,8 +50,11 @@ class SqlAlchemyUnitOfWork:
 
     _accounts: SqlAlchemyAccountRepository | None
     _categories: SqlAlchemyCategoryRepository | None
+    _households: HouseholdRepository | None
     _payees: SqlAlchemyPayeeRepository | None
+    _refresh_tokens: RefreshTokenRepository | None
     _transactions: SqlAlchemyTransactionRepository | None
+    _users: UserRepository | None
 
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         """Initialize Unit of Work.
@@ -61,8 +67,11 @@ class SqlAlchemyUnitOfWork:
         self._session: Session | None = None
         self._accounts: SqlAlchemyAccountRepository | None = None
         self._categories: SqlAlchemyCategoryRepository | None = None
+        self._households: HouseholdRepository | None = None
         self._payees: SqlAlchemyPayeeRepository | None = None
+        self._refresh_tokens: RefreshTokenRepository | None = None
         self._transactions: SqlAlchemyTransactionRepository | None = None
+        self._users: UserRepository | None = None
 
     def __enter__(self) -> Self:
         """Start a new unit of work (transaction).
@@ -74,8 +83,11 @@ class SqlAlchemyUnitOfWork:
         # Reset repository instances for fresh session
         self._accounts = None
         self._categories = None
+        self._households = None
         self._payees = None
+        self._refresh_tokens = None
         self._transactions = None
+        self._users = None
         return self
 
     def __exit__(
@@ -166,6 +178,51 @@ class SqlAlchemyUnitOfWork:
 
             self._transactions = SqlAlchemyTransactionRepository(self.session)
         return self._transactions
+
+    @property
+    def users(self) -> UserRepository:
+        """Access to User repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            UserRepository for user persistence.
+        """
+        if self._users is None:
+            from .repositories.user import UserRepository
+
+            self._users = UserRepository(self.session)
+        return self._users
+
+    @property
+    def households(self) -> HouseholdRepository:
+        """Access to Household repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            HouseholdRepository for household persistence.
+        """
+        if self._households is None:
+            from .repositories.household import HouseholdRepository
+
+            self._households = HouseholdRepository(self.session)
+        return self._households
+
+    @property
+    def refresh_tokens(self) -> RefreshTokenRepository:
+        """Access to RefreshToken repository.
+
+        Lazily creates repository on first access.
+
+        Returns:
+            RefreshTokenRepository for refresh token persistence.
+        """
+        if self._refresh_tokens is None:
+            from .repositories.refresh_token import RefreshTokenRepository
+
+            self._refresh_tokens = RefreshTokenRepository(self.session)
+        return self._refresh_tokens
 
     def collect_events(self, events: list[DomainEvent]) -> None:
         """Collect domain events to be persisted with commit.

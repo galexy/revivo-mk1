@@ -12,14 +12,16 @@ Key principles:
 - Events are collected and persisted to outbox on commit()
 """
 
-from typing import TYPE_CHECKING, Protocol, Self
+from typing import TYPE_CHECKING, Any, Protocol, Self
 
 if TYPE_CHECKING:
     from src.domain.events.base import DomainEvent
     from src.domain.ports.account_repository import AccountRepository
     from src.domain.ports.category_repository import CategoryRepository
+    from src.domain.ports.household_repository import HouseholdRepositoryProtocol
     from src.domain.ports.payee_repository import PayeeRepository
     from src.domain.ports.transaction_repository import TransactionRepository
+    from src.domain.ports.user_repository import UserRepositoryProtocol
 
 
 class UnitOfWork(Protocol):
@@ -40,6 +42,9 @@ class UnitOfWork(Protocol):
     - categories: CategoryRepository
     - payees: PayeeRepository
     - transactions: TransactionRepository
+    - users: UserRepositoryProtocol
+    - households: HouseholdRepositoryProtocol
+    - refresh_tokens: RefreshTokenRepository
     """
 
     @property
@@ -60,6 +65,26 @@ class UnitOfWork(Protocol):
     @property
     def transactions(self) -> "TransactionRepository":
         """Access to Transaction repository."""
+        ...
+
+    @property
+    def users(self) -> "UserRepositoryProtocol":
+        """Access to User repository."""
+        ...
+
+    @property
+    def households(self) -> "HouseholdRepositoryProtocol":
+        """Access to Household repository."""
+        ...
+
+    @property
+    def refresh_tokens(self) -> Any:
+        """Access to RefreshToken repository.
+
+        Returns the RefreshTokenRepository implementation. Typed as Any
+        because RefreshTokenRepository is infrastructure (not a domain
+        protocol) -- refresh tokens are security records, not aggregates.
+        """
         ...
 
     def __enter__(self) -> Self:
