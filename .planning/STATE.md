@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 3.2 Complete - Ready for Phase 4 (Authentication Infrastructure)
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 01 complete
 
 ## Current Position
 
-Phase: 3.2 of 20 (Add Missing PATCH Test Cases) - COMPLETE
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-02-04 - Roadmap restructured (10 phases → 20 phases)
+Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
+Plan: 1 of 8 complete
+Status: In progress
+Last activity: 2026-02-05 - Completed 04-01-PLAN.md (User & Household Domain Entities)
 
-Progress: [██░░░░░░░░] ~25%
+Progress: [██░░░░░░░░] ~27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
-- Average duration: 5.3 min
-- Total execution time: 2.6 hours
+- Total plans completed: 27
+- Average duration: 5.2 min
+- Total execution time: 2.7 hours
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [██░░░░░░░░] ~25%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
+| 04-authentication-infrastructure | 1 | 3 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-04 (4 min), 03.2-01 (1 min), 03.2-02 (2 min), 03.2-03 (4 min)
-- Trend: Phase 3.2 complete
+- Last 5 plans: 03.2-01 (1 min), 03.2-02 (2 min), 03.2-03 (4 min), 04-01 (3 min)
+- Trend: Phase 4 started, TDD domain entities
 
 *Updated after each plan completion*
 
@@ -114,6 +115,11 @@ Recent decisions affecting current work:
 - TransactionResponse includes source_split_id field for mirror linkage
 - PATCH rejects splits with neither category_id nor transfer_account_id (API validation, domain allows)
 - PATCH validates provided split IDs exist on transaction before update
+- User events are standalone frozen dataclasses (not inheriting DomainEvent base)
+- User.collect_events() pattern (copy-then-clear) for event collection
+- Email normalization in domain layer (lowercase + strip in User.create())
+- verify_email() is idempotent (no-op on already-verified user)
+- HouseholdId uses "hh_" prefix in TypeID pattern
 
 ### Pending Todos
 
@@ -125,10 +131,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-03
-Stopped at: Completed 03.2-03-PLAN.md (Validation Error tests)
+Last session: 2026-02-05
+Stopped at: Completed 04-01-PLAN.md (User & Household Domain Entities)
 Resume file: None
-Next action: Begin Phase 4: Web Interface & API
+Next action: Continue Phase 4 plan 02 (Password Hashing & JWT)
 
 ## Roadmap Evolution
 
