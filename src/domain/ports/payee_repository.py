@@ -2,7 +2,7 @@
 
 from typing import Protocol
 
-from src.domain.model.entity_id import PayeeId, UserId
+from src.domain.model.entity_id import HouseholdId, PayeeId, UserId
 from src.domain.model.payee import Payee
 
 
@@ -34,7 +34,9 @@ class PayeeRepository(Protocol):
         """Search payees by name prefix for autocomplete."""
         ...
 
-    def get_or_create(self, user_id: UserId, name: str) -> Payee:
+    def get_or_create(
+        self, user_id: UserId, name: str, household_id: HouseholdId | None = None
+    ) -> Payee:
         """Get existing payee or create new one (for auto-creation pattern)."""
         ...
 

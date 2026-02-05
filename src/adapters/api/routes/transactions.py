@@ -131,6 +131,7 @@ def create_transaction(
         memo=request.memo,
         check_number=request.check_number,
         posted_date=request.posted_date,
+        household_id=current_user.household_id,
     )
 
     if isinstance(result, TransactionError):

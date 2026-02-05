@@ -116,11 +116,14 @@ class SqlAlchemyCategoryRepository:
             self._reconstruct_value_objects(category)
         return category
 
-    def get_or_create_uncategorized(self, user_id: UserId) -> Category:
+    def get_or_create_uncategorized(
+        self, user_id: UserId, household_id: HouseholdId | None = None
+    ) -> Category:
         """Get or create the 'Uncategorized' system category for a user.
 
         Args:
             user_id: The user identifier.
+            household_id: The household identifier for data scoping.
 
         Returns:
             The 'Uncategorized' category for the user.
@@ -130,7 +133,7 @@ class SqlAlchemyCategoryRepository:
             return existing
 
         category = Category.create_system_category(
-            user_id, SYSTEM_CATEGORY_UNCATEGORIZED
+            user_id, SYSTEM_CATEGORY_UNCATEGORIZED, household_id=household_id
         )
         self._session.add(category)
         return category

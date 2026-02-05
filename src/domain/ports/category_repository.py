@@ -3,7 +3,7 @@
 from typing import Protocol
 
 from src.domain.model.category import Category
-from src.domain.model.entity_id import CategoryId, UserId
+from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 
 class CategoryRepository(Protocol):
@@ -29,7 +29,9 @@ class CategoryRepository(Protocol):
         """Get a system category by name (e.g., 'Uncategorized')."""
         ...
 
-    def get_or_create_uncategorized(self, user_id: UserId) -> Category:
+    def get_or_create_uncategorized(
+        self, user_id: UserId, household_id: HouseholdId | None = None
+    ) -> Category:
         """Get or create the 'Uncategorized' system category for a user."""
         ...
 

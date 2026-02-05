@@ -13,7 +13,7 @@ from src.domain.events.transaction_events import (
     MirrorTransactionCreated,
     MirrorTransactionDeleted,
 )
-from src.domain.model.entity_id import AccountId, CategoryId, PayeeId, TransactionId, UserId
+from src.domain.model.entity_id import AccountId, CategoryId, HouseholdId, PayeeId, TransactionId, UserId
 from src.domain.model.money import Money
 from src.domain.model.split_line import SplitLine
 from src.domain.model.transaction import Transaction
@@ -96,12 +96,15 @@ class TransactionService:
         self,
         user_id: UserId,
         payee_name: str | None,
+        household_id: HouseholdId | None = None,
     ) -> tuple[PayeeId | None, str | None]:
         """Get or create payee by name, returning (payee_id, payee_name)."""
         if not payee_name:
             return None, None
 
-        payee = self._uow.payees.get_or_create(user_id, payee_name)
+        payee = self._uow.payees.get_or_create(
+            user_id, payee_name, household_id=household_id
+        )
         payee.record_usage()
         return payee.id, payee.name
 
@@ -232,6 +235,7 @@ class TransactionService:
         check_number: str | None = None,
         posted_date: date | None = None,
         source: TransactionSource = TransactionSource.MANUAL,
+        household_id: HouseholdId | None = None,
     ) -> Transaction | TransactionError:
         """Create a transaction with splits.
 
@@ -256,7 +260,9 @@ class TransactionService:
                 return TransactionError("INVALID_SPLITS", msg or "Invalid splits")
 
             # Get or create payee
-            payee_id, payee_display = self._get_or_create_payee(user_id, payee_name)
+            payee_id, payee_display = self._get_or_create_payee(
+                user_id, payee_name, household_id=household_id
+            )
 
             # Flush to ensure payee exists in DB before transaction insert (FK constraint)
             if payee_id:
@@ -270,6 +276,7 @@ class TransactionService:
                     effective_date=effective_date,
                     amount=amount,
                     splits=splits,
+                    household_id=household_id,
                     payee_id=payee_id,
                     payee_name=payee_display,
                     memo=memo,

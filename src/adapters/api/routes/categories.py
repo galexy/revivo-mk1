@@ -71,6 +71,7 @@ def create_category(
         parent_id=parent_id,
         icon=request.icon,
         category_type=category_type,
+        household_id=current_user.household_id,
     )
 
     if isinstance(result, CategoryError):
@@ -91,7 +92,7 @@ def list_categories(
     user_id = current_user.user_id
 
     # Ensure system categories exist
-    service.ensure_system_categories(user_id)
+    service.ensure_system_categories(user_id, household_id=current_user.household_id)
 
     categories = service.get_user_categories(user_id)
     return CategoryListResponse(
@@ -108,7 +109,7 @@ def get_category_tree(
     """Get categories organized as a tree structure."""
     user_id = current_user.user_id
 
-    service.ensure_system_categories(user_id)
+    service.ensure_system_categories(user_id, household_id=current_user.household_id)
     tree = service.get_category_tree(user_id)
 
     return CategoryTreeResponse(
@@ -198,7 +199,10 @@ def delete_category(
     cat_id = CategoryId.from_string(category_id)
     reassign_id = CategoryId.from_string(reassign_to) if reassign_to else None
 
-    result = service.delete_category(current_user.user_id, cat_id, reassign_id)
+    result = service.delete_category(
+        current_user.user_id, cat_id, reassign_id,
+        household_id=current_user.household_id,
+    )
 
     if isinstance(result, CategoryError):
         status_code = status.HTTP_400_BAD_REQUEST

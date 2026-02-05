@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from src.domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
-from src.domain.model.entity_id import CategoryId, UserId
+from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 if TYPE_CHECKING:
     from src.domain.ports.unit_of_work import UnitOfWork
@@ -27,14 +27,18 @@ class CategoryService:
     def __init__(self, uow: "UnitOfWork") -> None:
         self._uow = uow
 
-    def ensure_system_categories(self, user_id: UserId) -> Category:
+    def ensure_system_categories(
+        self, user_id: UserId, household_id: HouseholdId | None = None
+    ) -> Category:
         """Ensure system categories exist for user.
 
         Creates 'Uncategorized' if it doesn't exist.
         Returns the Uncategorized category.
         """
         with self._uow:
-            category = self._uow.categories.get_or_create_uncategorized(user_id)
+            category = self._uow.categories.get_or_create_uncategorized(
+                user_id, household_id=household_id
+            )
             self._uow.commit()
             return category
 
@@ -45,6 +49,7 @@ class CategoryService:
         parent_id: CategoryId | None = None,
         icon: str | None = None,
         category_type: CategoryType = CategoryType.EXPENSE,
+        household_id: HouseholdId | None = None,
     ) -> Category | CategoryError:
         """Create a new user category."""
         with self._uow:
@@ -70,6 +75,7 @@ class CategoryService:
                 parent_id=parent_id,
                 icon=icon,
                 category_type=category_type,
+                household_id=household_id,
             )
 
             self._uow.categories.add(category)
@@ -186,6 +192,7 @@ class CategoryService:
         user_id: UserId,
         category_id: CategoryId,
         reassign_to: CategoryId | None = None,
+        household_id: HouseholdId | None = None,
     ) -> bool | CategoryError:
         """Delete a category.
 
@@ -215,7 +222,9 @@ class CategoryService:
 
             # Get or create Uncategorized for reassignment
             if reassign_to is None:
-                uncategorized = self._uow.categories.get_or_create_uncategorized(user_id)
+                uncategorized = self._uow.categories.get_or_create_uncategorized(
+                    user_id, household_id=household_id
+                )
                 reassign_to = uncategorized.id
 
             # TODO: Reassign transactions (will be added when transaction filter by category works)

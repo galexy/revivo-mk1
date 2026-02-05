@@ -123,7 +123,9 @@ class SqlAlchemyPayeeRepository:
 
         return payees
 
-    def get_or_create(self, user_id: UserId, name: str) -> Payee:
+    def get_or_create(
+        self, user_id: UserId, name: str, household_id: HouseholdId | None = None
+    ) -> Payee:
         """Get existing payee or create new one.
 
         Used for auto-creation pattern when entering transactions.
@@ -131,6 +133,7 @@ class SqlAlchemyPayeeRepository:
         Args:
             user_id: The user identifier.
             name: The payee name.
+            household_id: The household identifier for data scoping.
 
         Returns:
             Existing or newly created Payee entity.
@@ -139,7 +142,7 @@ class SqlAlchemyPayeeRepository:
         if existing:
             return existing
 
-        payee = Payee.create(user_id=user_id, name=name)
+        payee = Payee.create(user_id=user_id, name=name, household_id=household_id)
         self._session.add(payee)
         return payee
 
