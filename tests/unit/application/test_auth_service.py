@@ -100,3 +100,141 @@ class TestAuthServiceRegister:
         uow.collect_events = MagicMock()
 
         return uow
+
+
+class TestAuthServiceLogin:
+    """Tests for AuthService.login() method."""
+
+    def test_login_with_valid_credentials_returns_tokens(self) -> None:
+        """login() returns AuthTokens for valid credentials."""
+        from src.application.services.auth_service import AuthService, AuthTokens
+        from src.adapters.security.password import hash_password
+
+        uow = self._make_mock_uow_with_user(
+            email="user@example.com",
+            password_hash=hash_password("ValidPass123!"),
+            email_verified=True,
+        )
+        service = AuthService(uow)
+
+        result = service.login("user@example.com", "ValidPass123!")
+
+        assert isinstance(result, AuthTokens)
+        assert result.access_token is not None
+        assert result.refresh_token is not None
+        assert result.token_type == "bearer"
+
+    def test_login_wrong_password_returns_error(self) -> None:
+        """login() returns AuthError for wrong password."""
+        from src.application.services.auth_service import AuthService, AuthError
+        from src.adapters.security.password import hash_password
+
+        uow = self._make_mock_uow_with_user(
+            email="user@example.com",
+            password_hash=hash_password("CorrectPassword123!"),
+            email_verified=True,
+        )
+        service = AuthService(uow)
+
+        result = service.login("user@example.com", "WrongPassword123!")
+
+        assert isinstance(result, AuthError)
+        assert result.code == "INVALID_CREDENTIALS"
+
+    def test_login_nonexistent_email_returns_error(self) -> None:
+        """login() returns AuthError for nonexistent email."""
+        from src.application.services.auth_service import AuthService, AuthError
+
+        uow = self._make_mock_uow_with_user(email=None)
+        service = AuthService(uow)
+
+        result = service.login("nobody@example.com", "SomePass123!")
+
+        assert isinstance(result, AuthError)
+        assert result.code == "INVALID_CREDENTIALS"
+
+    def test_login_unverified_email_returns_error(self) -> None:
+        """login() returns AuthError if email not verified."""
+        from src.application.services.auth_service import AuthService, AuthError
+        from src.adapters.security.password import hash_password
+
+        uow = self._make_mock_uow_with_user(
+            email="user@example.com",
+            password_hash=hash_password("ValidPass123!"),
+            email_verified=False,
+        )
+        service = AuthService(uow)
+
+        result = service.login("user@example.com", "ValidPass123!")
+
+        assert isinstance(result, AuthError)
+        assert result.code == "EMAIL_NOT_VERIFIED"
+
+    @staticmethod
+    def _make_mock_uow_with_user(
+        email: str | None,
+        password_hash: str = "",
+        email_verified: bool = True,
+    ) -> MagicMock:
+        """Create mock UnitOfWork with optional user."""
+        from src.domain.model.entity_id import HouseholdId, UserId
+
+        uow = MagicMock()
+        uow.__enter__ = MagicMock(return_value=uow)
+        uow.__exit__ = MagicMock(return_value=False)
+
+        if email:
+            mock_user = MagicMock()
+            mock_user.id = UserId.generate()
+            mock_user.email = email
+            mock_user.password_hash = password_hash
+            mock_user.email_verified = email_verified
+            mock_user.household_id = HouseholdId.generate()
+            uow.users.get_by_email.return_value = mock_user
+        else:
+            uow.users.get_by_email.return_value = None
+
+        uow.refresh_tokens.create_token.return_value = ("raw_refresh_token", MagicMock())
+        uow.commit = MagicMock()
+
+        return uow
+
+
+class TestAuthServiceVerifyEmail:
+    """Tests for AuthService.verify_email() method."""
+
+    def test_valid_token_marks_email_verified(self) -> None:
+        """verify_email() marks user verified for valid token."""
+        from src.application.services.auth_service import AuthService
+        from src.adapters.security.tokens import generate_verification_token
+        from src.domain.model.entity_id import HouseholdId, UserId
+        from src.domain.model.user import User
+
+        token = generate_verification_token("user@example.com")
+        hh_id = HouseholdId.generate()
+        user = User.create("user@example.com", "Test", "hash", hh_id)
+
+        uow = MagicMock()
+        uow.__enter__ = MagicMock(return_value=uow)
+        uow.__exit__ = MagicMock(return_value=False)
+        uow.users.get_by_email.return_value = user
+        uow.commit = MagicMock()
+        uow.collect_events = MagicMock()
+
+        service = AuthService(uow)
+        result = service.verify_email(token)
+
+        assert not isinstance(result, type(None))
+        assert hasattr(result, 'email_verified')
+
+    def test_invalid_token_returns_error(self) -> None:
+        """verify_email() returns AuthError for invalid token."""
+        from src.application.services.auth_service import AuthService, AuthError
+
+        uow = MagicMock()
+        service = AuthService(uow)
+
+        result = service.verify_email("invalid-token")
+
+        assert isinstance(result, AuthError)
+        assert result.code == "INVALID_VERIFICATION_TOKEN"
