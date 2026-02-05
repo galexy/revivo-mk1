@@ -5,9 +5,11 @@ This ensures domain models remain pure (no SQLAlchemy imports).
 
 Tables created:
 - outbox: Domain event outbox for reliable delivery (Pattern 5 from RESEARCH.md)
-- users: Foundation user table (expanded in later phases)
+- households: Multi-user data ownership scope
+- users: User authentication and identity (expanded in Phase 4)
 - encrypted_secrets: Storage for encrypted sensitive data (Plaid tokens, etc.)
 - accounts: Account aggregate persistence with type-specific fields
+- refresh_tokens: JWT refresh token storage for rotation and revocation
 
 Custom type decorators handle domain type conversion for EntityIds and Enums.
 """
@@ -36,6 +38,7 @@ from .types import (
     AccountSubtypeEnum,
     AccountTypeEnum,
     CategoryIdType,
+    HouseholdIdType,
     PayeeIdType,
     SplitIdType,
     TransactionIdType,
@@ -70,14 +73,37 @@ outbox = Table(
     ),
 )
 
-# Users table (foundation for all user-owned data)
-# Using String(36) for ID to accommodate prefixed TypeID format (user_xxx)
+# Households table (multi-user data ownership scope)
+# All user-owned data (accounts, transactions, categories, payees) belongs to a household.
+# Enables future multi-user access (e.g., family finance management).
+households = Table(
+    "households",
+    metadata,
+    Column("id", HouseholdIdType(36), primary_key=True),  # hh_xxx
+    Column("name", String(255), nullable=False),
+    Column("owner_id", UserIdType(36), nullable=False),  # FK added after users table
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+)
+
+# Users table (authentication and identity)
+# Expanded in Phase 4 with password_hash, display_name, household_id.
+# Using UserIdType for ID to handle EntityId conversion.
 users = Table(
     "users",
     metadata,
-    Column("id", String(36), primary_key=True),  # user_xxx
+    Column("id", UserIdType(36), primary_key=True),  # user_xxx
     Column("email", String(255), nullable=False, unique=True),
+    Column("display_name", String(255), nullable=False),
+    Column("password_hash", String(255), nullable=False),
+    Column(
+        "household_id",
+        HouseholdIdType(36),
+        ForeignKey("households.id"),
+        nullable=False,
+    ),
     Column("email_verified", Boolean, nullable=False, default=False),
+    Column("email_verified_at", DateTime(timezone=True), nullable=True),
     Column(
         "created_at",
         DateTime(timezone=True),
@@ -91,6 +117,8 @@ users = Table(
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
     ),
+    Index("ix_users_email", "email", unique=True),
+    Index("ix_users_household_id", "household_id"),
 )
 
 # Encrypted secrets storage (for Plaid tokens, etc.)
@@ -128,6 +156,12 @@ accounts = Table(
     # Identity - uses custom type decorators for EntityId conversion
     Column("id", AccountIdType(36), primary_key=True),  # acct_xxx
     Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column(
+        "household_id",
+        HouseholdIdType(36),
+        ForeignKey("households.id"),
+        nullable=False,
+    ),
 
     # Core fields - uses custom type decorators for enum conversion
     Column("name", String(255), nullable=False),
@@ -173,6 +207,7 @@ accounts = Table(
 
     # Indexes
     Index("ix_accounts_user_id", "user_id"),
+    Index("ix_accounts_household_id", "household_id"),
     Index("ix_accounts_user_type", "user_id", "account_type"),
     Index("ix_accounts_user_status", "user_id", "status"),
 )
@@ -184,6 +219,12 @@ categories = Table(
     metadata,
     Column("id", CategoryIdType(36), primary_key=True),  # cat_xxx
     Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column(
+        "household_id",
+        HouseholdIdType(36),
+        ForeignKey("households.id"),
+        nullable=False,
+    ),
     Column("name", String(255), nullable=False),
 
     # Hierarchy - parent_id is None for top-level categories
@@ -204,6 +245,7 @@ categories = Table(
 
     # Indexes
     Index("ix_categories_user_id", "user_id"),
+    Index("ix_categories_household_id", "household_id"),
     Index("ix_categories_parent_id", "parent_id"),
     Index("ix_categories_user_system", "user_id", "is_system"),
 )
@@ -215,6 +257,12 @@ payees = Table(
     metadata,
     Column("id", PayeeIdType(36), primary_key=True),  # payee_xxx
     Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
+    Column(
+        "household_id",
+        HouseholdIdType(36),
+        ForeignKey("households.id"),
+        nullable=False,
+    ),
     Column("name", String(255), nullable=False),
     Column("normalized_name", String(255), nullable=False),  # Lowercase for matching
 
@@ -236,6 +284,7 @@ payees = Table(
 
     # Indexes
     Index("ix_payees_user_id", "user_id"),
+    Index("ix_payees_household_id", "household_id"),
     Index("ix_payees_user_normalized", "user_id", "normalized_name"),
 )
 
@@ -247,6 +296,12 @@ transactions = Table(
     Column("id", TransactionIdType(36), primary_key=True),  # txn_xxx
     Column("user_id", UserIdType(36), ForeignKey("users.id"), nullable=False),
     Column("account_id", AccountIdType(36), ForeignKey("accounts.id"), nullable=False),
+    Column(
+        "household_id",
+        HouseholdIdType(36),
+        ForeignKey("households.id"),
+        nullable=False,
+    ),
 
     # Dates per CONTEXT: effective_date and posted_date (Date type, not DateTime)
     Column("effective_date", Date, nullable=False),
@@ -287,6 +342,7 @@ transactions = Table(
 
     # Indexes
     Index("ix_transactions_user_id", "user_id"),
+    Index("ix_transactions_household_id", "household_id"),
     Index("ix_transactions_account_id", "account_id"),
     Index("ix_transactions_user_effective_date", "user_id", "effective_date"),
     Index("ix_transactions_account_effective_date", "account_id", "effective_date"),
@@ -335,4 +391,29 @@ split_lines = Table(
     Index("ix_split_lines_category_id", "category_id"),
     Index("ix_split_lines_transfer_account", "transfer_account_id"),
     Index("ix_split_lines_split_id", "split_id", unique=True),
+)
+
+# Refresh tokens table (JWT refresh token rotation and revocation)
+# Tokens are hashed (SHA-256) in the database. Token family tracking
+# enables reuse detection (if a rotated token is reused, entire family is revoked).
+refresh_tokens = Table(
+    "refresh_tokens",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column(
+        "user_id",
+        UserIdType(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    Column("token_hash", String(64), nullable=False),  # SHA-256 hash
+    Column("token_family", String(36), nullable=False),  # UUID for reuse detection
+    Column("expires_at", DateTime(timezone=True), nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("revoked_at", DateTime(timezone=True), nullable=True),
+
+    # Indexes
+    Index("ix_refresh_tokens_user_id", "user_id"),
+    Index("ix_refresh_tokens_token_hash", "token_hash", unique=True),
+    Index("ix_refresh_tokens_family", "token_family"),
 )
