@@ -1,7 +1,5 @@
 """Tests for password hashing infrastructure."""
 
-import pytest
-
 
 class TestHashPassword:
     """Tests for hash_password function."""

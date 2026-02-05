@@ -1,7 +1,5 @@
 """Tests for email verification token infrastructure."""
 
-import pytest
-
 
 class TestGenerateVerificationToken:
     """Tests for generate_verification_token function."""
@@ -73,7 +71,7 @@ class TestVerifyEmailToken:
 
         token = generate_verification_token("test@example.com")
 
-        # Verify with 0 max_age (expired immediately)
-        result = verify_email_token(token, max_age=0)
+        # Verify with negative max_age (guarantees token is expired)
+        result = verify_email_token(token, max_age=-1)
 
         assert result is None

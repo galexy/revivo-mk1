@@ -1,7 +1,8 @@
 """Tests for JWT token infrastructure."""
 
-import pytest
 from datetime import timedelta
+
+import pytest
 
 
 class TestCreateAccessToken:

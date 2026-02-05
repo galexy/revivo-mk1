@@ -81,7 +81,7 @@ def decode_access_token(token: str) -> dict[str, Any]:
             options={"require": ["exp", "sub", "household_id"]},
         )
         return payload
-    except ExpiredSignatureError:
-        raise TokenError("Token has expired")
+    except ExpiredSignatureError as e:
+        raise TokenError("Token has expired") from e
     except InvalidTokenError as e:
-        raise TokenError(f"Invalid token: {e}")
+        raise TokenError(f"Invalid token: {e}") from e
