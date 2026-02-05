@@ -158,7 +158,13 @@ def upgrade() -> None:
     op.alter_column("users", "display_name", nullable=False)
     op.alter_column("users", "password_hash", nullable=False)
     op.alter_column("users", "household_id", nullable=False)
-    op.alter_column("households", "owner_id", nullable=False)
+    # Only set NOT NULL if there are households with owner_id populated
+    # On fresh databases, the default household has no owner (no users exist yet)
+    has_owners = conn.execute(
+        sa.text("SELECT EXISTS(SELECT 1 FROM households WHERE owner_id IS NOT NULL)")
+    ).scalar()
+    if has_owners:
+        op.alter_column("households", "owner_id", nullable=False)
 
     for table_name in ("accounts", "transactions", "categories", "payees"):
         op.alter_column(table_name, "household_id", nullable=False)
