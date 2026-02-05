@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 01 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 02 complete
 
 ## Current Position
 
 Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 1 of 8 complete
+Plan: 2 of 8 complete
 Status: In progress
-Last activity: 2026-02-05 - Completed 04-01-PLAN.md (User & Household Domain Entities)
+Last activity: 2026-02-05 - Completed 04-02-PLAN.md (Security Primitives)
 
-Progress: [██░░░░░░░░] ~27%
+Progress: [███░░░░░░░] ~28%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
-- Average duration: 5.2 min
-- Total execution time: 2.7 hours
+- Total plans completed: 28
+- Average duration: 5.1 min
+- Total execution time: 2.8 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██░░░░░░░░] ~27%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 1 | 3 min | 3.0 min |
+| 04-authentication-infrastructure | 2 | 7 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.2-01 (1 min), 03.2-02 (2 min), 03.2-03 (4 min), 04-01 (3 min)
-- Trend: Phase 4 started, TDD domain entities
+- Last 5 plans: 03.2-02 (2 min), 03.2-03 (4 min), 04-01 (3 min), 04-02 (4 min)
+- Trend: Phase 4 progressing, TDD security primitives
 
 *Updated after each plan completion*
 
@@ -120,6 +120,12 @@ Recent decisions affecting current work:
 - Email normalization in domain layer (lowercase + strip in User.create())
 - verify_email() is idempotent (no-op on already-verified user)
 - HouseholdId uses "hh_" prefix in TypeID pattern
+- PyJWT over python-jose (abandoned, CVE-2025-61152)
+- pwdlib with Argon2 over passlib (deprecated, breaks Python 3.13+)
+- itsdangerous for email verification tokens (no DB lookup, signed+timestamped)
+- Explicit algorithm list in jwt.decode() to prevent algorithm confusion attacks
+- JWT_SECRET from os.environ with fallback default for development
+- Required claims (exp, sub, household_id) enforced in JWT decode
 
 ### Pending Todos
 
@@ -132,9 +138,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-01-PLAN.md (User & Household Domain Entities)
+Stopped at: Completed 04-02-PLAN.md (Security Primitives)
 Resume file: None
-Next action: Continue Phase 4 plan 02 (Password Hashing & JWT)
+Next action: Continue Phase 4 plan 03 (Database Tables & Migration)
 
 ## Roadmap Evolution
 
