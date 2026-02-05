@@ -19,6 +19,11 @@ Transaction domain handling:
 - Transaction has splits excluded (loaded/saved manually in repository)
 - Transaction.amount excluded (reconstructed from columns in repository)
 - SplitLine is a frozen dataclass - not mapped directly, handled in repository
+
+Authentication domain handling:
+- User maps to users table with _events excluded (transient)
+- Household maps to households table (simple entity, no excluded properties)
+- RefreshToken is NOT mapped - it uses SQLAlchemy Core (infrastructure record)
 """
 
 from sqlalchemy import event
@@ -96,6 +101,10 @@ def start_mappers() -> None:
       Simple entity with usage tracking.
     - Transaction: Maps Transaction class to transactions table.
       splits and amount excluded - handled manually in repository.
+    - Household: Maps Household class to households table.
+      Simple entity with owner reference.
+    - User: Maps User class to users table.
+      _events excluded (transient domain event list).
     """
     global _mappers_started
     if _mappers_started:
@@ -104,10 +113,12 @@ def start_mappers() -> None:
     # Import domain entities inside function to avoid circular imports
     from src.domain.model.account import Account
     from src.domain.model.category import Category
+    from src.domain.model.household import Household
     from src.domain.model.payee import Payee
     from src.domain.model.transaction import Transaction
+    from src.domain.model.user import User
 
-    from .tables import accounts, categories, payees, transactions
+    from .tables import accounts, categories, households, payees, transactions, users
 
     # Account aggregate mapping
     # - EntityIds (id, user_id, etc.): TypeDecorators handle string conversion
@@ -158,6 +169,24 @@ def start_mappers() -> None:
             "_events",  # _events is transient, not persisted
             "splits",  # Loaded manually in repository (frozen dataclass with Money)
             "amount",  # Reconstructed from amount/currency columns in repository
+        ],
+    )
+
+    # Household entity mapping
+    # - Simple entity with owner reference
+    # - No excluded properties (no domain events or value objects)
+    mapper_registry.map_imperatively(
+        Household,
+        households,
+    )
+
+    # User aggregate mapping
+    # - _events excluded (transient domain event list, not persisted)
+    mapper_registry.map_imperatively(
+        User,
+        users,
+        exclude_properties=[
+            "_events",  # _events is transient, not persisted
         ],
     )
 
