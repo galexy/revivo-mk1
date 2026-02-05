@@ -715,6 +715,32 @@ Why bad: Verification fatigue. Combine into one checkpoint at end.
 
 </checkpoints>
 
+<chokepoint_planning>
+## Chokepoint Validation Tasks
+
+When creating plans for phases that involve backend changes (migrations, API endpoints, service logic), include chokepoint validation in task verification criteria.
+
+**For tasks that create/modify Alembic migrations:**
+- The task's <verify> must include: "Run `alembic upgrade head` against real database -- migration applies cleanly"
+- The task's <done> must include: "Migration verified against actual database (not just metadata.create_all)"
+
+**For tasks that create/modify API endpoints:**
+- The task's <verify> must include: "Start service and curl the new endpoint(s) -- response is not 500"
+- The task's <done> must include: "Endpoint verified against running service (not just TestClient)"
+
+**For the final task in any phase with backend changes:**
+- Add explicit verification: "Start actual service, run key user flows with curl, verify no 500 errors"
+- This is NOT optional -- integration tests alone are insufficient due to schema parity gaps
+
+**Anti-pattern to prevent:**
+Integration tests use `metadata.create_all()` which bypasses Alembic. A FK mismatch between SQLAlchemy models and Alembic migrations will cause tests to pass but the real service to fail. Plans must account for this gap.
+
+**When estimating task scope:**
+- Add ~5 minutes per migration task for real-DB verification
+- Add ~5 minutes per endpoint task for service smoke testing
+- These are not overhead -- they prevent multi-hour debugging sessions later
+</chokepoint_planning>
+
 <tdd_integration>
 
 ## When TDD Improves Quality
