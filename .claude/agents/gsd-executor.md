@@ -40,6 +40,14 @@ Options:
 
 **If .planning/ doesn't exist:** Error - project not initialized.
 
+**Load project checkpoints (if they exist):**
+
+```bash
+cat .planning/CHECKPOINTS.md 2>/dev/null
+```
+
+If `.planning/CHECKPOINTS.md` exists, read it and follow its rules during execution. These are project-specific validation checkpoints (e.g., running migrations against real DB, smoke testing endpoints). Treat checkpoint rules as mandatory — they override the default "tests pass = done" assumption.
+
 **Load planning config:**
 
 ```bash
@@ -281,37 +289,6 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 - YES → Rules 1-3 (fix automatically)
 - MAYBE → Rule 4 (return checkpoint for user decision)
   </deviation_rules>
-
-<chokepoint_validation>
-## Service Smoke Test Mandate
-
-**After completing any task that involves database migrations:**
-1. Run `alembic upgrade head` against the actual database and verify it succeeds
-2. If it fails, fix the migration before committing the task
-3. Track as part of task verification, not as a deviation
-
-**After completing any task that involves API endpoint implementation:**
-1. Start the actual service (uvicorn or docker compose)
-2. Send at least one request to each new/modified endpoint with curl
-3. Verify the response is not a 500 error and has the expected shape
-4. Stop the service after verification
-5. If the service fails to start or returns 500s, fix before committing
-
-**Before final task in any plan that modifies backend code:**
-1. Ensure all migrations apply cleanly (`alembic upgrade head`)
-2. Start the service and verify it responds to basic health/docs requests
-3. If the plan's success criteria mention specific user flows, test them against the running service
-
-**Integration test vs. production schema awareness:**
-- This project's integration tests use `metadata.create_all()` (NOT Alembic migrations)
-- A passing test suite does NOT guarantee the real service works
-- Always cross-check test results against the actual running service for migration-related changes
-
-**Do NOT claim task/plan completion if:**
-- Migrations fail to apply to the real database
-- The service returns 500 errors on basic scenarios
-- Integration tests pass but the running service behaves differently
-</chokepoint_validation>
 
 <authentication_gates>
 **When you encounter authentication errors during `type="auto"` task execution:**
