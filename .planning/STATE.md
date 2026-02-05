@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 03 complete
+**Current focus:** Phase 4 (Authentication Infrastructure) - Plan 04 complete
 
 ## Current Position
 
 Phase: 4 of 20 (Authentication Infrastructure) - IN PROGRESS
-Plan: 3 of 8 complete
+Plan: 5 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05)
 Status: In progress
-Last activity: 2026-02-05 - Completed 04-03-PLAN.md (Database Tables & Migration)
+Last activity: 2026-02-05 - Completed 04-04-PLAN.md (Auth Repositories & Unit of Work)
 
-Progress: [████░░░░░░] ~31%
+Progress: [█████░░░░░] ~35%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
-- Average duration: 5.1 min
-- Total execution time: 2.9 hours
+- Total plans completed: 30
+- Average duration: 5.0 min
+- Total execution time: 3.0 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [████░░░░░░] ~31%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
-| 04-authentication-infrastructure | 3 | 14 min | 4.7 min |
+| 04-authentication-infrastructure | 4 | 18 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.2-03 (4 min), 04-01 (3 min), 04-02 (4 min), 04-03 (7 min)
-- Trend: Phase 4 progressing, database migration for auth tables
+- Last 5 plans: 04-01 (3 min), 04-02 (4 min), 04-03 (7 min), 04-05 (4 min)
+- Trend: Phase 4 wave 3 progressing, AuthService TDD complete
 
 *Updated after each plan completion*
 
@@ -130,6 +130,10 @@ Recent decisions affecting current work:
 - Circular FK bootstrap: create households.owner_id nullable, populate, then add NOT NULL
 - All user-owned data tables (accounts, transactions, categories, payees) have household_id FK
 - HouseholdIdType TypeDecorator for ORM mapping of HouseholdId
+- Household bootstrap: create with placeholder owner_id, update after user creation
+- login() returns same INVALID_CREDENTIALS for bad email and bad password (prevent enumeration)
+- EMAIL_NOT_VERIFIED is separate error code (user can take action)
+- verify_email() validates token stateless first, then DB lookup (no unnecessary queries)
 
 ### Pending Todos
 
@@ -142,9 +146,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-03-PLAN.md (Database Tables & Migration)
+Stopped at: Completed 04-05-PLAN.md (AuthService Application Service)
 Resume file: None
-Next action: Continue Phase 4 plan 04 (Auth Repositories & Unit of Work)
+Next action: Continue Phase 4 wave 3 (04-04, 04-06 remaining)
 
 ## Roadmap Evolution
 
