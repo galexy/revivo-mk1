@@ -7,9 +7,11 @@ from src.domain.model.entity_id import (
     BudgetId,
     CategoryId,
     EntityId,
+    HouseholdId,
     TransactionId,
     UserId,
 )
+from src.domain.model.household import Household
 from src.domain.model.institution import InstitutionDetails
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
@@ -22,6 +24,7 @@ __all__ = [
     # Entity IDs
     "EntityId",
     "AccountId",
+    "HouseholdId",
     "TransactionId",
     "UserId",
     "CategoryId",
@@ -32,4 +35,5 @@ __all__ = [
     "AccountSubtype",
     # Entities
     "Account",
+    "Household",
 ]
