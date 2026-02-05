@@ -1,7 +1,6 @@
 """Tests for AuthService application service."""
 
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 class TestAuthServiceRegister:
@@ -9,7 +8,10 @@ class TestAuthServiceRegister:
 
     def test_register_creates_user_and_household(self) -> None:
         """register() creates User and Household, returns RegistrationResult."""
-        from src.application.services.auth_service import AuthService, RegistrationResult
+        from src.application.services.auth_service import (
+            AuthService,
+            RegistrationResult,
+        )
 
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
@@ -27,7 +29,10 @@ class TestAuthServiceRegister:
 
     def test_register_normalizes_email(self) -> None:
         """register() lowercases email."""
-        from src.application.services.auth_service import AuthService, RegistrationResult
+        from src.application.services.auth_service import (
+            AuthService,
+            RegistrationResult,
+        )
 
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
@@ -43,7 +48,7 @@ class TestAuthServiceRegister:
 
     def test_register_duplicate_email_returns_error(self) -> None:
         """register() returns AuthError when email already exists."""
-        from src.application.services.auth_service import AuthService, AuthError
+        from src.application.services.auth_service import AuthError, AuthService
 
         # Mock returns existing user for this email
         uow = self._make_mock_uow(existing_email="taken@example.com")
@@ -60,7 +65,10 @@ class TestAuthServiceRegister:
 
     def test_register_hashes_password(self) -> None:
         """register() hashes password (does not store plaintext)."""
-        from src.application.services.auth_service import AuthService, RegistrationResult
+        from src.application.services.auth_service import (
+            AuthService,
+            RegistrationResult,
+        )
 
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
@@ -78,7 +86,6 @@ class TestAuthServiceRegister:
     @staticmethod
     def _make_mock_uow(existing_email: str | None) -> MagicMock:
         """Create mock UnitOfWork with stubbed repositories."""
-        from src.domain.model.entity_id import HouseholdId, UserId
         from src.domain.model.user import User
 
         uow = MagicMock()
@@ -107,8 +114,8 @@ class TestAuthServiceLogin:
 
     def test_login_with_valid_credentials_returns_tokens(self) -> None:
         """login() returns AuthTokens for valid credentials."""
-        from src.application.services.auth_service import AuthService, AuthTokens
         from src.adapters.security.password import hash_password
+        from src.application.services.auth_service import AuthService, AuthTokens
 
         uow = self._make_mock_uow_with_user(
             email="user@example.com",
@@ -126,8 +133,8 @@ class TestAuthServiceLogin:
 
     def test_login_wrong_password_returns_error(self) -> None:
         """login() returns AuthError for wrong password."""
-        from src.application.services.auth_service import AuthService, AuthError
         from src.adapters.security.password import hash_password
+        from src.application.services.auth_service import AuthError, AuthService
 
         uow = self._make_mock_uow_with_user(
             email="user@example.com",
@@ -143,7 +150,7 @@ class TestAuthServiceLogin:
 
     def test_login_nonexistent_email_returns_error(self) -> None:
         """login() returns AuthError for nonexistent email."""
-        from src.application.services.auth_service import AuthService, AuthError
+        from src.application.services.auth_service import AuthError, AuthService
 
         uow = self._make_mock_uow_with_user(email=None)
         service = AuthService(uow)
@@ -155,8 +162,8 @@ class TestAuthServiceLogin:
 
     def test_login_unverified_email_returns_error(self) -> None:
         """login() returns AuthError if email not verified."""
-        from src.application.services.auth_service import AuthService, AuthError
         from src.adapters.security.password import hash_password
+        from src.application.services.auth_service import AuthError, AuthService
 
         uow = self._make_mock_uow_with_user(
             email="user@example.com",
@@ -205,9 +212,9 @@ class TestAuthServiceVerifyEmail:
 
     def test_valid_token_marks_email_verified(self) -> None:
         """verify_email() marks user verified for valid token."""
-        from src.application.services.auth_service import AuthService
         from src.adapters.security.tokens import generate_verification_token
-        from src.domain.model.entity_id import HouseholdId, UserId
+        from src.application.services.auth_service import AuthService
+        from src.domain.model.entity_id import HouseholdId
         from src.domain.model.user import User
 
         token = generate_verification_token("user@example.com")
@@ -225,11 +232,11 @@ class TestAuthServiceVerifyEmail:
         result = service.verify_email(token)
 
         assert not isinstance(result, type(None))
-        assert hasattr(result, 'email_verified')
+        assert hasattr(result, "email_verified")
 
     def test_invalid_token_returns_error(self) -> None:
         """verify_email() returns AuthError for invalid token."""
-        from src.application.services.auth_service import AuthService, AuthError
+        from src.application.services.auth_service import AuthError, AuthService
 
         uow = MagicMock()
         service = AuthService(uow)

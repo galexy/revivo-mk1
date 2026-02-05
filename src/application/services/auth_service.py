@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 from src.adapters.security.jwt import create_access_token
 from src.adapters.security.password import hash_password, verify_password
 from src.adapters.security.tokens import generate_verification_token, verify_email_token
-from src.domain.model.entity_id import HouseholdId, UserId
+from src.domain.model.entity_id import UserId
 from src.domain.model.household import Household
 from src.domain.model.user import User
 
@@ -193,7 +193,50 @@ class AuthService:
         Returns:
             AuthTokens on success, AuthError on failure.
         """
-        raise NotImplementedError("login() not yet implemented")
+        normalized_email = email.lower().strip()
+
+        with self._uow:
+            # Look up user by email
+            user = self._uow.users.get_by_email(normalized_email)
+
+            # Generic error for nonexistent email (prevent user enumeration)
+            if user is None:
+                return AuthError(
+                    code="INVALID_CREDENTIALS",
+                    message="Invalid credentials",
+                )
+
+            # Verify password
+            if not verify_password(password, user.password_hash):
+                return AuthError(
+                    code="INVALID_CREDENTIALS",
+                    message="Invalid credentials",
+                )
+
+            # Check email verification
+            if not user.email_verified:
+                return AuthError(
+                    code="EMAIL_NOT_VERIFIED",
+                    message="Email not verified. Please check your inbox.",
+                )
+
+            # Create access token (JWT)
+            access_token = create_access_token(
+                user_id=str(user.id),
+                household_id=str(user.household_id),
+            )
+
+            # Create refresh token (stored in database)
+            raw_refresh_token, _token_record = self._uow.refresh_tokens.create_token(
+                user_id=user.id,
+            )
+
+            self._uow.commit()
+
+            return AuthTokens(
+                access_token=access_token,
+                refresh_token=raw_refresh_token,
+            )
 
     def refresh(
         self,
@@ -210,7 +253,38 @@ class AuthService:
         Returns:
             AuthTokens on success, AuthError if token is invalid/expired.
         """
-        raise NotImplementedError("refresh() not yet implemented")
+        with self._uow:
+            # Validate and rotate refresh token
+            result = self._uow.refresh_tokens.validate_and_rotate(refresh_token)
+
+            if result is None:
+                return AuthError(
+                    code="INVALID_REFRESH_TOKEN",
+                    message="Invalid or expired refresh token",
+                )
+
+            new_raw_token, token_record = result
+
+            # Look up user to get household_id for access token
+            user = self._uow.users.get_by_id(token_record.user_id)
+            if user is None:
+                return AuthError(
+                    code="INVALID_REFRESH_TOKEN",
+                    message="Invalid or expired refresh token",
+                )
+
+            # Create new access token
+            access_token = create_access_token(
+                user_id=str(user.id),
+                household_id=str(user.household_id),
+            )
+
+            self._uow.commit()
+
+            return AuthTokens(
+                access_token=access_token,
+                refresh_token=new_raw_token,
+            )
 
     def verify_email(
         self,
@@ -224,7 +298,33 @@ class AuthService:
         Returns:
             Updated User on success, AuthError if token is invalid.
         """
-        raise NotImplementedError("verify_email() not yet implemented")
+        # Validate token (stateless - no DB lookup needed)
+        email = verify_email_token(token)
+        if email is None:
+            return AuthError(
+                code="INVALID_VERIFICATION_TOKEN",
+                message="Invalid or expired verification token",
+            )
+
+        with self._uow:
+            # Look up user by email from token
+            user = self._uow.users.get_by_email(email)
+            if user is None:
+                return AuthError(
+                    code="INVALID_VERIFICATION_TOKEN",
+                    message="Invalid or expired verification token",
+                )
+
+            # Mark email as verified (idempotent)
+            user.verify_email()
+
+            # Collect events
+            events = user.collect_events()
+            self._uow.collect_events(events)
+
+            self._uow.commit()
+
+            return user
 
     def logout_all_sessions(
         self,
@@ -238,7 +338,10 @@ class AuthService:
         Returns:
             True on success.
         """
-        raise NotImplementedError("logout_all_sessions() not yet implemented")
+        with self._uow:
+            self._uow.refresh_tokens.revoke_all_for_user(user_id)
+            self._uow.commit()
+            return True
 
     def get_user_by_id(
         self,
@@ -252,4 +355,5 @@ class AuthService:
         Returns:
             User if found, None otherwise.
         """
-        raise NotImplementedError("get_user_by_id() not yet implemented")
+        with self._uow:
+            return self._uow.users.get_by_id(user_id)
