@@ -13,6 +13,7 @@ from src.domain.model.account_types import AccountStatus, AccountSubtype, Accoun
 from src.domain.model.entity_id import (
     AccountId,
     CategoryId,
+    HouseholdId,
     PayeeId,
     SplitId,
     TransactionId,
@@ -274,4 +275,28 @@ class SplitIdType(TypeDecorator):
 
     def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
         """Return string value - conversion to SplitId done in repository."""
+        return value
+
+
+class HouseholdIdType(TypeDecorator):
+    """SQLAlchemy type for HouseholdId value objects.
+
+    Converts HouseholdId to/from string for database storage.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(
+        self, value: HouseholdId | str | None, dialect: Dialect
+    ) -> str | None:
+        """Convert HouseholdId to string for database storage."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return str(value)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> str | None:
+        """Return string value - conversion to HouseholdId done in repository."""
         return value
