@@ -12,16 +12,16 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 Phase: 4 of 20 (Authentication Infrastructure) - COMPLETE
 Plan: 8 of 8 complete (04-01, 04-02, 04-03, 04-04, 04-05, 04-06, 04-07, 04-08)
 Status: Phase complete
-Last activity: 2026-02-05 - Completed 04-08-PLAN.md (Update Integration Tests for Auth)
+Last activity: 2026-02-05 - Completed quick/001-PLAN.md (Add Chokepoint Testing Guardrails)
 
 Progress: [██████░░░░] ~40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
-- Average duration: 4.9 min
-- Total execution time: 3.35 hours
+- Total plans completed: 35
+- Average duration: 4.8 min
+- Total execution time: 3.38 hours
 
 **By Phase:**
 
@@ -35,8 +35,8 @@ Progress: [██████░░░░] ~40%
 | 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-05 (4 min), 04-04 (4 min), 04-06 (7 min), 04-07 (8 min), 04-08 (9 min)
-- Trend: Phase 4 complete, all 8 plans executed
+- Last 5 plans: 04-04 (4 min), 04-06 (7 min), 04-07 (8 min), 04-08 (9 min), quick-001 (2 min)
+- Trend: Phase 4 complete, chokepoint guardrails added
 
 *Updated after each plan completion*
 
@@ -150,6 +150,8 @@ Recent decisions affecting current work:
 - Removed placeholder get_current_user_id; all routes use real JWT auth
 - Auth fixture chain per test file (not shared conftest) for test module independence
 - household_id must be threaded through all service layers to domain entity creation (category, transaction, payee)
+- CLAUDE.md for project-wide rules (auto-loaded by Claude Code, always visible)
+- Chokepoint testing: verify migrations against real DB, smoke test endpoints against running service, never rely solely on integration tests
 
 ### Pending Todos
 
@@ -162,7 +164,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Phase 4 COMPLETE - Verified (5/5 success criteria), all 407 tests passing
+Stopped at: Completed quick/001-PLAN.md (Add Chokepoint Testing Guardrails)
 Resume file: None
 Next action: Begin Phase 5 (Nx Monorepo Restructure)
 
