@@ -13,6 +13,7 @@ from src.domain.model.entity_id import (
 )
 from src.domain.model.household import Household
 from src.domain.model.institution import InstitutionDetails
+from src.domain.model.user import User
 from src.domain.model.money import Money
 from src.domain.model.rewards_balance import RewardsBalance
 
@@ -36,4 +37,5 @@ __all__ = [
     # Entities
     "Account",
     "Household",
+    "User",
 ]
