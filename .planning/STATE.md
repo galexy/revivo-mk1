@@ -173,6 +173,8 @@ Next action: Begin Phase 5 (Nx Monorepo Restructure)
   - Plan 01: PATCH Split Modifications (M1-M6) - COMPLETE
   - Plan 02: Split Addition/Removal - COMPLETE
   - Plan 03: Validation Errors - COMPLETE
+- Phase 4.2 inserted after Phase 4.1: Current User Metadata Endpoint - Add /auth/me endpoint returning authenticated user profile (INSERTED)
+- Phase 4.3 inserted after Phase 4.2: Transactional Email Infrastructure - Email domain, SMTP adapter, Mailpit dev env, verification email on registration, mocked emails in integration tests (INSERTED)
 
 ## Phase 1 Milestone
 

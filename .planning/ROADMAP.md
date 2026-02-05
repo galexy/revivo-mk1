@@ -18,6 +18,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
 - [x] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
 - [x] **Phase 4: Authentication Infrastructure** - User domain model, JWT issuance, protected routes
+- [ ] **Phase 4.1: Test Schema Parity** - Align SQLAlchemy metadata with Alembic migrations so tests use production-equivalent schema (INSERTED)
+- [ ] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
+- [ ] **Phase 4.3: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration (INSERTED)
 - [ ] **Phase 5: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [ ] **Phase 6: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 7: Login UI** - Login page, session/token management, logout
@@ -167,9 +170,54 @@ Plans:
 - [x] 04-07-PLAN.md — Route protection and household scoping (TDD)
 - [x] 04-08-PLAN.md — Update existing E2E tests for auth and household isolation
 
+### Phase 4.1: Test Schema Parity (INSERTED)
+**Goal**: Eliminate schema drift between SQLAlchemy table metadata and Alembic migrations so integration tests run against a production-equivalent schema
+**Depends on**: Phase 4
+**Requirements**: TEST integrity
+**Success Criteria** (what must be TRUE):
+  1. Integration tests create tables using Alembic migrations (not metadata.create_all)
+  2. All FK constraints, indexes, and column properties in migrations are reflected in SQLAlchemy metadata (or vice versa)
+  3. No test can pass against a schema that differs from production
+  4. All existing tests still pass
+**Plans**: TBD
+
+Plans:
+- [ ] 04.1-01: TBD
+- [ ] 04.1-02: TBD
+
+### Phase 4.2: Current User Metadata Endpoint (INSERTED)
+**Goal**: Add a /auth/me endpoint that returns the authenticated user's profile metadata (user_id, email, display_name, household_id, email_verified status)
+**Depends on**: Phase 4
+**Requirements**: WEB-02 (user identity)
+**Success Criteria** (what must be TRUE):
+  1. GET /auth/me with valid JWT returns user profile (user_id, email, display_name, household_id, email_verified)
+  2. GET /auth/me without JWT returns 401
+  3. Response does not leak sensitive fields (password_hash, internal IDs)
+**Plans**: TBD
+
+Plans:
+- [ ] 04.2-01: TBD
+
+### Phase 4.3: Transactional Email Infrastructure (INSERTED)
+**Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration, and mock emails in integration tests
+**Depends on**: Phase 4.2
+**Requirements**: AUTH email delivery
+**Success Criteria** (what must be TRUE):
+  1. Email domain exists with port (EmailService protocol) and SMTP adapter implementation
+  2. Mailpit runs in Docker Compose dev environment and captures all outgoing emails
+  3. Registration endpoint triggers a verification email containing the signed token link
+  4. Integration tests mock the email adapter (no real SMTP calls) and verify email send was invoked with correct arguments
+  5. Password reset and other future transactional emails can reuse the same infrastructure
+  6. Dev workflow: register user -> open Mailpit UI -> click verification link -> user verified
+**Plans**: TBD
+
+Plans:
+- [ ] 04.3-01: TBD
+- [ ] 04.3-02: TBD
+
 ### Phase 5: Nx Monorepo Restructure
 **Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
-**Depends on**: Phase 4
+**Depends on**: Phase 4.3
 **Requirements**: ARCH-06, ARCH-07
 **Success Criteria** (what must be TRUE):
   1. Project uses Nx monorepo structure
@@ -531,7 +579,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 20 -> 21 -> ... -> 26
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 4.3 -> 5 -> ... -> 20 -> 21 -> ... -> 26
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -540,7 +588,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 5 -> ... -> 2
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 3.1 Split Identity & Validation | 4/4 | Complete | 2026-02-02 |
 | 3.2 Add Missing PATCH Tests | 3/3 | Complete | 2026-02-03 |
-| 4. Authentication Infrastructure | 0/8 | Not started | - |
+| 4. Authentication Infrastructure | 8/8 | Complete | 2026-02-05 |
+| 4.1 Test Schema Parity | 0/2 | Not started | - |
+| 4.2 Current User Metadata Endpoint | 0/1 | Not started | - |
+| 4.3 Transactional Email Infrastructure | 0/2 | Not started | - |
 | 5. Nx Monorepo Restructure | 0/2 | Not started | - |
 | 6. Frontend Infrastructure | 0/2 | Not started | - |
 | 7. Login UI | 0/2 | Not started | - |
