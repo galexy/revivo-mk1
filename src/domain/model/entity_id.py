@@ -205,6 +205,49 @@ class UserId:
 
 
 @dataclass(frozen=True, slots=True)
+class HouseholdId:
+    """Identifier for Household aggregate root.
+
+    Format: hh_01h455vb4pex5vsknk084sn02q
+    """
+
+    value: str
+
+    @classmethod
+    def generate(cls) -> Self:
+        """Generate a new HouseholdId."""
+        tid = TypeID(prefix="hh")
+        return cls(value=str(tid))
+
+    @classmethod
+    def from_string(cls, value: str) -> Self:
+        """Parse and validate a HouseholdId from string.
+
+        Args:
+            value: Full prefixed ID string (must start with "hh_").
+
+        Returns:
+            HouseholdId with validated value.
+
+        Raises:
+            ValueError: If ID format is invalid or prefix doesn't match.
+        """
+        tid = TypeID.from_string(value)
+        if tid.prefix != "hh":
+            raise ValueError(f"Expected 'hh' prefix, got '{tid.prefix}'")
+        return cls(value=value)
+
+    @property
+    def prefix(self) -> str:
+        """Return the prefix (always 'hh')."""
+        return "hh"
+
+    def __str__(self) -> str:
+        """Return the full ID string."""
+        return self.value
+
+
+@dataclass(frozen=True, slots=True)
 class CategoryId:
     """Identifier for Category entity.
 
