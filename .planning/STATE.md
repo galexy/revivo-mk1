@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 1 of 4 complete
+**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 2 of 4 complete
 
 ## Current Position
 
 Phase: 6 of 22 (Transactional Email Infrastructure)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-02-06 - Completed 06-01-PLAN.md (MJML Build Tooling and Mailpit)
+Last activity: 2026-02-06 - Completed 06-02-PLAN.md (EmailService Protocol and SMTP Adapter)
 
-Progress: [██████░░░░] ~47%
+Progress: [██████░░░░] ~48%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 42
+- Total plans completed: 43
 - Average duration: 4.6 min
-- Total execution time: 3.92 hours
+- Total execution time: 3.99 hours
 
 **By Phase:**
 
@@ -36,11 +36,11 @@ Progress: [██████░░░░] ~47%
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
-| 06-transactional-email-infrastructure | 1 | 3 min | 3.0 min |
+| 06-transactional-email-infrastructure | 2 | 7 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min), 05-03 (4 min), 06-01 (3 min)
-- Trend: Phase 6 started, MJML and Mailpit infrastructure set up
+- Last 5 plans: 05-01 (4 min), 05-02 (6 min), 05-03 (4 min), 06-01 (3 min), 06-02 (4 min)
+- Trend: Phase 6 progressing, email service protocol and SMTP adapter created
 
 *Updated after each plan completion*
 
@@ -184,6 +184,13 @@ Recent decisions affecting current work:
 - App starts even if SMTP unavailable (mailpit condition: service_started)
 - No SMTP_USER/SMTP_PASSWORD for Mailpit (accepts any auth in dev)
 - Makefile for non-Python build tooling (build-emails target)
+- Jinja2 for email template rendering (runtime variable substitution in compiled HTML)
+- FileSystemLoader with StrictUndefined for template safety (catches missing variables)
+- EmailService Protocol in domain/ports with SmtpEmailAdapter in adapters/email
+- Default SMTP_PORT 1025 for Mailpit dev server, use_tls=False
+- Lazy is_available() with cached result for SMTP connectivity checks
+- EmailDeliveryError wraps both SMTPException and OSError
+- Email PII masking: first 3 chars + *** for log output
 
 ### Pending Todos
 
@@ -203,9 +210,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 06-01-PLAN.md (MJML Build Tooling and Mailpit)
+Stopped at: Completed 06-02-PLAN.md (EmailService Protocol and SMTP Adapter)
 Resume file: None
-Next action: Continue Phase 6 with 06-02-PLAN.md (requires devcontainer rebuild for Mailpit)
+Next action: Continue Phase 6 with 06-03-PLAN.md (Email Verification Handler)
 
 ## Roadmap Evolution
 
