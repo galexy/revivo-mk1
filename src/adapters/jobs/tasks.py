@@ -46,7 +46,7 @@ async def send_verification_email(
     email_service = get_email_service()
 
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:8000")
-    verification_link = f"{base_url}/auth/verify-email?token={verification_token}"
+    verification_link = f"{base_url}/auth/verify?token={verification_token}"
 
     html_content, text_content = render_verification_email(
         recipient_name=None,
