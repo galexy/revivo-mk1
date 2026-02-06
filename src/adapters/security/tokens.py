@@ -12,14 +12,14 @@ from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 # Use same secret as JWT (or separate if needed)
 TOKEN_SECRET = os.environ.get("JWT_SECRET", "CHANGE-ME-IN-PRODUCTION")
 EMAIL_VERIFICATION_SALT = "email-verification"
-EMAIL_VERIFICATION_MAX_AGE = 86400  # 24 hours in seconds
+EMAIL_VERIFICATION_MAX_AGE = 172800  # 48 hours in seconds
 
 
 def generate_verification_token(email: str) -> str:
     """Generate a URL-safe verification token for email.
 
     Token is cryptographically signed and includes timestamp.
-    Valid for 24 hours by default.
+    Valid for 48 hours by default.
 
     Args:
         email: The email address to embed in token
@@ -38,7 +38,7 @@ def verify_email_token(
 
     Args:
         token: The token to verify
-        max_age: Maximum age in seconds (default 24 hours)
+        max_age: Maximum age in seconds (default 48 hours)
 
     Returns:
         The email address if token is valid, None if invalid/expired
