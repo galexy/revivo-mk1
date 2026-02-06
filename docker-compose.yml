@@ -11,6 +11,7 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/personal_finance
       - DATABASE_URL_SYNC=postgresql+psycopg2://postgres:postgres@postgres:5432/personal_finance
+      - JOB_QUEUE_DATABASE_URL=postgresql://postgres:postgres@postgres-jobs:5432/jobs
       - ENVIRONMENT=development
       - LOG_LEVEL=DEBUG
     depends_on:
@@ -40,12 +41,32 @@ services:
     ports:
       - "5432:5432"
 
+  postgres-jobs:
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - postgres-jobs-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jobs
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jobs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+    ports:
+      - "5433:5432"
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   postgres-data:
+  postgres-jobs-data:
 
 secrets:
   encryption_key:
