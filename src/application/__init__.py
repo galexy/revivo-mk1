@@ -14,6 +14,7 @@ Exports:
     AccountService: Account use case orchestration
 """
 
+from src.application import event_bus
 from src.application.services.account_service import AccountService
 
-__all__ = ["AccountService"]
+__all__ = ["AccountService", "event_bus"]
