@@ -236,16 +236,22 @@ class SqlAlchemyUnitOfWork:
         self._events.extend(events)
 
     def commit(self) -> None:
-        """Commit transaction, writing events to outbox.
+        """Commit transaction, writing events to outbox, then publishing.
 
         Events are written to the outbox table as part of the same
         transaction. This ensures atomicity - events are only visible
         if the business data commit succeeds.
 
         Events that don't conform to the DomainEvent protocol (missing
-        event_type, aggregate_type, aggregate_id, to_dict) are skipped.
-        This handles standalone event dataclasses (e.g., UserRegistered).
+        event_type, aggregate_type, aggregate_id, to_dict) are skipped
+        for outbox writing. All events are published to handlers.
+
+        CRITICAL: Events are published AFTER commit succeeds to ensure
+        handlers see committed data (see 05-RESEARCH.md Pitfall 1).
         """
+        # Capture events before commit clears them
+        events_to_publish = list(self._events)
+
         # Write collected events to outbox
         for event in self._events:
             # Only write events that conform to DomainEvent protocol
@@ -260,6 +266,12 @@ class SqlAlchemyUnitOfWork:
                 )
         self.session.commit()
         self._events.clear()
+
+        # Publish events to handlers AFTER commit succeeds
+        # Import inside method to avoid circular import issues
+        from src.application.event_bus import publish_all
+
+        publish_all(events_to_publish)
 
     def flush(self) -> None:
         """Flush pending changes to database without committing.
