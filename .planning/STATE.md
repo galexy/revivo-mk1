@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 5 (Domain Event Publishing) - NOT STARTED
+**Current focus:** Phase 5 (Domain Event Publishing) - IN PROGRESS
 
 ## Current Position
 
 Phase: 5 of 22 (Domain Event Publishing)
-Plan: 0 of 2 complete
-Status: Not started
-Last activity: 2026-02-06 - Completed quick task 002: Split phase 4.3 into event and email phases
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-02-06 - Completed 05-01-PLAN.md (Event Bus Infrastructure)
 
-Progress: [██████░░░░] ~42%
+Progress: [██████░░░░] ~43%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 4.7 min
-- Total execution time: 3.63 hours
+- Total execution time: 3.70 hours
 
 **By Phase:**
 
@@ -35,10 +35,11 @@ Progress: [██████░░░░] ~42%
 | 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
+| 05-domain-event-publishing | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-08 (9 min), quick-001 (2 min), 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min)
-- Trend: Current user metadata endpoint complete with 6 new tests
+- Last 5 plans: quick-001 (2 min), 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min)
+- Trend: Event bus infrastructure with procrastinate job queue dependencies
 
 *Updated after each plan completion*
 
@@ -165,6 +166,10 @@ Recent decisions affecting current work:
 - is_owner derived from user.role == "owner" (not stored on household)
 - CurrentUserDep type alias for JWT-authenticated endpoints
 - Nested Pydantic response schemas with from_domain classmethod
+- Event bus uses dict[type, list[Callable]] for handler registry (Cosmic Python pattern)
+- Handlers called synchronously; async work delegated to job queue
+- Exception in handler re-raised for fail-fast in development
+- Separate postgres-jobs database on port 5433 for job queue isolation
 
 ### Pending Todos
 
@@ -184,9 +189,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 04.2-01-PLAN.md (Current User Metadata Endpoint)
+Stopped at: Completed 05-01-PLAN.md (Event Bus Infrastructure)
 Resume file: None
-Next action: Begin Phase 5 (Domain Event Publishing)
+Next action: Continue Phase 5 with 05-02-PLAN.md (Job Queue Integration)
 
 ## Roadmap Evolution
 
