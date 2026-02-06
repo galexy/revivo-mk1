@@ -1,0 +1,67 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="16px" line-height="1.5" color="#333333" />
+      <mj-button background-color="#4F46E5" color="#ffffff" font-size="16px" border-radius="6px" />
+    </mj-attributes>
+    <mj-style>
+      a { color: #4F46E5; }
+      .break-url div { word-break: break-all; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <!-- Header -->
+    <mj-section padding="20px 0">
+      <mj-column>
+        <mj-text align="center" font-size="24px" font-weight="bold" color="#111827">
+          {{ company_name }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Main content -->
+    <mj-section background-color="#ffffff" border-radius="8px" padding="40px 30px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold" color="#111827" padding-bottom="10px">
+          Verify your email address
+        </mj-text>
+
+        <mj-text>
+          Hi{{ recipient_name }},
+        </mj-text>
+
+        <mj-text>
+          Thanks for signing up! Please verify your email address by clicking
+          the button below.
+        </mj-text>
+
+        <mj-button href="{{ verification_link }}" align="center" padding="20px 0">
+          Verify Email Address
+        </mj-button>
+
+        <mj-text font-size="14px" color="#6b7280">
+          Or copy and paste this link into your browser:
+        </mj-text>
+
+        <mj-text font-size="14px" color="#4F46E5" css-class="break-url">
+          {{ verification_link }}
+        </mj-text>
+
+        <mj-text font-size="14px" color="#6b7280" padding-top="20px">
+          This link expires in {{ expiry_hours }} hours. If you did not create
+          an account, you can safely ignore this email.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section padding="20px 0">
+      <mj-column>
+        <mj-text align="center" font-size="12px" color="#9ca3af">
+          {{ company_name }} | {{ support_email }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
