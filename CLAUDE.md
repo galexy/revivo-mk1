@@ -17,3 +17,16 @@ Key points:
 - After any endpoint change, start the actual service and smoke test with curl — not just TestClient
 - Integration tests use `metadata.create_all()` which bypasses Alembic — test schema can drift from production
 - Never claim completion unless the running service actually works (tests passing is necessary but not sufficient)
+
+## Database Schema Changes
+
+**tables.py is the source of truth for database schema.**
+
+Rules:
+- Never hand-write DDL in migration files
+- Always use `alembic revision --autogenerate` to generate migrations from tables.py changes
+- After generating, review the migration -- hand-edit ONLY for data backfill logic
+- Run `alembic check` to verify no remaining drift
+- Run `alembic upgrade head` against the real database (not just tests)
+
+For the full step-by-step procedure, see `.claude/skills/safe-schema-change.md`
