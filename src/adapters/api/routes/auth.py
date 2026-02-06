@@ -6,6 +6,7 @@ Provides REST endpoints for authentication:
 - POST /auth/refresh: Rotate refresh token and get new access token
 - GET /auth/verify: Verify email address via signed token
 - POST /auth/logout: Clear refresh token cookie
+- GET /auth/me: Get current user profile with household info
 
 Design decisions:
 - Registration always returns 202 (even on duplicate email) for enumeration protection
@@ -23,11 +24,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.application.services.auth_service import AuthError, AuthService
 
-from ..dependencies import get_auth_service
+from ..dependencies import CurrentUser, get_auth_service, get_current_user
 from ..schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
+    UserProfileResponse,
     VerifyEmailResponse,
 )
 
@@ -36,6 +38,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Type aliases
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
 
 # --- Cookie Configuration ---
@@ -281,3 +284,35 @@ async def logout(response: Response) -> None:
         response: FastAPI response for clearing cookie.
     """
     _clear_refresh_cookie(response)
+
+
+@router.get(
+    "/me",
+    response_model=UserProfileResponse,
+    summary="Get current user profile",
+)
+async def get_current_user_profile(
+    service: AuthServiceDep,
+    current_user: CurrentUserDep,
+) -> UserProfileResponse:
+    """Get authenticated user's profile with household info.
+
+    Returns user metadata (email, display_name, email_verified, created_at)
+    and nested household object (id, name, is_owner flag).
+
+    Args:
+        service: AuthService from dependency injection.
+        current_user: CurrentUser extracted from JWT.
+
+    Returns:
+        UserProfileResponse with user profile and household info.
+
+    Raises:
+        HTTPException: 404 if user not found (should not happen with valid JWT).
+    """
+    result = service.get_user_profile(current_user.user_id)
+    if result is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    user, household = result
+    return UserProfileResponse.from_domain(user, household)
