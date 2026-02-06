@@ -1,0 +1,1095 @@
+{
+  "tables": {
+    "accounts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "household_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "account_type",
+          "type": "VARCHAR(50)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false
+        },
+        {
+          "name": "subtype",
+          "type": "VARCHAR(50)",
+          "nullable": true
+        },
+        {
+          "name": "opening_balance_amount",
+          "type": "NUMERIC(19, 4)",
+          "nullable": false
+        },
+        {
+          "name": "opening_balance_currency",
+          "type": "VARCHAR(3)",
+          "nullable": false
+        },
+        {
+          "name": "opening_date",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "credit_limit_amount",
+          "type": "NUMERIC(19, 4)",
+          "nullable": true
+        },
+        {
+          "name": "credit_limit_currency",
+          "type": "VARCHAR(3)",
+          "nullable": true
+        },
+        {
+          "name": "apr",
+          "type": "NUMERIC(5, 4)",
+          "nullable": true
+        },
+        {
+          "name": "term_months",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "due_date",
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "name": "rewards_value",
+          "type": "NUMERIC(19, 0)",
+          "nullable": true
+        },
+        {
+          "name": "rewards_unit",
+          "type": "VARCHAR(100)",
+          "nullable": true
+        },
+        {
+          "name": "institution_name",
+          "type": "VARCHAR(255)",
+          "nullable": true
+        },
+        {
+          "name": "institution_website",
+          "type": "VARCHAR(500)",
+          "nullable": true
+        },
+        {
+          "name": "institution_phone",
+          "type": "VARCHAR(50)",
+          "nullable": true
+        },
+        {
+          "name": "institution_notes",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "encrypted_account_number",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "closing_date",
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "updated_by",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_accounts_household_id_households",
+          "constrained_columns": [
+            "household_id"
+          ],
+          "referred_table": "households",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_accounts_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_accounts_household_id",
+          "unique": false,
+          "column_names": [
+            "household_id"
+          ]
+        },
+        {
+          "name": "ix_accounts_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "ix_accounts_user_status",
+          "unique": false,
+          "column_names": [
+            "user_id",
+            "status"
+          ]
+        },
+        {
+          "name": "ix_accounts_user_type",
+          "unique": false,
+          "column_names": [
+            "user_id",
+            "account_type"
+          ]
+        }
+      ]
+    },
+    "categories": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "household_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "parent_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "category_type",
+          "type": "VARCHAR(10)",
+          "nullable": false
+        },
+        {
+          "name": "is_system",
+          "type": "BOOLEAN",
+          "nullable": false
+        },
+        {
+          "name": "is_hidden",
+          "type": "BOOLEAN",
+          "nullable": false
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "icon",
+          "type": "VARCHAR(50)",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_categories_household_id_households",
+          "constrained_columns": [
+            "household_id"
+          ],
+          "referred_table": "households",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_categories_parent_id_categories",
+          "constrained_columns": [
+            "parent_id"
+          ],
+          "referred_table": "categories",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_categories_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_categories_household_id",
+          "unique": false,
+          "column_names": [
+            "household_id"
+          ]
+        },
+        {
+          "name": "ix_categories_parent_id",
+          "unique": false,
+          "column_names": [
+            "parent_id"
+          ]
+        },
+        {
+          "name": "ix_categories_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "ix_categories_user_system",
+          "unique": false,
+          "column_names": [
+            "user_id",
+            "is_system"
+          ]
+        }
+      ]
+    },
+    "encrypted_secrets": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "secret_type",
+          "type": "VARCHAR(50)",
+          "nullable": false
+        },
+        {
+          "name": "encrypted_value",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_encrypted_secrets_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_encrypted_secrets_user_type",
+          "unique": true,
+          "column_names": [
+            "user_id",
+            "secret_type"
+          ]
+        }
+      ]
+    },
+    "households": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "indexes": []
+    },
+    "outbox": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "event_type",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "aggregate_type",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "aggregate_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "processed_at",
+          "type": "TIMESTAMP",
+          "nullable": true
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [],
+      "indexes": [
+        {
+          "name": "ix_outbox_unprocessed",
+          "unique": false,
+          "column_names": [
+            "processed_at"
+          ]
+        }
+      ]
+    },
+    "payees": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "household_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "normalized_name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "default_category_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "last_used_at",
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "name": "usage_count",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_payees_default_category_id_categories",
+          "constrained_columns": [
+            "default_category_id"
+          ],
+          "referred_table": "categories",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_payees_household_id_households",
+          "constrained_columns": [
+            "household_id"
+          ],
+          "referred_table": "households",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_payees_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_payees_household_id",
+          "unique": false,
+          "column_names": [
+            "household_id"
+          ]
+        },
+        {
+          "name": "ix_payees_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "ix_payees_user_normalized",
+          "unique": false,
+          "column_names": [
+            "user_id",
+            "normalized_name"
+          ]
+        }
+      ]
+    },
+    "refresh_tokens": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "token_hash",
+          "type": "VARCHAR(64)",
+          "nullable": false
+        },
+        {
+          "name": "token_family",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "revoked_at",
+          "type": "TIMESTAMP",
+          "nullable": true
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_refresh_tokens_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_refresh_tokens_family",
+          "unique": false,
+          "column_names": [
+            "token_family"
+          ]
+        },
+        {
+          "name": "ix_refresh_tokens_token_hash",
+          "unique": true,
+          "column_names": [
+            "token_hash"
+          ]
+        },
+        {
+          "name": "ix_refresh_tokens_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    "split_lines": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "split_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "transaction_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "amount",
+          "type": "NUMERIC(19, 4)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "nullable": false
+        },
+        {
+          "name": "category_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "transfer_account_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "memo",
+          "type": "VARCHAR(500)",
+          "nullable": true
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_split_lines_category_id_categories",
+          "constrained_columns": [
+            "category_id"
+          ],
+          "referred_table": "categories",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_split_lines_transaction_id_transactions",
+          "constrained_columns": [
+            "transaction_id"
+          ],
+          "referred_table": "transactions",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_split_lines_transfer_account_id_accounts",
+          "constrained_columns": [
+            "transfer_account_id"
+          ],
+          "referred_table": "accounts",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_split_lines_category_id",
+          "unique": false,
+          "column_names": [
+            "category_id"
+          ]
+        },
+        {
+          "name": "ix_split_lines_split_id",
+          "unique": true,
+          "column_names": [
+            "split_id"
+          ]
+        },
+        {
+          "name": "ix_split_lines_transaction_id",
+          "unique": false,
+          "column_names": [
+            "transaction_id"
+          ]
+        },
+        {
+          "name": "ix_split_lines_transfer_account",
+          "unique": false,
+          "column_names": [
+            "transfer_account_id"
+          ]
+        }
+      ]
+    },
+    "transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "account_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "household_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "effective_date",
+          "type": "DATE",
+          "nullable": false
+        },
+        {
+          "name": "posted_date",
+          "type": "DATE",
+          "nullable": true
+        },
+        {
+          "name": "amount",
+          "type": "NUMERIC(19, 4)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "VARCHAR(3)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": false
+        },
+        {
+          "name": "source",
+          "type": "VARCHAR(20)",
+          "nullable": false
+        },
+        {
+          "name": "payee_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "payee_name",
+          "type": "VARCHAR(255)",
+          "nullable": true
+        },
+        {
+          "name": "memo",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "check_number",
+          "type": "VARCHAR(50)",
+          "nullable": true
+        },
+        {
+          "name": "source_transaction_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "source_split_id",
+          "type": "VARCHAR(36)",
+          "nullable": true
+        },
+        {
+          "name": "is_mirror",
+          "type": "BOOLEAN",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "search_vector",
+          "type": "TSVECTOR",
+          "nullable": true
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_transactions_account_id_accounts",
+          "constrained_columns": [
+            "account_id"
+          ],
+          "referred_table": "accounts",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_transactions_household_id_households",
+          "constrained_columns": [
+            "household_id"
+          ],
+          "referred_table": "households",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_transactions_payee_id_payees",
+          "constrained_columns": [
+            "payee_id"
+          ],
+          "referred_table": "payees",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_transactions_source_transaction_id_transactions",
+          "constrained_columns": [
+            "source_transaction_id"
+          ],
+          "referred_table": "transactions",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_transactions_user_id_users",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_transactions_account_effective_date",
+          "unique": false,
+          "column_names": [
+            "account_id",
+            "effective_date"
+          ]
+        },
+        {
+          "name": "ix_transactions_account_id",
+          "unique": false,
+          "column_names": [
+            "account_id"
+          ]
+        },
+        {
+          "name": "ix_transactions_household_id",
+          "unique": false,
+          "column_names": [
+            "household_id"
+          ]
+        },
+        {
+          "name": "ix_transactions_search",
+          "unique": false,
+          "column_names": [
+            "search_vector"
+          ]
+        },
+        {
+          "name": "ix_transactions_source_split_id",
+          "unique": false,
+          "column_names": [
+            "source_split_id"
+          ]
+        },
+        {
+          "name": "ix_transactions_source_transaction",
+          "unique": false,
+          "column_names": [
+            "source_transaction_id"
+          ]
+        },
+        {
+          "name": "ix_transactions_user_effective_date",
+          "unique": false,
+          "column_names": [
+            "user_id",
+            "effective_date"
+          ]
+        },
+        {
+          "name": "ix_transactions_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    "users": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "display_name",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR(255)",
+          "nullable": false
+        },
+        {
+          "name": "household_id",
+          "type": "VARCHAR(36)",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR(20)",
+          "nullable": false
+        },
+        {
+          "name": "email_verified",
+          "type": "BOOLEAN",
+          "nullable": false
+        },
+        {
+          "name": "email_verified_at",
+          "type": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP",
+          "nullable": false
+        }
+      ],
+      "primary_keys": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_users_household_id_households",
+          "constrained_columns": [
+            "household_id"
+          ],
+          "referred_table": "households",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_users_email",
+          "unique": true,
+          "column_names": [
+            "email"
+          ]
+        },
+        {
+          "name": "ix_users_household_id",
+          "unique": false,
+          "column_names": [
+            "household_id"
+          ]
+        },
+        {
+          "name": "uq_users_email",
+          "unique": true,
+          "column_names": [
+            "email"
+          ]
+        }
+      ]
+    }
+  }
+}
