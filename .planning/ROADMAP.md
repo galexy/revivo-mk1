@@ -209,11 +209,11 @@ Plans:
   3. Events can be published synchronously (in-process) or queued for async handling
   4. Event publishing integrates with existing domain events (UserRegistered, etc.)
   5. Test infrastructure supports event handler testing
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Event bus infrastructure and dependencies (Procrastinate, jobs database)
+- [ ] 05-02-PLAN.md — Job queue wiring, UoW event publishing, handler registration
 
 ### Phase 6: Transactional Email Infrastructure
 **Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration
