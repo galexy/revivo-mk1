@@ -54,7 +54,7 @@
     }
   },
 
-  "forwardPorts": [8000, 5432],
+  "forwardPorts": [8000, 5432, 8025],
 
   "remoteUser": "developer",
 
@@ -73,7 +73,7 @@
     "LOG_LEVEL": "DEBUG"
   },
 
-  "postCreateCommand": "uv sync",
+  "postCreateCommand": "uv sync && npm ci",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
   "waitFor": "postStartCommand",
 
