@@ -1,5 +1,7 @@
 """FastAPI application factory."""
 
+import asyncio
+import contextlib
 import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -11,6 +13,7 @@ from typeid.core.errors import TypeIDException
 
 from src.adapters.logging import configure_logging, get_logger
 from src.adapters.persistence.orm.mappers import start_mappers
+from src.application.handlers import register_all_handlers
 
 from .routes import accounts, auth, categories, health, transactions
 
@@ -21,8 +24,8 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Application lifespan events.
-    Startup: Configure logging, start mappers
-    Shutdown: Cleanup resources
+    Startup: Configure logging, start mappers, register handlers, start worker
+    Shutdown: Stop worker, cleanup resources
     """
     # Startup
     environment = os.getenv("ENVIRONMENT", "development")
@@ -38,7 +41,38 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     start_mappers()
     logger.info("orm_mappers_initialized")
 
-    yield
+    # Register event handlers
+    register_all_handlers()
+    logger.info("event_handlers_registered")
+
+    # Start job queue worker in background (if job queue database available)
+    worker_task: asyncio.Task[None] | None = None
+    job_queue_enabled = os.getenv("JOB_QUEUE_ENABLED", "true").lower() == "true"
+
+    if job_queue_enabled:
+        try:
+            from src.adapters.jobs import job_queue
+
+            async with job_queue.open_async():
+                worker_task = asyncio.create_task(
+                    job_queue.run_worker_async(install_signal_handlers=False)
+                )
+                logger.info("job_queue_worker_started")
+
+                yield
+
+                # Shutdown: cancel worker
+                if worker_task:
+                    worker_task.cancel()
+                    with contextlib.suppress(TimeoutError, asyncio.CancelledError):
+                        await asyncio.wait_for(worker_task, timeout=10)
+                    logger.info("job_queue_worker_stopped")
+        except Exception as e:
+            logger.warning("job_queue_failed_to_start", error=str(e))
+            yield
+    else:
+        logger.info("job_queue_disabled")
+        yield
 
     # Shutdown
     logger.info("application_shutting_down")
