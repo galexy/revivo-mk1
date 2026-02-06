@@ -14,9 +14,16 @@ services:
       - JOB_QUEUE_DATABASE_URL=postgresql://postgres:postgres@postgres-jobs:5432/jobs
       - ENVIRONMENT=development
       - LOG_LEVEL=DEBUG
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_FROM_NAME=Personal Finance
+      - SMTP_FROM_EMAIL=noreply@localhost
+      - APP_BASE_URL=http://localhost:8000
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - app-network
     secrets:
@@ -59,6 +66,20 @@ services:
       - app-network
     ports:
       - "5433:5432"
+
+  mailpit:
+    image: axllent/mailpit:v1.29
+    container_name: mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - app-network
 
 networks:
   app-network:
