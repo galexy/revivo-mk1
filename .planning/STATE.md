@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4.1 (Test Schema Parity) - COMPLETE
+**Current focus:** Phase 4.2 (Current User Metadata Endpoint) - COMPLETE
 
 ## Current Position
 
-Phase: 4.1 of 20 (Test Schema Parity)
-Plan: 2 of 2 complete (04.1-01, 04.1-02)
+Phase: 4.2 of 20 (Current User Metadata Endpoint)
+Plan: 1 of 1 complete (04.2-01)
 Status: Phase complete
-Last activity: 2026-02-06 - Completed 04.1-02-PLAN.md (Drift Detection Test and Workflow Documentation)
+Last activity: 2026-02-06 - Completed 04.2-01-PLAN.md (GET /auth/me endpoint)
 
-Progress: [██████░░░░] ~40%
+Progress: [██████░░░░] ~42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 4.7 min
-- Total execution time: 3.51 hours
+- Total execution time: 3.63 hours
 
 **By Phase:**
 
@@ -34,10 +34,11 @@ Progress: [██████░░░░] ~40%
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
 | 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
+| 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-07 (8 min), 04-08 (9 min), quick-001 (2 min), 04.1-01 (3 min), 04.1-02 (5 min)
-- Trend: Schema parity phase complete with drift detection test and workflow docs
+- Last 5 plans: 04-08 (9 min), quick-001 (2 min), 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min)
+- Trend: Current user metadata endpoint complete with 6 new tests
 
 *Updated after each plan completion*
 
@@ -160,6 +161,10 @@ Recent decisions affecting current work:
 - Drift detection test guards schema parity between metadata.create_all and alembic upgrade head
 - compare_type=True in MigrationContext for thorough type drift detection
 - Three-level autogenerate-first documentation: CLAUDE.md, skill file, CHECKPOINTS.md
+- UserProfileResponse includes created_at for "member since" display
+- is_owner derived from user.role == "owner" (not stored on household)
+- CurrentUserDep type alias for JWT-authenticated endpoints
+- Nested Pydantic response schemas with from_domain classmethod
 
 ### Pending Todos
 
@@ -178,9 +183,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 04.1-02-PLAN.md (Drift Detection Test and Workflow Documentation)
+Stopped at: Completed 04.2-01-PLAN.md (Current User Metadata Endpoint)
 Resume file: None
-Next action: Begin Phase 4.2 (Current User Metadata Endpoint) or Phase 5 (Nx Monorepo Restructure)
+Next action: Begin Phase 4.3 (Transactional Email Infrastructure) or Phase 5 (Nx Monorepo Restructure)
 
 ## Roadmap Evolution
 
@@ -329,3 +334,23 @@ Key stats:
 - Autogenerate-first workflow documented at 3 levels (CLAUDE.md, skill file, CHECKPOINTS.md)
 
 Ready for Phase 4.2: Current User Metadata Endpoint
+
+## Phase 4.2 Milestone
+
+**Phase 4.2: Current User Metadata Endpoint - COMPLETE**
+
+All success criteria met:
+1. GET /auth/me with valid JWT returns user profile (user_id, email, display_name, email_verified, created_at)
+2. GET /auth/me response includes nested household object with id, name, is_owner
+3. GET /auth/me without JWT returns 401 Unauthorized
+4. Response does not leak sensitive fields (password_hash not in response)
+
+Plans completed (1 of 1):
+- 04.2-01: GET /auth/me endpoint with UserProfileResponse schema and integration tests
+
+Key stats:
+- 414 total tests passing (408 existing + 6 new)
+- Service smoke tested per CHECKPOINTS.md
+- is_owner flag ready for Phase 25 (Multi-User Households)
+
+Ready for Phase 4.3: Transactional Email Infrastructure
