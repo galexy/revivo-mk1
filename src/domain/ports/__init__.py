@@ -7,9 +7,16 @@ and infrastructure adapters implement those interfaces.
 Key ports:
 - Repository: Persistence of aggregates
 - UnitOfWork: Transaction boundary management
+- EmailService: Transactional email delivery
 """
 
+from src.domain.ports.email_service import EmailDeliveryError, EmailService
 from src.domain.ports.repository import Repository
 from src.domain.ports.unit_of_work import UnitOfWork
 
-__all__ = ["Repository", "UnitOfWork"]
+__all__ = [
+    "EmailDeliveryError",
+    "EmailService",
+    "Repository",
+    "UnitOfWork",
+]
