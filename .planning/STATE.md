@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 5 of 22 (Domain Event Publishing)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-02-06 - Completed 05-01-PLAN.md (Event Bus Infrastructure)
+Last activity: 2026-02-06 - Completed 05-02-PLAN.md (Job Queue Integration)
 
-Progress: [██████░░░░] ~43%
+Progress: [██████░░░░] ~44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 39
+- Total plans completed: 40
 - Average duration: 4.7 min
-- Total execution time: 3.70 hours
+- Total execution time: 3.80 hours
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Progress: [██████░░░░] ~43%
 | 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
-| 05-domain-event-publishing | 1 | 4 min | 4.0 min |
+| 05-domain-event-publishing | 2 | 10 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: quick-001 (2 min), 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min)
-- Trend: Event bus infrastructure with procrastinate job queue dependencies
+- Last 5 plans: 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min)
+- Trend: Event infrastructure complete, job queue wired
 
 *Updated after each plan completion*
 
@@ -170,6 +170,11 @@ Recent decisions affecting current work:
 - Handlers called synchronously; async work delegated to job queue
 - Exception in handler re-raised for fail-fast in development
 - Separate postgres-jobs database on port 5433 for job queue isolation
+- UoW publishes events AFTER commit succeeds (RESEARCH.md Pitfall 1)
+- JOB_QUEUE_ENABLED env var for graceful degradation when job db unavailable
+- Procrastinate job queue with PsycopgConnector for async jobs
+- Event handlers registered in lifespan via register_all_handlers()
+- Job queue worker runs in same process as API via lifespan
 
 ### Pending Todos
 
@@ -189,9 +194,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 05-01-PLAN.md (Event Bus Infrastructure)
+Stopped at: Completed 05-02-PLAN.md (Job Queue Integration)
 Resume file: None
-Next action: Continue Phase 5 with 05-02-PLAN.md (Job Queue Integration)
+Next action: Continue Phase 5 with 05-03-PLAN.md (Registration Event Flow)
 
 ## Roadmap Evolution
 
