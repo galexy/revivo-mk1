@@ -348,3 +348,26 @@ class AuthService:
         """
         with self._uow:
             return self._uow.users.get_by_id(user_id)
+
+    def get_user_profile(
+        self,
+        user_id: UserId,
+    ) -> tuple[User, Household] | None:
+        """Load user and household for profile endpoint.
+
+        Used by GET /auth/me to return user metadata with nested household info.
+
+        Args:
+            user_id: The user identifier.
+
+        Returns:
+            Tuple of (User, Household) if found, None if user not found.
+        """
+        with self._uow:
+            user = self._uow.users.get_by_id(user_id)
+            if user is None:
+                return None
+            household = self._uow.households.get_by_id(user.household_id)
+            if household is None:
+                return None  # Should not happen if FK constraint enforced
+            return (user, household)

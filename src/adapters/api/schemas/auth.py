@@ -4,6 +4,7 @@ Provides request/response schemas for auth operations:
 - RegisterRequest: User registration with password complexity validation
 - TokenResponse: OAuth2-compatible token response
 - VerifyEmailResponse: Email verification result
+- UserProfileResponse: Authenticated user profile with household info
 - ErrorResponse: Structured error response
 
 Password complexity rules:
@@ -15,8 +16,14 @@ Password complexity rules:
 """
 
 import re
+from datetime import datetime
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+if TYPE_CHECKING:
+    from src.domain.model.household import Household
+    from src.domain.model.user import User
 
 
 class RegisterRequest(BaseModel):
@@ -93,3 +100,59 @@ class ErrorResponse(BaseModel):
 
     detail: str = Field(..., description="Error message")
     code: str = Field(..., description="Machine-readable error code")
+
+
+class HouseholdResponse(BaseModel):
+    """Nested household info in user profile response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str = Field(..., description="Household ID (hh_xxx format)")
+    name: str = Field(..., description="Household display name")
+    is_owner: bool = Field(..., description="Whether user owns this household")
+
+
+class UserProfileResponse(BaseModel):
+    """User profile with household info.
+
+    Returned by GET /auth/me for displaying user context (welcome message,
+    household info) in the frontend. Prepares is_owner flag for Phase 25
+    (Multi-User Households).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: str = Field(..., description="User ID (user_xxx format)")
+    email: str = Field(..., description="User email address")
+    display_name: str = Field(..., description="User display name")
+    email_verified: bool = Field(..., description="Whether email is verified")
+    created_at: datetime = Field(..., description="Account creation timestamp (member since)")
+    household: HouseholdResponse = Field(..., description="User's household info")
+
+    @classmethod
+    def from_domain(
+        cls,
+        user: "User",
+        household: "Household",
+    ) -> "UserProfileResponse":
+        """Construct response from domain objects.
+
+        Args:
+            user: User domain entity.
+            household: Household domain entity.
+
+        Returns:
+            UserProfileResponse with nested HouseholdResponse.
+        """
+        return cls(
+            user_id=str(user.id),
+            email=user.email,
+            display_name=user.display_name,
+            email_verified=user.email_verified,
+            created_at=user.created_at,
+            household=HouseholdResponse(
+                id=str(household.id),
+                name=household.name,
+                is_owner=(user.role == "owner"),
+            ),
+        )
