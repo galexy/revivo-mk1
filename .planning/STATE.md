@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 5 (Domain Event Publishing) - IN PROGRESS
+**Current focus:** Phase 5 (Domain Event Publishing) - COMPLETE
 
 ## Current Position
 
 Phase: 5 of 22 (Domain Event Publishing)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-02-06 - Completed 05-02-PLAN.md (Job Queue Integration)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-02-06 - Completed 05-03-PLAN.md (Operations Tooling)
 
-Progress: [██████░░░░] ~44%
+Progress: [██████░░░░] ~46%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 4.7 min
-- Total execution time: 3.80 hours
+- Total execution time: 3.87 hours
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Progress: [██████░░░░] ~44%
 | 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
-| 05-domain-event-publishing | 2 | 10 min | 5.0 min |
+| 05-domain-event-publishing | 3 | 14 min | 4.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 04.1-01 (3 min), 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min)
-- Trend: Event infrastructure complete, job queue wired
+- Last 5 plans: 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min), 05-03 (4 min)
+- Trend: Phase 5 complete, operations tooling shipped
 
 *Updated after each plan completion*
 
@@ -175,6 +175,9 @@ Recent decisions affecting current work:
 - Procrastinate job queue with PsycopgConnector for async jobs
 - Event handlers registered in lifespan via register_all_handlers()
 - Job queue worker runs in same process as API via lifespan
+- Direct SQL queries via psql for job queue operations (maximum visibility)
+- scripts/jobs/ directory for operational scripts
+- docs/runbooks/ directory for operational documentation
 
 ### Pending Todos
 
@@ -194,9 +197,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 05-02-PLAN.md (Job Queue Integration)
+Stopped at: Completed 05-03-PLAN.md (Operations Tooling) - Phase 5 COMPLETE
 Resume file: None
-Next action: Continue Phase 5 with 05-03-PLAN.md (Registration Event Flow)
+Next action: Begin Phase 6 (Transactional Email Infrastructure)
 
 ## Roadmap Evolution
 
@@ -365,3 +368,26 @@ Key stats:
 - is_owner flag ready for Phase 25 (Multi-User Households)
 
 Ready for Phase 5: Domain Event Publishing
+
+## Phase 5 Milestone
+
+**Phase 5: Domain Event Publishing - COMPLETE**
+
+All success criteria met:
+1. Domain events published after aggregate changes commit
+2. Event handlers can enqueue async jobs for side effects
+3. Job queue worker processes jobs with retry on failure
+4. Operators can manage job queue via CLI scripts and runbook
+
+Plans completed (3 of 3):
+- 05-01: Event Bus Infrastructure (in-memory bus with dict registry, Cosmic Python pattern)
+- 05-02: Job Queue Integration (Procrastinate with separate postgres-jobs database)
+- 05-03: Operations Tooling (7 scripts, 300-line runbook)
+
+Key stats:
+- 432 total tests passing (all existing tests)
+- Separate jobs database on port 5433 for isolation
+- JOB_QUEUE_ENABLED env var for graceful degradation
+- Comprehensive runbook with monitoring queries and emergency procedures
+
+Ready for Phase 6: Transactional Email Infrastructure
