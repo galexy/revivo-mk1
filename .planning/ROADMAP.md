@@ -193,10 +193,10 @@ Plans:
   1. GET /auth/me with valid JWT returns user profile (user_id, email, display_name, household_id, email_verified)
   2. GET /auth/me without JWT returns 401
   3. Response does not leak sensitive fields (password_hash, internal IDs)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04.2-01: TBD
+- [ ] 04.2-01-PLAN.md — Add /auth/me endpoint with UserProfileResponse schema and integration tests
 
 ### Phase 4.3: Transactional Email Infrastructure (INSERTED)
 **Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration, and mock emails in integration tests
