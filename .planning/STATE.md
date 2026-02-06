@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 2 of 4 complete
+**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 3 of 4 complete
 
 ## Current Position
 
 Phase: 6 of 22 (Transactional Email Infrastructure)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-02-06 - Completed 06-02-PLAN.md (EmailService Protocol and SMTP Adapter)
+Last activity: 2026-02-06 - Completed 06-03-PLAN.md (Event Handler and Job Queue Email Integration)
 
-Progress: [██████░░░░] ~48%
+Progress: [██████░░░░] ~49%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 43
-- Average duration: 4.6 min
-- Total execution time: 3.99 hours
+- Total plans completed: 44
+- Average duration: 4.5 min
+- Total execution time: 4.04 hours
 
 **By Phase:**
 
@@ -36,11 +36,11 @@ Progress: [██████░░░░] ~48%
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
-| 06-transactional-email-infrastructure | 2 | 7 min | 3.5 min |
+| 06-transactional-email-infrastructure | 3 | 10 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (4 min), 05-02 (6 min), 05-03 (4 min), 06-01 (3 min), 06-02 (4 min)
-- Trend: Phase 6 progressing, email service protocol and SMTP adapter created
+- Last 5 plans: 05-02 (6 min), 05-03 (4 min), 06-01 (3 min), 06-02 (4 min), 06-03 (3 min)
+- Trend: Phase 6 nearly complete, email flow fully wired from event to SMTP delivery
 
 *Updated after each plan completion*
 
@@ -191,6 +191,10 @@ Recent decisions affecting current work:
 - Lazy is_available() with cached result for SMTP connectivity checks
 - EmailDeliveryError wraps both SMTPException and OSError
 - Email PII masking: first 3 chars + *** for log output
+- Handler catches defer exceptions for graceful degradation (email is side effect, not critical path)
+- 48-hour token expiry to match email template promise
+- EmailDeliveryError added to job retry_exceptions for transient SMTP failures
+- Lazy import of send_verification_email inside handler to avoid module-level job queue initialization
 
 ### Pending Todos
 
@@ -210,9 +214,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 06-02-PLAN.md (EmailService Protocol and SMTP Adapter)
+Stopped at: Completed 06-03-PLAN.md (Event Handler and Job Queue Email Integration)
 Resume file: None
-Next action: Continue Phase 6 with 06-03-PLAN.md (Email Verification Handler)
+Next action: Continue Phase 6 with 06-04-PLAN.md (End-to-End Email Integration Testing)
 
 ## Roadmap Evolution
 
