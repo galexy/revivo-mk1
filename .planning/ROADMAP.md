@@ -209,11 +209,12 @@ Plans:
   3. Events can be published synchronously (in-process) or queued for async handling
   4. Event publishing integrates with existing domain events (UserRegistered, etc.)
   5. Test infrastructure supports event handler testing
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Event bus infrastructure and dependencies (Procrastinate, jobs database)
-- [ ] 05-02-PLAN.md — Job queue wiring, UoW event publishing, handler registration
+- [x] 05-01-PLAN.md — Event bus infrastructure and dependencies (Procrastinate, jobs database)
+- [x] 05-02-PLAN.md — Job queue wiring, UoW event publishing, handler registration
+- [x] 05-03-PLAN.md — Operational scripts and runbook for job queue management
 
 ### Phase 6: Transactional Email Infrastructure
 **Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration
@@ -608,7 +609,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 4. Authentication Infrastructure | 8/8 | Complete | 2026-02-05 |
 | 4.1 Test Schema Parity | 2/2 | Complete | 2026-02-06 |
 | 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
-| 5. Domain Event Publishing | 0/2 | Not started | - |
+| 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 0/2 | Not started | - |
 | 7. Nx Monorepo Restructure | 0/2 | Not started | - |
 | 8. Frontend Infrastructure | 0/2 | Not started | - |
