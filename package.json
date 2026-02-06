@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Node.js dependencies for build tooling (MJML email templates)",
+  "devDependencies": {
+    "mjml": "^4.15.0"
+  }
+}

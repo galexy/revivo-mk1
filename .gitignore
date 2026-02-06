@@ -89,3 +89,6 @@ docker-compose.local.yml
 # Alembic
 alembic/versions/__pycache__/
 .hypothesis/
+
+# Node.js
+node_modules/
