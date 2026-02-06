@@ -15,6 +15,7 @@ from sqlalchemy import engine_from_config, pool
 # Import metadata for autogenerate support
 # This enables `alembic revision --autogenerate` to detect changes
 from src.adapters.persistence.orm.base import metadata
+import src.adapters.persistence.orm.tables  # noqa: F401  # Registers Table objects with metadata
 
 # Alembic Config object for access to .ini values
 config = context.config
@@ -55,6 +56,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        user_module_prefix="types.",
     )
 
     with context.begin_transaction():
@@ -79,6 +81,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+            compare_type=True,
+            user_module_prefix="types.",
         )
 
         with context.begin_transaction():
