@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
 - [x] **Phase 4: Authentication Infrastructure** - User domain model, JWT issuance, protected routes
 - [x] **Phase 4.1: Test Schema Parity** - Align SQLAlchemy metadata with Alembic migrations so tests use production-equivalent schema (INSERTED)
-- [ ] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
+- [x] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
 - [ ] **Phase 4.3: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration (INSERTED)
 - [ ] **Phase 5: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [ ] **Phase 6: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
@@ -196,7 +196,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04.2-01-PLAN.md — Add /auth/me endpoint with UserProfileResponse schema and integration tests
+- [x] 04.2-01-PLAN.md — Add /auth/me endpoint with UserProfileResponse schema and integration tests
 
 ### Phase 4.3: Transactional Email Infrastructure (INSERTED)
 **Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration, and mock emails in integration tests
@@ -590,7 +590,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 3.2 Add Missing PATCH Tests | 3/3 | Complete | 2026-02-03 |
 | 4. Authentication Infrastructure | 8/8 | Complete | 2026-02-05 |
 | 4.1 Test Schema Parity | 2/2 | Complete | 2026-02-06 |
-| 4.2 Current User Metadata Endpoint | 0/1 | Not started | - |
+| 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
 | 4.3 Transactional Email Infrastructure | 0/2 | Not started | - |
 | 5. Nx Monorepo Restructure | 0/2 | Not started | - |
 | 6. Frontend Infrastructure | 0/2 | Not started | - |
