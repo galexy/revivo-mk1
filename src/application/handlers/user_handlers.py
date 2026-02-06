@@ -4,6 +4,7 @@ These handlers are called synchronously after UoW commit.
 For side effects (email, external calls), they enqueue jobs.
 """
 
+import asyncio
 import os
 
 from src.adapters.logging import get_logger
@@ -17,8 +18,8 @@ def on_user_registered(event: UserRegistered) -> None:
     """Handle UserRegistered event.
 
     Generates a verification token and enqueues a job to send
-    the verification email. The job is deferred synchronously
-    (the event bus calls handlers without await).
+    the verification email. Uses defer_async via the running event
+    loop (the app runs under FastAPI/asyncio).
 
     If the job queue is disabled (JOB_QUEUE_ENABLED=false), the
     defer is skipped and only a log message is emitted.
@@ -45,10 +46,13 @@ def on_user_registered(event: UserRegistered) -> None:
     try:
         from src.adapters.jobs.tasks import send_verification_email
 
-        send_verification_email.defer(
-            user_id=event.user_id,
-            email=event.email,
-            verification_token=verification_token,
+        loop = asyncio.get_running_loop()
+        loop.create_task(
+            send_verification_email.defer_async(
+                user_id=event.user_id,
+                email=event.email,
+                verification_token=verification_token,
+            )
         )
 
         logger.info(
