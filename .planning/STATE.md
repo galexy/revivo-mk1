@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 5 (Domain Event Publishing) - COMPLETE
+**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 1 of 4 complete
 
 ## Current Position
 
-Phase: 5 of 22 (Domain Event Publishing)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-02-06 - Completed 05-03-PLAN.md (Operations Tooling)
+Phase: 6 of 22 (Transactional Email Infrastructure)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-02-06 - Completed 06-01-PLAN.md (MJML Build Tooling and Mailpit)
 
-Progress: [██████░░░░] ~46%
+Progress: [██████░░░░] ~47%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 41
-- Average duration: 4.7 min
-- Total execution time: 3.87 hours
+- Total plans completed: 42
+- Average duration: 4.6 min
+- Total execution time: 3.92 hours
 
 **By Phase:**
 
@@ -36,10 +36,11 @@ Progress: [██████░░░░] ~46%
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
+| 06-transactional-email-infrastructure | 1 | 3 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 04.1-02 (5 min), 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min), 05-03 (4 min)
-- Trend: Phase 5 complete, operations tooling shipped
+- Last 5 plans: 04.2-01 (7 min), 05-01 (4 min), 05-02 (6 min), 05-03 (4 min), 06-01 (3 min)
+- Trend: Phase 6 started, MJML and Mailpit infrastructure set up
 
 *Updated after each plan completion*
 
@@ -178,6 +179,11 @@ Recent decisions affecting current work:
 - Direct SQL queries via psql for job queue operations (maximum visibility)
 - scripts/jobs/ directory for operational scripts
 - docs/runbooks/ directory for operational documentation
+- MJML via npm devDependency (not Python package), invoked via npx
+- Mailpit always-on Docker Compose service (not optional profile)
+- App starts even if SMTP unavailable (mailpit condition: service_started)
+- No SMTP_USER/SMTP_PASSWORD for Mailpit (accepts any auth in dev)
+- Makefile for non-Python build tooling (build-emails target)
 
 ### Pending Todos
 
@@ -197,9 +203,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Completed 05-03-PLAN.md (Operations Tooling) - Phase 5 COMPLETE
+Stopped at: Completed 06-01-PLAN.md (MJML Build Tooling and Mailpit)
 Resume file: None
-Next action: Begin Phase 6 (Transactional Email Infrastructure)
+Next action: Continue Phase 6 with 06-02-PLAN.md (requires devcontainer rebuild for Mailpit)
 
 ## Roadmap Evolution
 
