@@ -157,6 +157,7 @@ Own your financial data and access it anywhere through any interface - web, API,
 | React state management library | Avoid reinventing solved problems, battle-tested solutions | — Pending |
 | K8s deployment | Production-grade orchestration, observability integration | — Pending |
 | OTel from day 1 | Observability as foundational requirement, not afterthought (SRE mindset) | — Pending |
+| Autogenerate-first migration workflow | tables.py is source of truth; never hand-write DDL in migrations; use alembic revision --autogenerate; drift detection test guards parity | Validated (Phase 4.1) |
 
 ---
-*Last updated: 2026-01-29 after initialization*
+*Last updated: 2026-02-06 after Phase 4.1*

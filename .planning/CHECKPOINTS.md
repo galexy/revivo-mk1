@@ -6,6 +6,14 @@ Validation rules that GSD agents (planner and executor) must follow during phase
 
 ### After writing or modifying any Alembic migration
 
+**Autogenerate-first workflow (required):**
+- Schema changes MUST start in `src/adapters/persistence/orm/tables.py`
+- Then use `alembic revision --autogenerate -m "description"` to generate the migration
+- Never hand-write DDL operations in migration files (if autogenerate doesn't produce the right DDL, fix tables.py)
+- Hand-edit migrations ONLY for data backfill logic (not DDL)
+
+**Verification:**
+- Run `alembic check` after generating migrations to confirm no remaining drift
 - Run `alembic upgrade head` against the actual dev database and verify it applies cleanly
 - If the migration involves FK constraints, verify the referenced tables/columns exist
 - Run `alembic downgrade -1` then `alembic upgrade head` to verify reversibility
@@ -43,6 +51,8 @@ This project's integration tests use `metadata.create_all()` (NOT Alembic migrat
 - An FK constraint in migrations but missing from SQLAlchemy models will exist in production but not in tests
 - Index definitions may differ between the two schemas
 - Tests use transactional rollback per test — FK constraints, triggers, and sequences may behave differently with committed data
+
+**RESOLVED:** The drift detection test (`tests/integration/test_schema_parity.py`) now guards against schema drift between `metadata.create_all()` (used by integration tests) and `alembic upgrade head` (used by production). This test runs alembic migrations against a clean database and compares the result to SQLAlchemy metadata.
 
 A passing test suite does NOT guarantee the real service works. Always cross-check against the running service for migration-related changes.
 
