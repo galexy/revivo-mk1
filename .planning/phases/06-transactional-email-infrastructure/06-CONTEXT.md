@@ -1,12 +1,13 @@
-# Phase 4.3: Transactional Email Infrastructure - Context
+# Phase 6: Transactional Email Infrastructure - Context
 
 **Gathered:** 2026-02-06
 **Status:** Ready for planning
+**Depends on:** Phase 5 (Domain Event Publishing)
 
 <domain>
 ## Phase Boundary
 
-Build email sending capability with SMTP adapter, background job queue for async processing, and Mailpit for dev environment. Send verification email on user registration. Integration tests mock the email adapter.
+Build email sending capability with SMTP adapter and Mailpit for dev environment. Send verification email on user registration using the event infrastructure from Phase 5. Integration tests mock the email adapter.
 
 This phase establishes reusable infrastructure for all transactional emails (verification now, password reset later).
 
@@ -46,34 +47,15 @@ This phase establishes reusable infrastructure for all transactional emails (ver
 - Test verification is test-specific (each test decides what to assert)
 - No dev preview endpoint — use Mailpit to view sent emails
 
-### Background Job Infrastructure
-- Full job queue implementation (not synchronous email sending)
-- PostgreSQL-backed job queue (no Redis dependency)
-- Separate database for job queue (not same as app database)
-- Worker runs in same container as API if library supports (auto-start with API)
-- Dead letter queue for permanently failed jobs
-- Logging: standard level (job ID, email type, status, retry count) — no PII or email addresses
-- Admin visibility via library-provided dashboard UI
-
-### Error Handling & Retries
-- Job queue handles retries with backoff (library-provided)
-- Failed jobs go to dead letter queue for review
+### Event Integration
+- Email sending triggered by domain event (UserRegistered) via Phase 5 infrastructure
+- Event handler enqueues job to job queue (handler doesn't send email directly)
 - Registration returns 202 immediately when email job is queued
 - If email queuing fails during registration, registration fails (rollback user creation)
 
-### Event Architecture
-- Hybrid approach: sync domain events + async job queue for side effects
-- Email sending triggered by domain event (UserRegistered) — not direct call from registration service
-- Event handler enqueues job to job queue (handler doesn't send email directly)
-- Maintains existing UoW-managed event pattern
-- Side effects (email, external calls) are async via job queue
-
 ### Claude's Discretion
-- Specific job queue library choice (research PostgreSQL-backed options: e.g., procrastinate, apscheduler, or similar)
 - Email templating library choice (Jinja2-based or specialized)
-- Exact retry backoff strategy
-- Dashboard port configuration
-- Worker concurrency settings
+- Specific SMTP library choice
 
 </decisions>
 
@@ -81,9 +63,8 @@ This phase establishes reusable infrastructure for all transactional emails (ver
 ## Specific Ideas
 
 - Research email templating solutions that allow editing templates in markup files outside code
-- Job queue must have operational visibility for when jobs consistently fail
+- Dev workflow: register user -> open Mailpit UI -> click verification link -> user verified
 - No logging of PII — use job IDs for debugging correlation
-- Existing `UserRegistered` event pattern should trigger the email (event-driven)
 
 </specifics>
 
@@ -98,5 +79,5 @@ This phase establishes reusable infrastructure for all transactional emails (ver
 
 ---
 
-*Phase: 04.3-transactional-email-infrastructure*
+*Phase: 06-transactional-email-infrastructure*
 *Context gathered: 2026-02-06*

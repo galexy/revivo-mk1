@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 4.2 (Current User Metadata Endpoint) - COMPLETE
+**Current focus:** Phase 5 (Domain Event Publishing) - NOT STARTED
 
 ## Current Position
 
-Phase: 4.2 of 20 (Current User Metadata Endpoint)
-Plan: 1 of 1 complete (04.2-01)
-Status: Phase complete
-Last activity: 2026-02-06 - Completed 04.2-01-PLAN.md (GET /auth/me endpoint)
+Phase: 5 of 22 (Domain Event Publishing)
+Plan: 0 of 2 complete
+Status: Not started
+Last activity: 2026-02-06 - Completed quick task 002: Split phase 4.3 into event and email phases
 
 Progress: [██████░░░░] ~42%
 
@@ -179,13 +179,14 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Add chokepoint testing guardrails (CLAUDE.md + GSD agent updates) | 2026-02-05 | ff9f765 | [001-add-chokepoint-testing-guardrails](./quick/001-add-chokepoint-testing-guardrails/) |
+| 002 | Split phase 4.3 into event publishing and email phases | 2026-02-06 | ee20011 | [002-split-phase-4-3-into-event-and-email-phases](./quick/002-split-phase-4-3-into-event-and-email-phases/) |
 
 ## Session Continuity
 
 Last session: 2026-02-06
 Stopped at: Completed 04.2-01-PLAN.md (Current User Metadata Endpoint)
 Resume file: None
-Next action: Begin Phase 4.3 (Transactional Email Infrastructure) or Phase 5 (Nx Monorepo Restructure)
+Next action: Begin Phase 5 (Domain Event Publishing)
 
 ## Roadmap Evolution
 
@@ -195,7 +196,7 @@ Next action: Begin Phase 4.3 (Transactional Email Infrastructure) or Phase 5 (Nx
   - Plan 02: Split Addition/Removal - COMPLETE
   - Plan 03: Validation Errors - COMPLETE
 - Phase 4.2 inserted after Phase 4.1: Current User Metadata Endpoint - Add /auth/me endpoint returning authenticated user profile (INSERTED)
-- Phase 4.3 inserted after Phase 4.2: Transactional Email Infrastructure - Email domain, SMTP adapter, Mailpit dev env, verification email on registration, mocked emails in integration tests (INSERTED)
+- Phase 4.3 split into Phase 5 (Domain Event Publishing) and Phase 6 (Transactional Email Infrastructure), all subsequent phases renumbered +2
 
 ## Phase 1 Milestone
 
@@ -309,7 +310,7 @@ Key stats:
 - 1 critical bug fixed (household_id not threaded through category/transaction services)
 - Verification: 5/5 success criteria confirmed
 
-Ready for Phase 5: Nx Monorepo Restructure
+Ready for Phase 7: Nx Monorepo Restructure
 
 ## Phase 4.1 Milestone
 
@@ -353,4 +354,4 @@ Key stats:
 - Service smoke tested per CHECKPOINTS.md
 - is_owner flag ready for Phase 25 (Multi-User Households)
 
-Ready for Phase 4.3: Transactional Email Infrastructure
+Ready for Phase 5: Domain Event Publishing
