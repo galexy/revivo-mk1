@@ -247,11 +247,13 @@ Plans:
   4. Libraries directory structure ready at `libs/`
   5. All existing backend tests pass after restructure
   6. Nx commands work for building and testing apps
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Initialize Nx workspace, scaffold apps/web/ and libs/ui/
+- [ ] 07-02-PLAN.md — Move backend to apps/api/ with config updates
+- [ ] 07-03-PLAN.md — Extract domain layer to libs/domain/, rewrite imports
+- [ ] 07-04-PLAN.md — Update CLAUDE.md, final verification and smoke test
 
 ### Phase 8: Frontend Infrastructure
 **Goal**: Set up frontend tooling and testing infrastructure
@@ -614,7 +616,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
-| 7. Nx Monorepo Restructure | 0/2 | Not started | - |
+| 7. Nx Monorepo Restructure | 0/4 | Not started | - |
 | 8. Frontend Infrastructure | 0/2 | Not started | - |
 | 9. Login UI | 0/2 | Not started | - |
 | 10. Frontend API & Routing | 0/2 | Not started | - |
