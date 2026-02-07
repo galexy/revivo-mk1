@@ -104,7 +104,7 @@ class AuthService:
         """
         self._uow = uow
 
-    def register(
+    async def register(
         self,
         email: str,
         password: str,
@@ -155,7 +155,7 @@ class AuthService:
             events = user.collect_events()
             self._uow.collect_events(events)
 
-            self._uow.commit()
+            await self._uow.commit()
 
             # Generate verification token (outside transaction - stateless)
             verification_token = generate_verification_token(user.email)
@@ -166,7 +166,7 @@ class AuthService:
                 verification_token=verification_token,
             )
 
-    def login(
+    async def login(
         self,
         email: str,
         password: str,
@@ -222,14 +222,14 @@ class AuthService:
                 user_id=user.id,
             )
 
-            self._uow.commit()
+            await self._uow.commit()
 
             return AuthTokens(
                 access_token=access_token,
                 refresh_token=raw_refresh_token,
             )
 
-    def refresh(
+    async def refresh(
         self,
         refresh_token: str,
     ) -> AuthTokens | AuthError:
@@ -270,14 +270,14 @@ class AuthService:
                 household_id=str(user.household_id),
             )
 
-            self._uow.commit()
+            await self._uow.commit()
 
             return AuthTokens(
                 access_token=access_token,
                 refresh_token=new_raw_token,
             )
 
-    def verify_email(
+    async def verify_email(
         self,
         token: str,
     ) -> User | AuthError:
@@ -313,11 +313,11 @@ class AuthService:
             events = user.collect_events()
             self._uow.collect_events(events)
 
-            self._uow.commit()
+            await self._uow.commit()
 
             return user
 
-    def logout_all_sessions(
+    async def logout_all_sessions(
         self,
         user_id: UserId,
     ) -> bool:
@@ -331,7 +331,7 @@ class AuthService:
         """
         with self._uow:
             self._uow.refresh_tokens.revoke_all_for_user(user_id)
-            self._uow.commit()
+            await self._uow.commit()
             return True
 
     def get_user_by_id(

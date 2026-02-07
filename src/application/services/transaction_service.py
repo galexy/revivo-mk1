@@ -223,7 +223,7 @@ class TransactionService:
                     ]
                 )
 
-    def create_transaction(
+    async def create_transaction(
         self,
         user_id: UserId,
         account_id: AccountId,
@@ -294,7 +294,7 @@ class TransactionService:
             # Create mirror transactions for transfers
             self._create_mirror_transactions(txn)
 
-            self._uow.commit()
+            await self._uow.commit()
 
             return txn
 
@@ -366,7 +366,7 @@ class TransactionService:
                 offset=offset,
             )
 
-    def update_transaction_memo(
+    async def update_transaction_memo(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -406,10 +406,10 @@ class TransactionService:
                     mirror.update_memo(memo)
                     self._uow.transactions.update(mirror)
 
-            self._uow.commit()
+            await self._uow.commit()
             return txn
 
-    def update_transaction_dates(
+    async def update_transaction_dates(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -451,11 +451,11 @@ class TransactionService:
             self._uow.transactions.update(txn)
             self._uow.collect_events(txn.events)
             txn.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return txn
 
-    def update_transaction_splits(
+    async def update_transaction_splits(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -528,11 +528,11 @@ class TransactionService:
             # Sync mirror transactions
             self._sync_mirrors_for_split_update(txn, old_splits, new_splits)
 
-            self._uow.commit()
+            await self._uow.commit()
 
             return txn
 
-    def mark_transaction_cleared(
+    async def mark_transaction_cleared(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -556,11 +556,11 @@ class TransactionService:
             self._uow.transactions.update(txn)
             self._uow.collect_events(txn.events)
             txn.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return txn
 
-    def mark_transaction_reconciled(
+    async def mark_transaction_reconciled(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -583,11 +583,11 @@ class TransactionService:
             self._uow.transactions.update(txn)
             self._uow.collect_events(txn.events)
             txn.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return txn
 
-    def delete_transaction(
+    async def delete_transaction(
         self,
         user_id: UserId,
         transaction_id: TransactionId,
@@ -631,6 +631,6 @@ class TransactionService:
             txn.delete()
             self._uow.collect_events(txn.events)
             self._uow.transactions.delete(transaction_id)
-            self._uow.commit()
+            await self._uow.commit()
 
             return True

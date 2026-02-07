@@ -77,7 +77,7 @@ class AccountService:
 
     # --- Create Operations ---
 
-    def create_checking(
+    async def create_checking(
         self,
         user_id: UserId,
         name: str,
@@ -116,10 +116,10 @@ class AccountService:
             self._uow.accounts.add(account)
             self._uow.collect_events(account.events)
             account.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
             return account
 
-    def create_savings(
+    async def create_savings(
         self,
         user_id: UserId,
         name: str,
@@ -158,10 +158,10 @@ class AccountService:
             self._uow.accounts.add(account)
             self._uow.collect_events(account.events)
             account.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
             return account
 
-    def create_credit_card(
+    async def create_credit_card(
         self,
         user_id: UserId,
         name: str,
@@ -201,12 +201,12 @@ class AccountService:
                 self._uow.accounts.add(account)
                 self._uow.collect_events(account.events)
                 account.clear_events()
-                self._uow.commit()
+                await self._uow.commit()
                 return account
         except ValueError as e:
             return AccountError(code="VALIDATION_ERROR", message=str(e))
 
-    def create_loan(
+    async def create_loan(
         self,
         user_id: UserId,
         name: str,
@@ -254,10 +254,10 @@ class AccountService:
             self._uow.accounts.add(account)
             self._uow.collect_events(account.events)
             account.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
             return account
 
-    def create_brokerage(
+    async def create_brokerage(
         self,
         user_id: UserId,
         name: str,
@@ -293,10 +293,10 @@ class AccountService:
             self._uow.accounts.add(account)
             self._uow.collect_events(account.events)
             account.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
             return account
 
-    def create_ira(
+    async def create_ira(
         self,
         user_id: UserId,
         name: str,
@@ -336,12 +336,12 @@ class AccountService:
                 self._uow.accounts.add(account)
                 self._uow.collect_events(account.events)
                 account.clear_events()
-                self._uow.commit()
+                await self._uow.commit()
                 return account
         except ValueError as e:
             return AccountError(code="VALIDATION_ERROR", message=str(e))
 
-    def create_rewards(
+    async def create_rewards(
         self,
         user_id: UserId,
         name: str,
@@ -377,7 +377,7 @@ class AccountService:
             self._uow.accounts.add(account)
             self._uow.collect_events(account.events)
             account.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
             return account
 
     # --- Read Operations ---
@@ -463,7 +463,7 @@ class AccountService:
 
     # --- Lifecycle Operations ---
 
-    def close_account(
+    async def close_account(
         self,
         account_id: AccountId,
         closed_by: UserId | None = None,
@@ -495,12 +495,12 @@ class AccountService:
                 account.close(closed_by)
                 self._uow.collect_events(account.events)
                 account.clear_events()
-                self._uow.commit()
+                await self._uow.commit()
                 return account
             except ValueError as e:
                 return AccountError(code="ALREADY_CLOSED", message=str(e))
 
-    def reopen_account(
+    async def reopen_account(
         self,
         account_id: AccountId,
         reopened_by: UserId | None = None,
@@ -532,12 +532,12 @@ class AccountService:
                 account.reopen(reopened_by)
                 self._uow.collect_events(account.events)
                 account.clear_events()
-                self._uow.commit()
+                await self._uow.commit()
                 return account
             except ValueError as e:
                 return AccountError(code="NOT_CLOSED", message=str(e))
 
-    def delete_account(
+    async def delete_account(
         self,
         account_id: AccountId,
         household_id: HouseholdId | None = None,
@@ -579,12 +579,12 @@ class AccountService:
             )
             self._uow.collect_events([delete_event])
             self._uow.accounts.delete(account)
-            self._uow.commit()
+            await self._uow.commit()
             return True
 
     # --- Update Operations ---
 
-    def update_account_name(
+    async def update_account_name(
         self,
         account_id: AccountId,
         new_name: str,
@@ -617,7 +617,7 @@ class AccountService:
                 account.update_name(new_name, updated_by)
                 self._uow.collect_events(account.events)
                 account.clear_events()
-                self._uow.commit()
+                await self._uow.commit()
                 return account
             except ValueError as e:
                 return AccountError(code="VALIDATION_ERROR", message=str(e))

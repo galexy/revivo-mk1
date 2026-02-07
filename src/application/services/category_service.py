@@ -27,7 +27,7 @@ class CategoryService:
     def __init__(self, uow: "UnitOfWork") -> None:
         self._uow = uow
 
-    def ensure_system_categories(
+    async def ensure_system_categories(
         self, user_id: UserId, household_id: HouseholdId | None = None
     ) -> Category:
         """Ensure system categories exist for user.
@@ -39,10 +39,10 @@ class CategoryService:
             category = self._uow.categories.get_or_create_uncategorized(
                 user_id, household_id=household_id
             )
-            self._uow.commit()
+            await self._uow.commit()
             return category
 
-    def create_category(
+    async def create_category(
         self,
         user_id: UserId,
         name: str,
@@ -81,7 +81,7 @@ class CategoryService:
             self._uow.categories.add(category)
             self._uow.collect_events(category.events)
             category.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return category
 
@@ -121,7 +121,7 @@ class CategoryService:
                 "children": children_by_parent,
             }
 
-    def update_category_name(
+    async def update_category_name(
         self,
         user_id: UserId,
         category_id: CategoryId,
@@ -142,11 +142,11 @@ class CategoryService:
 
             self._uow.collect_events(category.events)
             category.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return category
 
-    def update_category_parent(
+    async def update_category_parent(
         self,
         user_id: UserId,
         category_id: CategoryId,
@@ -183,11 +183,11 @@ class CategoryService:
 
             self._uow.collect_events(category.events)
             category.clear_events()
-            self._uow.commit()
+            await self._uow.commit()
 
             return category
 
-    def delete_category(
+    async def delete_category(
         self,
         user_id: UserId,
         category_id: CategoryId,
@@ -239,6 +239,6 @@ class CategoryService:
             category.delete()
             self._uow.collect_events(category.events)
             self._uow.categories.delete(category_id)
-            self._uow.commit()
+            await self._uow.commit()
 
             return True
