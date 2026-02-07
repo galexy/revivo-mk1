@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 6 (Transactional Email Infrastructure) - Plan 3 of 4 complete
+**Current focus:** Phase 6 (Transactional Email Infrastructure) - COMPLETE
 
 ## Current Position
 
 Phase: 6 of 22 (Transactional Email Infrastructure)
-Plan: 3 of 4 complete
-Status: In progress
-Last activity: 2026-02-06 - Completed 06-03-PLAN.md (Event Handler and Job Queue Email Integration)
+Plan: 5 of 5 complete
+Status: Phase complete
+Last activity: 2026-02-07 - Completed 06-05-PLAN.md (Async Event Bus, UoW, Services, Routes)
 
-Progress: [██████░░░░] ~49%
+Progress: [██████░░░░] ~51%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 44
+- Total plans completed: 45
 - Average duration: 4.5 min
-- Total execution time: 4.04 hours
+- Total execution time: 4.24 hours
 
 **By Phase:**
 
@@ -36,11 +36,11 @@ Progress: [██████░░░░] ~49%
 | 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
 | 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
-| 06-transactional-email-infrastructure | 3 | 10 min | 3.3 min |
+| 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (6 min), 05-03 (4 min), 06-01 (3 min), 06-02 (4 min), 06-03 (3 min)
-- Trend: Phase 6 nearly complete, email flow fully wired from event to SMTP delivery
+- Last 5 plans: 06-01 (3 min), 06-02 (4 min), 06-03 (3 min), 06-04 (15 min), 06-05 (12 min)
+- Trend: Phase 6 complete. Full async email flow verified end-to-end.
 
 *Updated after each plan completion*
 
@@ -195,6 +195,10 @@ Recent decisions affecting current work:
 - 48-hour token expiry to match email template promise
 - EmailDeliveryError added to job retry_exceptions for transient SMTP failures
 - Lazy import of send_verification_email inside handler to avoid module-level job queue initialization
+- Async event bus with mixed sync/async handler support via inspect.iscoroutinefunction
+- UoW context manager stays sync, only commit() is async
+- Read-only service methods and routes stay sync for thread pool execution
+- asyncio.run() in sync tests for async function calls (no pytest-asyncio dependency)
 
 ### Pending Todos
 
@@ -213,10 +217,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: 06-04 Task 3 checkpoint verified, defer fix uncommitted
-Resume file: .planning/phases/06-transactional-email-infrastructure/.continue-here.md
-Next action: Commit defer fix, run tests, create 06-04-SUMMARY, complete phase 6
+Last session: 2026-02-07
+Stopped at: Completed 06-05-PLAN.md, Phase 6 complete
+Resume file: None
+Next action: Begin Phase 7 (Nx Monorepo Restructure)
 
 ## Roadmap Evolution
 
@@ -408,3 +412,31 @@ Key stats:
 - Comprehensive runbook with monitoring queries and emergency procedures
 
 Ready for Phase 6: Transactional Email Infrastructure
+
+## Phase 6 Milestone
+
+**Phase 6: Transactional Email Infrastructure - COMPLETE**
+
+All success criteria met:
+1. MJML email templates compiled to HTML with Jinja2 rendering
+2. SmtpEmailAdapter with Mailpit dev server for local email testing
+3. Event handler enqueues verification email job via Procrastinate
+4. Full async await chain: route -> service -> commit -> publish_all -> handler -> defer_async
+5. Integration tests and E2E verification of complete email flow
+6. 444 total tests passing, service smoke tested
+
+Plans completed (5 of 5):
+- 06-01: MJML Email Templates and Rendering (verification email template, Jinja2 rendering)
+- 06-02: Email Service Protocol and SMTP Adapter (SmtpEmailAdapter, Mailpit config)
+- 06-03: Event Handler and Job Queue Email Integration (send_verification_email job, handler wiring)
+- 06-04: Integration Tests and E2E Verification (MockEmailAdapter, 11 tests, E2E Mailpit flow)
+- 06-05: Async Event Bus, UoW, Services, Routes (full async conversion, eliminate create_task workaround)
+
+Key stats:
+- 444 total tests passing (444 existing, tests updated for async)
+- Full async publish chain eliminates fire-and-forget create_task workaround
+- 30 service write methods converted to async across 4 service files
+- 17 files modified in 06-05 (largest plan in phase)
+- Proper error handling: defer_async failures caught by handler try/except
+
+Ready for Phase 7: Nx Monorepo Restructure
