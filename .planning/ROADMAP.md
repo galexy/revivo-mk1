@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.1: Test Schema Parity** - Align SQLAlchemy metadata with Alembic migrations so tests use production-equivalent schema (INSERTED)
 - [x] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
 - [x] **Phase 5: Domain Event Publishing** - Event bus infrastructure, async event handlers, event-driven architecture
-- [ ] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
+- [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
 - [ ] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [ ] **Phase 8: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 9: Login UI** - Login page, session/token management, logout
@@ -227,13 +227,14 @@ Plans:
   4. Integration tests mock the email adapter (no real SMTP calls) and verify email send was invoked with correct arguments
   5. Password reset and other future transactional emails can reuse the same infrastructure
   6. Dev workflow: register user -> open Mailpit UI -> click verification link -> user verified
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — EmailService protocol and SMTP adapter with Jinja2 templates
-- [ ] 06-02-PLAN.md — Mailpit Docker Compose and SMTP configuration
-- [ ] 06-03-PLAN.md — Event handler and job queue email integration
-- [ ] 06-04-PLAN.md — Integration tests and end-to-end verification
+- [x] 06-01-PLAN.md — EmailService protocol and SMTP adapter with Jinja2 templates
+- [x] 06-02-PLAN.md — Mailpit Docker Compose and SMTP configuration
+- [x] 06-03-PLAN.md — Event handler and job queue email integration
+- [x] 06-04-PLAN.md — Integration tests and end-to-end verification
+- [x] 06-05-PLAN.md — Async event bus, UoW, services, and routes conversion
 
 ### Phase 7: Nx Monorepo Restructure
 **Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
@@ -612,7 +613,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 4.1 Test Schema Parity | 2/2 | Complete | 2026-02-06 |
 | 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
-| 6. Transactional Email Infrastructure | 0/4 | Not started | - |
+| 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 0/2 | Not started | - |
 | 8. Frontend Infrastructure | 0/2 | Not started | - |
 | 9. Login UI | 0/2 | Not started | - |
