@@ -1,0 +1,25 @@
+{
+  "name": "domain",
+  "projectType": "library",
+  "sourceRoot": "libs/domain/domain",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": ".venv/bin/python -m pytest libs/domain/tests/ -v --tb=short",
+        "cwd": "{workspaceRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": ".venv/bin/ruff check libs/domain/domain/ libs/domain/tests/",
+        "cwd": "{workspaceRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    }
+  }
+}

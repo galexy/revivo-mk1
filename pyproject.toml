@@ -53,7 +53,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["apps/api/src"]
+packages = ["apps/api/src", "libs/domain/domain"]
 
 [tool.uv]
 dev-dependencies = [
@@ -173,7 +173,7 @@ layers = [
 # Pytest Configuration
 # ============================================================================
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests"]
+testpaths = ["apps/api/tests", "libs/domain/tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 addopts = "-v --tb=short"
@@ -182,7 +182,7 @@ addopts = "-v --tb=short"
 # Coverage Configuration
 # ============================================================================
 [tool.coverage.run]
-source = ["apps/api/src"]
+source = ["apps/api/src", "libs/domain/domain"]
 branch = true
 omit = ["*/tests/*", "*/__pycache__/*"]
 
