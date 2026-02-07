@@ -6,24 +6,24 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000 --reload",
-        "cwd": "apps/api"
+        "command": ".venv/bin/uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000 --reload",
+        "cwd": "{workspaceRoot}"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "python -m pytest tests/ -v --tb=short",
-        "cwd": "apps/api"
+        "command": ".venv/bin/python -m pytest apps/api/tests/ -v --tb=short",
+        "cwd": "{workspaceRoot}"
       },
-      "inputs": ["{projectRoot}/**/*.py", "libs/domain/**/*.py"],
+      "inputs": ["{projectRoot}/**/*.py", "{workspaceRoot}/libs/domain/**/*.py"],
       "outputs": []
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ruff check src/ tests/",
-        "cwd": "apps/api"
+        "command": ".venv/bin/ruff check apps/api/src/ apps/api/tests/",
+        "cwd": "{workspaceRoot}"
       },
       "inputs": ["{projectRoot}/**/*.py"],
       "outputs": []
