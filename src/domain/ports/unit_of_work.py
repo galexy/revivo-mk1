@@ -35,7 +35,7 @@ class UnitOfWork(Protocol):
             account = uow.accounts.get(account_id)
             account.deposit(money)
             uow.collect_events(account.events)
-            uow.commit()
+            await uow.commit()
 
     Repository accessors:
     - accounts: AccountRepository
@@ -112,11 +112,12 @@ class UnitOfWork(Protocol):
         """
         ...
 
-    def commit(self) -> None:
+    async def commit(self) -> None:
         """Commit all changes to the database.
 
         This persists all added/modified entities and any collected
-        domain events to the outbox table.
+        domain events to the outbox table. After DB commit succeeds,
+        publishes events to registered handlers asynchronously.
         """
         ...
 

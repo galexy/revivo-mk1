@@ -43,7 +43,7 @@ class SqlAlchemyUnitOfWork:
         with uow:
             uow.accounts.add(account)
             uow.collect_events(account.events)
-            uow.commit()  # Events written to outbox here
+            await uow.commit()  # Events written to outbox here
 
     Repositories are lazily created on first access via properties.
     """
@@ -235,7 +235,7 @@ class SqlAlchemyUnitOfWork:
         """
         self._events.extend(events)
 
-    def commit(self) -> None:
+    async def commit(self) -> None:
         """Commit transaction, writing events to outbox, then publishing.
 
         Events are written to the outbox table as part of the same
@@ -271,7 +271,7 @@ class SqlAlchemyUnitOfWork:
         # Import inside method to avoid circular import issues
         from src.application.event_bus import publish_all
 
-        publish_all(events_to_publish)
+        await publish_all(events_to_publish)
 
     def flush(self) -> None:
         """Flush pending changes to database without committing.
