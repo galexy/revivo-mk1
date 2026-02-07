@@ -1,5 +1,6 @@
 """Unit tests for in-process event bus."""
 
+import asyncio
 from dataclasses import dataclass
 
 import pytest
@@ -42,7 +43,7 @@ class TestRegister:
 
         # Verify handler is registered by publishing an event
         test_event = SampleEvent(value="test")
-        event_bus.publish(test_event)
+        asyncio.run(event_bus.publish(test_event))
 
         assert len(calls) == 1
         assert calls[0] == test_event
@@ -60,7 +61,7 @@ class TestRegister:
         event_bus.register(SampleEvent, handler_one)
         event_bus.register(SampleEvent, handler_two)
 
-        event_bus.publish(SampleEvent(value="test"))
+        asyncio.run(event_bus.publish(SampleEvent(value="test")))
 
         assert calls == ["one", "two"]
 
@@ -78,7 +79,7 @@ class TestPublish:
         event_bus.register(SampleEvent, handler)
 
         test_event = SampleEvent(value="hello")
-        event_bus.publish(test_event)
+        asyncio.run(event_bus.publish(test_event))
 
         assert len(received_events) == 1
         assert received_events[0] == test_event
@@ -101,7 +102,7 @@ class TestPublish:
         event_bus.register(SampleEvent, handler_second)
         event_bus.register(SampleEvent, handler_third)
 
-        event_bus.publish(SampleEvent(value="test"))
+        asyncio.run(event_bus.publish(SampleEvent(value="test")))
 
         assert call_order == [1, 2, 3]
 
@@ -116,7 +117,7 @@ class TestPublish:
         event_bus.register(SampleEvent, handler)
 
         # Publish a different event type - should not error
-        event_bus.publish(AnotherSampleEvent(number=42))
+        asyncio.run(event_bus.publish(AnotherSampleEvent(number=42)))
 
         # Original handler should not have been called
         assert len(calls) == 0
@@ -131,7 +132,7 @@ class TestPublish:
         event_bus.register(SampleEvent, failing_handler)
 
         with pytest.raises(ValueError, match="Handler failed intentionally"):
-            event_bus.publish(SampleEvent(value="test"))
+            asyncio.run(event_bus.publish(SampleEvent(value="test")))
 
 
 class TestPublishAll:
@@ -157,7 +158,7 @@ class TestPublishAll:
             SampleEvent(value="second"),
             AnotherSampleEvent(number=2),
         ]
-        event_bus.publish_all(events)
+        asyncio.run(event_bus.publish_all(events))
 
         assert len(test_events) == 2
         assert test_events[0].value == "first"
@@ -181,7 +182,7 @@ class TestPublishAll:
             SampleEvent(value="b"),
             SampleEvent(value="c"),
         ]
-        event_bus.publish_all(events)
+        asyncio.run(event_bus.publish_all(events))
 
         assert received == ["a", "b", "c"]
 
@@ -199,12 +200,12 @@ class TestClearHandlers:
         event_bus.register(SampleEvent, handler)
 
         # Verify handler is registered
-        event_bus.publish(SampleEvent(value="before"))
+        asyncio.run(event_bus.publish(SampleEvent(value="before")))
         assert len(calls) == 1
 
         # Clear handlers
         event_bus.clear_handlers()
 
         # Verify handler is no longer registered
-        event_bus.publish(SampleEvent(value="after"))
+        asyncio.run(event_bus.publish(SampleEvent(value="after")))
         assert len(calls) == 1  # Still 1, no new calls

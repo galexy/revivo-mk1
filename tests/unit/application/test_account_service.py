@@ -11,8 +11,9 @@ Tests cover:
 All tests use mock UnitOfWork to isolate service behavior.
 """
 
+import asyncio
 from decimal import Decimal
-from unittest.mock import MagicMock, PropertyMock
+from unittest.mock import AsyncMock, MagicMock, PropertyMock
 
 import pytest
 
@@ -54,6 +55,9 @@ def mock_uow():
 
     uow.collect_events = MagicMock(side_effect=collect_events)
 
+    # commit() is now async, must be AsyncMock
+    uow.commit = AsyncMock()
+
     return uow
 
 
@@ -91,11 +95,11 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates checking account, adds to repo, collects events, commits."""
-        result = service.create_checking(
+        result = asyncio.run(service.create_checking(
             user_id=user_id,
             name="My Checking",
             opening_balance=usd_balance,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.CHECKING
@@ -118,11 +122,11 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates savings account with correct type."""
-        result = service.create_savings(
+        result = asyncio.run(service.create_savings(
             user_id=user_id,
             name="Emergency Fund",
             opening_balance=usd_balance,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.SAVINGS
@@ -136,12 +140,12 @@ class TestAccountCreation:
         balance = Money(Decimal("500"), "USD")
         limit = Money(Decimal("5000"), "USD")
 
-        result = service.create_credit_card(
+        result = asyncio.run(service.create_credit_card(
             user_id=user_id,
             name="Visa Rewards",
             opening_balance=balance,
             credit_limit=limit,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.CREDIT_CARD
@@ -155,12 +159,12 @@ class TestAccountCreation:
         usd_balance = Money(Decimal("500"), "USD")
         eur_limit = Money(Decimal("5000"), "EUR")
 
-        result = service.create_credit_card(
+        result = asyncio.run(service.create_credit_card(
             user_id=user_id,
             name="Card",
             opening_balance=usd_balance,
             credit_limit=eur_limit,
-        )
+        ))
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"
@@ -171,14 +175,14 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates loan with APR, term_months, subtype."""
-        result = service.create_loan(
+        result = asyncio.run(service.create_loan(
             user_id=user_id,
             name="Car Loan",
             opening_balance=usd_balance,
             subtype=AccountSubtype.AUTO_LOAN,
             apr=Decimal("0.0599"),
             term_months=60,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.LOAN
@@ -191,11 +195,11 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates brokerage account."""
-        result = service.create_brokerage(
+        result = asyncio.run(service.create_brokerage(
             user_id=user_id,
             name="Fidelity",
             opening_balance=usd_balance,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.BROKERAGE
@@ -205,12 +209,12 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates IRA with IRA subtype."""
-        result = service.create_ira(
+        result = asyncio.run(service.create_ira(
             user_id=user_id,
             name="Roth IRA",
             opening_balance=usd_balance,
             subtype=AccountSubtype.ROTH_IRA,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.IRA
@@ -221,12 +225,12 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Returns AccountError for non-IRA subtype."""
-        result = service.create_ira(
+        result = asyncio.run(service.create_ira(
             user_id=user_id,
             name="IRA",
             opening_balance=usd_balance,
             subtype=AccountSubtype.AUTO_LOAN,
-        )
+        ))
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"
@@ -239,11 +243,11 @@ class TestAccountCreation:
         """Creates rewards account with RewardsBalance."""
         rewards = RewardsBalance(Decimal("50000"), "Alaska Miles")
 
-        result = service.create_rewards(
+        result = asyncio.run(service.create_rewards(
             user_id=user_id,
             name="Alaska Miles",
             rewards_balance=rewards,
-        )
+        ))
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.REWARDS
@@ -344,7 +348,7 @@ class TestLifecycleOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.close_account(account.id)
+        result = asyncio.run(service.close_account(account.id))
 
         assert isinstance(result, Account)
         assert result.status == AccountStatus.CLOSED
@@ -362,7 +366,7 @@ class TestLifecycleOperations:
         account_id = AccountId.generate()
         mock_uow.accounts.get.return_value = None
 
-        result = service.close_account(account_id)
+        result = asyncio.run(service.close_account(account_id))
 
         assert isinstance(result, AccountError)
         assert result.code == "NOT_FOUND"
@@ -379,7 +383,7 @@ class TestLifecycleOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.close_account(account.id)
+        result = asyncio.run(service.close_account(account.id))
 
         assert isinstance(result, AccountError)
         assert result.code == "ALREADY_CLOSED"
@@ -396,7 +400,7 @@ class TestLifecycleOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.reopen_account(account.id)
+        result = asyncio.run(service.reopen_account(account.id))
 
         assert isinstance(result, Account)
         assert result.status == AccountStatus.ACTIVE
@@ -414,7 +418,7 @@ class TestLifecycleOperations:
         account_id = AccountId.generate()
         mock_uow.accounts.get.return_value = None
 
-        result = service.reopen_account(account_id)
+        result = asyncio.run(service.reopen_account(account_id))
 
         assert isinstance(result, AccountError)
         assert result.code == "NOT_FOUND"
@@ -430,7 +434,7 @@ class TestLifecycleOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.reopen_account(account.id)
+        result = asyncio.run(service.reopen_account(account.id))
 
         assert isinstance(result, AccountError)
         assert result.code == "NOT_CLOSED"
@@ -453,7 +457,7 @@ class TestDeleteOperations:
         mock_uow.accounts.get.return_value = account
         mock_uow.accounts.has_transactions.return_value = False
 
-        result = service.delete_account(account.id)
+        result = asyncio.run(service.delete_account(account.id))
 
         assert result is True
         mock_uow.accounts.delete.assert_called_once_with(account)
@@ -470,7 +474,7 @@ class TestDeleteOperations:
         account_id = AccountId.generate()
         mock_uow.accounts.get.return_value = None
 
-        result = service.delete_account(account_id)
+        result = asyncio.run(service.delete_account(account_id))
 
         assert isinstance(result, AccountError)
         assert result.code == "NOT_FOUND"
@@ -487,7 +491,7 @@ class TestDeleteOperations:
         mock_uow.accounts.get.return_value = account
         mock_uow.accounts.has_transactions.return_value = True
 
-        result = service.delete_account(account.id)
+        result = asyncio.run(service.delete_account(account.id))
 
         assert isinstance(result, AccountError)
         assert result.code == "HAS_TRANSACTIONS"
@@ -512,7 +516,7 @@ class TestUpdateOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.update_account_name(account.id, "New Name")
+        result = asyncio.run(service.update_account_name(account.id, "New Name"))
 
         assert isinstance(result, Account)
         assert result.name == "New Name"
@@ -532,7 +536,7 @@ class TestUpdateOperations:
         account_id = AccountId.generate()
         mock_uow.accounts.get.return_value = None
 
-        result = service.update_account_name(account_id, "New Name")
+        result = asyncio.run(service.update_account_name(account_id, "New Name"))
 
         assert isinstance(result, AccountError)
         assert result.code == "NOT_FOUND"
@@ -548,7 +552,7 @@ class TestUpdateOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.update_account_name(account.id, "")
+        result = asyncio.run(service.update_account_name(account.id, ""))
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"
@@ -565,7 +569,7 @@ class TestUpdateOperations:
         account.clear_events()
         mock_uow.accounts.get.return_value = account
 
-        result = service.update_account_name(account.id, "   ")
+        result = asyncio.run(service.update_account_name(account.id, "   "))
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"

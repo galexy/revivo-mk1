@@ -8,6 +8,7 @@ Verifies that:
 4. Handler registration works correctly
 """
 
+import asyncio
 import os
 from typing import Any
 
@@ -86,7 +87,7 @@ class TestEventBusRegistration:
             email="test@example.com",
             household_id="hh_123",
         )
-        event_bus.publish(event)
+        asyncio.run(event_bus.publish(event))
 
         assert len(received) == 1
         assert received[0] is event
@@ -110,7 +111,7 @@ class TestEventBusRegistration:
             email="test@example.com",
             household_id="hh_123",
         )
-        event_bus.publish(event)
+        asyncio.run(event_bus.publish(event))
 
         assert len(handler1_called) == 1
         assert len(handler2_called) == 1
@@ -129,11 +130,13 @@ class TestEventBusRegistration:
         event_bus.register(UserRegistered, on_user_registered)
         event_bus.register(EmailVerified, on_email_verified)
 
-        event_bus.publish(
-            UserRegistered(
-                user_id="user_123",
-                email="test@example.com",
-                household_id="hh_123",
+        asyncio.run(
+            event_bus.publish(
+                UserRegistered(
+                    user_id="user_123",
+                    email="test@example.com",
+                    household_id="hh_123",
+                )
             )
         )
 
@@ -148,7 +151,7 @@ class TestEventBusRegistration:
             household_id="hh_123",
         )
         # Should not raise
-        event_bus.publish(event)
+        asyncio.run(event_bus.publish(event))
 
     def test_clear_handlers_removes_all(self) -> None:
         """clear_handlers removes all registered handlers."""
@@ -165,7 +168,7 @@ class TestEventBusRegistration:
             email="test@example.com",
             household_id="hh_123",
         )
-        event_bus.publish(event)
+        asyncio.run(event_bus.publish(event))
 
         assert len(received) == 0
 
@@ -202,7 +205,7 @@ class TestUnitOfWorkEventPublishing:
             uow.users.add(user)
 
             # Commit - should publish events
-            uow.commit()
+            asyncio.run(uow.commit())
 
         assert len(received_events) == 1
         assert isinstance(received_events[0], UserRegistered)
@@ -269,7 +272,7 @@ class TestUnitOfWorkEventPublishing:
             uow.users.add(user)
 
             commit_order.append("before_commit")
-            uow.commit()
+            asyncio.run(uow.commit())
             commit_order.append("after_commit")
 
         # Handler called during commit, before "after_commit"
@@ -293,11 +296,11 @@ class TestHandlerRegistration:
             household_id="hh_123",
         )
         # Should not raise
-        event_bus.publish(event)
+        asyncio.run(event_bus.publish(event))
 
         verified_event = EmailVerified(
             user_id="user_123",
             email="test@example.com",
         )
         # Should not raise
-        event_bus.publish(verified_event)
+        asyncio.run(event_bus.publish(verified_event))

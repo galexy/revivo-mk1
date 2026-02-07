@@ -1,6 +1,7 @@
 """Tests for AuthService application service."""
 
-from unittest.mock import MagicMock
+import asyncio
+from unittest.mock import AsyncMock, MagicMock
 
 
 class TestAuthServiceRegister:
@@ -16,10 +17,12 @@ class TestAuthServiceRegister:
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
 
-        result = service.register(
-            email="new@example.com",
-            password="Test123!@",
-            display_name="New User",
+        result = asyncio.run(
+            service.register(
+                email="new@example.com",
+                password="Test123!@",
+                display_name="New User",
+            )
         )
 
         assert isinstance(result, RegistrationResult)
@@ -37,10 +40,12 @@ class TestAuthServiceRegister:
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
 
-        result = service.register(
-            email="Test@EXAMPLE.COM",
-            password="Test123!@",
-            display_name="Test",
+        result = asyncio.run(
+            service.register(
+                email="Test@EXAMPLE.COM",
+                password="Test123!@",
+                display_name="Test",
+            )
         )
 
         assert isinstance(result, RegistrationResult)
@@ -54,10 +59,12 @@ class TestAuthServiceRegister:
         uow = self._make_mock_uow(existing_email="taken@example.com")
         service = AuthService(uow)
 
-        result = service.register(
-            email="taken@example.com",
-            password="Test123!@",
-            display_name="Test",
+        result = asyncio.run(
+            service.register(
+                email="taken@example.com",
+                password="Test123!@",
+                display_name="Test",
+            )
         )
 
         assert isinstance(result, AuthError)
@@ -73,10 +80,12 @@ class TestAuthServiceRegister:
         uow = self._make_mock_uow(existing_email=None)
         service = AuthService(uow)
 
-        result = service.register(
-            email="new@example.com",
-            password="Test123!@",
-            display_name="Test",
+        result = asyncio.run(
+            service.register(
+                email="new@example.com",
+                password="Test123!@",
+                display_name="Test",
+            )
         )
 
         assert isinstance(result, RegistrationResult)
@@ -103,7 +112,7 @@ class TestAuthServiceRegister:
         # Stub other methods
         uow.users.add = MagicMock()
         uow.households.add = MagicMock()
-        uow.commit = MagicMock()
+        uow.commit = AsyncMock()
         uow.collect_events = MagicMock()
 
         return uow
@@ -124,7 +133,7 @@ class TestAuthServiceLogin:
         )
         service = AuthService(uow)
 
-        result = service.login("user@example.com", "ValidPass123!")
+        result = asyncio.run(service.login("user@example.com", "ValidPass123!"))
 
         assert isinstance(result, AuthTokens)
         assert result.access_token is not None
@@ -143,7 +152,7 @@ class TestAuthServiceLogin:
         )
         service = AuthService(uow)
 
-        result = service.login("user@example.com", "WrongPassword123!")
+        result = asyncio.run(service.login("user@example.com", "WrongPassword123!"))
 
         assert isinstance(result, AuthError)
         assert result.code == "INVALID_CREDENTIALS"
@@ -155,7 +164,7 @@ class TestAuthServiceLogin:
         uow = self._make_mock_uow_with_user(email=None)
         service = AuthService(uow)
 
-        result = service.login("nobody@example.com", "SomePass123!")
+        result = asyncio.run(service.login("nobody@example.com", "SomePass123!"))
 
         assert isinstance(result, AuthError)
         assert result.code == "INVALID_CREDENTIALS"
@@ -172,7 +181,7 @@ class TestAuthServiceLogin:
         )
         service = AuthService(uow)
 
-        result = service.login("user@example.com", "ValidPass123!")
+        result = asyncio.run(service.login("user@example.com", "ValidPass123!"))
 
         assert isinstance(result, AuthError)
         assert result.code == "EMAIL_NOT_VERIFIED"
@@ -202,7 +211,7 @@ class TestAuthServiceLogin:
             uow.users.get_by_email.return_value = None
 
         uow.refresh_tokens.create_token.return_value = ("raw_refresh_token", MagicMock())
-        uow.commit = MagicMock()
+        uow.commit = AsyncMock()
 
         return uow
 
@@ -225,11 +234,11 @@ class TestAuthServiceVerifyEmail:
         uow.__enter__ = MagicMock(return_value=uow)
         uow.__exit__ = MagicMock(return_value=False)
         uow.users.get_by_email.return_value = user
-        uow.commit = MagicMock()
+        uow.commit = AsyncMock()
         uow.collect_events = MagicMock()
 
         service = AuthService(uow)
-        result = service.verify_email(token)
+        result = asyncio.run(service.verify_email(token))
 
         assert not isinstance(result, type(None))
         assert hasattr(result, "email_verified")
@@ -241,7 +250,7 @@ class TestAuthServiceVerifyEmail:
         uow = MagicMock()
         service = AuthService(uow)
 
-        result = service.verify_email("invalid-token")
+        result = asyncio.run(service.verify_email("invalid-token"))
 
         assert isinstance(result, AuthError)
         assert result.code == "INVALID_VERIFICATION_TOKEN"

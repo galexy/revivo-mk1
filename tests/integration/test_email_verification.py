@@ -9,7 +9,7 @@ Tests verify:
 
 import os
 import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -103,9 +103,9 @@ class TestRegistrationEnqueuesEmail:
         """Registration should attempt to enqueue verification email job."""
         from src.adapters.jobs.tasks import send_verification_email
 
-        original_defer = send_verification_email.defer
-        mock_defer = MagicMock()
-        send_verification_email.defer = mock_defer
+        original_defer_async = send_verification_email.defer_async
+        mock_defer_async = AsyncMock()
+        send_verification_email.defer_async = mock_defer_async
 
         try:
             response = client_with_handlers.post(
@@ -113,14 +113,14 @@ class TestRegistrationEnqueuesEmail:
             )
 
             assert response.status_code == 202
-            # Verify defer was called with correct keyword args
-            mock_defer.assert_called_once()
-            call_kwargs = mock_defer.call_args.kwargs
+            # Verify defer_async was called with correct keyword args
+            mock_defer_async.assert_called_once()
+            call_kwargs = mock_defer_async.call_args.kwargs
             assert call_kwargs["email"] == test_user_data["email"].lower()
             assert "verification_token" in call_kwargs
             assert "user_id" in call_kwargs
         finally:
-            send_verification_email.defer = original_defer
+            send_verification_email.defer_async = original_defer_async
 
     def test_registration_succeeds_when_job_queue_disabled(
         self, client_with_handlers
