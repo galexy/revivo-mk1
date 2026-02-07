@@ -1,24 +1,28 @@
 """In-process event bus for domain event publishing.
 
 The event bus dispatches domain events to registered handlers after
-UoW commit. Handlers are called synchronously. For async or
-potentially-failing operations (email, external API), handlers
-should enqueue jobs to the job queue.
+UoW commit. Handlers are called asynchronously. Both sync and async
+handlers are supported -- sync handlers are called directly, async
+handlers are awaited.
+
+For async or potentially-failing operations (email, external API),
+handlers should enqueue jobs to the job queue.
 
 Usage:
     from src.application import event_bus
     from src.domain.events.user_events import UserRegistered
 
-    def on_user_registered(event: UserRegistered) -> None:
+    async def on_user_registered(event: UserRegistered) -> None:
         # Enqueue welcome email job
-        pass
+        await some_async_operation()
 
     event_bus.register(UserRegistered, on_user_registered)
 
     # Later, after UoW commit:
-    event_bus.publish_all(events)
+    await event_bus.publish_all(events)
 """
 
+import inspect
 from collections.abc import Callable
 from typing import Any
 
@@ -34,11 +38,12 @@ def register(event_type: type, handler: Callable[..., Any]) -> None:
     """Register a handler for an event type.
 
     Multiple handlers can be registered for the same event type.
-    Handlers are called in registration order.
+    Handlers are called in registration order. Both sync and async
+    handlers are supported.
 
     Args:
         event_type: The type of event to handle (e.g., UserRegistered)
-        handler: A callable that takes an event and handles it
+        handler: A callable (sync or async) that takes an event and handles it
     """
     _handlers.setdefault(event_type, []).append(handler)
     logger.debug(
@@ -48,12 +53,12 @@ def register(event_type: type, handler: Callable[..., Any]) -> None:
     )
 
 
-def publish(event: Any) -> None:
+async def publish(event: Any) -> None:
     """Publish event to all registered handlers.
 
-    Handlers are called synchronously. If a handler needs to do
-    async work or potentially-failing operations, it should
-    enqueue a job instead.
+    Supports both sync and async handlers. Async handlers are awaited,
+    sync handlers are called directly. This allows handlers to use
+    async operations like Procrastinate's defer_async().
 
     If a handler raises an exception, it is logged and re-raised
     to fail fast during development. No PII is logged - only
@@ -72,7 +77,10 @@ def publish(event: Any) -> None:
                 event_type=event_type.__name__,
                 handler=handler.__name__,
             )
-            handler(event)
+            if inspect.iscoroutinefunction(handler):
+                await handler(event)
+            else:
+                handler(event)
         except Exception:
             logger.exception(
                 "handler_failed",
@@ -82,17 +90,18 @@ def publish(event: Any) -> None:
             raise
 
 
-def publish_all(events: list[Any]) -> None:
+async def publish_all(events: list[Any]) -> None:
     """Publish multiple events in order.
 
     Events are published one at a time in the order provided.
     If any handler fails, subsequent events will not be published.
+    Supports both sync and async handlers.
 
     Args:
         events: List of domain events to publish
     """
     for event in events:
-        publish(event)
+        await publish(event)
 
 
 def clear_handlers() -> None:
