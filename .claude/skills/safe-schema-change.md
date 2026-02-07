@@ -12,7 +12,7 @@ Any time a plan or task requires database schema changes:
 
 ### Step 1: Modify tables.py
 
-Make your schema change in `src/adapters/persistence/orm/tables.py`.
+Make your schema change in `apps/api/src/adapters/persistence/orm/tables.py`.
 
 This is the single source of truth for the database schema.
 
@@ -26,7 +26,7 @@ This compares tables.py metadata against the current database and generates a mi
 
 ### Step 3: Review the Migration
 
-Check the generated file in `alembic/versions/`.
+Check the generated file in `apps/api/alembic/versions/`.
 
 - Verify the DDL operations match your intent
 - Look for unexpected changes (Alembic may detect other drift)
@@ -67,7 +67,7 @@ This confirms the migration can be rolled back and reapplied cleanly.
 ### Step 8: Run Tests
 
 ```bash
-pytest tests/ -x -q
+pytest apps/api/tests/ -x -q
 ```
 
 Confirm all tests pass, including the schema parity test.
@@ -75,7 +75,7 @@ Confirm all tests pass, including the schema parity test.
 ## Common Mistakes to Avoid
 
 1. **Adding a column to tables.py but forgetting to generate a migration**
-   - The drift detection test (`tests/integration/test_schema_parity.py`) will catch this
+   - The drift detection test (`apps/api/tests/integration/test_schema_parity.py`) will catch this
    - Fix: Run `alembic revision --autogenerate`
 
 2. **Writing DDL directly in a migration file instead of changing tables.py first**
@@ -95,11 +95,11 @@ Confirm all tests pass, including the schema parity test.
 
 | File | Purpose |
 |------|---------|
-| `src/adapters/persistence/orm/tables.py` | Source of truth for schema |
-| `alembic/env.py` | Alembic configuration (imports tables.py for autogenerate) |
-| `alembic/script.py.mako` | Migration template (imports custom types) |
-| `alembic/versions/` | Generated migration files |
-| `tests/integration/test_schema_parity.py` | Drift detection test |
+| `apps/api/src/adapters/persistence/orm/tables.py` | Source of truth for schema |
+| `apps/api/alembic/env.py` | Alembic configuration (imports tables.py for autogenerate) |
+| `apps/api/alembic/script.py.mako` | Migration template (imports custom types) |
+| `apps/api/alembic/versions/` | Generated migration files |
+| `apps/api/tests/integration/test_schema_parity.py` | Drift detection test |
 
 ## Reference
 

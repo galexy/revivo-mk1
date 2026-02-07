@@ -3,8 +3,9 @@
 ## Overview
 
 - Python FastAPI app with PostgreSQL (SQLAlchemy + Alembic)
+- Nx monorepo: backend at apps/api/, frontend at apps/web/
 - Docker Compose setup: app service + postgres service
-- Tests: pytest with unit (tests/unit) and integration (tests/integration) directories
+- Tests: pytest with unit (apps/api/tests/unit) and integration (apps/api/tests/integration) directories
 - Integration tests use transactional rollback (session-scoped setup) which can mask issues that only appear with committed data
 
 ## Checkpoint Validation

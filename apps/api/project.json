@@ -1,0 +1,32 @@
+{
+  "name": "api",
+  "projectType": "application",
+  "sourceRoot": "apps/api/src",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000 --reload",
+        "cwd": "apps/api"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python -m pytest tests/ -v --tb=short",
+        "cwd": "apps/api"
+      },
+      "inputs": ["{projectRoot}/**/*.py", "libs/domain/**/*.py"],
+      "outputs": []
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ruff check src/ tests/",
+        "cwd": "apps/api"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    }
+  }
+}

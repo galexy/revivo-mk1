@@ -7,7 +7,7 @@ Validation rules that GSD agents (planner and executor) must follow during phase
 ### After writing or modifying any Alembic migration
 
 **Autogenerate-first workflow (required):**
-- Schema changes MUST start in `src/adapters/persistence/orm/tables.py`
+- Schema changes MUST start in `apps/api/src/adapters/persistence/orm/tables.py`
 - Then use `alembic revision --autogenerate -m "description"` to generate the migration
 - Never hand-write DDL operations in migration files (if autogenerate doesn't produce the right DDL, fix tables.py)
 - Hand-edit migrations ONLY for data backfill logic (not DDL)
@@ -21,7 +21,7 @@ Validation rules that GSD agents (planner and executor) must follow during phase
 
 ### After implementing or modifying API endpoints
 
-- Start the actual service (`uvicorn src.main:app --host 0.0.0.0 --port 8000`)
+- Start the actual service (`cd apps/api && uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000`)
 - Smoke test key endpoints with curl against the running service
 - Verify at minimum: a successful response (not 500), correct response shape, auth works if required
 - Do NOT skip this even if integration tests pass — TestClient may behave differently from a real HTTP server
@@ -52,7 +52,7 @@ This project's integration tests use `metadata.create_all()` (NOT Alembic migrat
 - Index definitions may differ between the two schemas
 - Tests use transactional rollback per test — FK constraints, triggers, and sequences may behave differently with committed data
 
-**RESOLVED:** The drift detection test (`tests/integration/test_schema_parity.py`) now guards against schema drift between `metadata.create_all()` (used by integration tests) and `alembic upgrade head` (used by production). This test runs alembic migrations against a clean database and compares the result to SQLAlchemy metadata.
+**RESOLVED:** The drift detection test (`apps/api/tests/integration/test_schema_parity.py`) now guards against schema drift between `metadata.create_all()` (used by integration tests) and `alembic upgrade head` (used by production). This test runs alembic migrations against a clean database and compares the result to SQLAlchemy metadata.
 
 A passing test suite does NOT guarantee the real service works. Always cross-check against the running service for migration-related changes.
 
@@ -70,8 +70,8 @@ A passing test suite does NOT guarantee the real service works. Always cross-che
 # Run migrations against real DB
 alembic upgrade head
 
-# Start service
-uvicorn src.main:app --host 0.0.0.0 --port 8000 &
+# Start service (from workspace root)
+cd apps/api && uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000 &
 
 # Smoke test
 curl -s http://localhost:8000/docs | head -5
@@ -80,5 +80,5 @@ curl -s -X POST http://localhost:8000/auth/token \
   -H "Content-Type: application/x-www-form-urlencoded"
 
 # Run all tests
-pytest tests/ -x -q
+pytest apps/api/tests/ -x -q
 ```
