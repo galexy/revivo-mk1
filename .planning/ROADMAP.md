@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
 - [x] **Phase 5: Domain Event Publishing** - Event bus infrastructure, async event handlers, event-driven architecture
 - [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
-- [ ] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
+- [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [ ] **Phase 8: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 9: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 10: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
@@ -239,7 +239,7 @@ Plans:
 ### Phase 7: Nx Monorepo Restructure
 **Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
 **Depends on**: Phase 6
-**Requirements**: ARCH-06, ARCH-07
+**Requirements**: Monorepo structure (apps/api, apps/web scaffold, libs/domain, libs/ui scaffold)
 **Success Criteria** (what must be TRUE):
   1. Project uses Nx monorepo structure
   2. Backend exists as app at `apps/backend/` (or `apps/api/`)
@@ -250,10 +250,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Initialize Nx workspace, scaffold apps/web/ and libs/ui/
-- [ ] 07-02-PLAN.md — Move backend to apps/api/ with config updates
-- [ ] 07-03-PLAN.md — Extract domain layer to libs/domain/, rewrite imports
-- [ ] 07-04-PLAN.md — Update CLAUDE.md, final verification and smoke test
+- [x] 07-01-PLAN.md — Initialize Nx workspace, scaffold apps/web/ and libs/ui/
+- [x] 07-02-PLAN.md — Move backend to apps/api/ with config updates
+- [x] 07-03-PLAN.md — Extract domain layer to libs/domain/, rewrite imports
+- [x] 07-04-PLAN.md — Update CLAUDE.md, final verification and smoke test
 
 ### Phase 8: Frontend Infrastructure
 **Goal**: Set up frontend tooling and testing infrastructure
@@ -616,7 +616,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
-| 7. Nx Monorepo Restructure | 0/4 | Not started | - |
+| 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
 | 8. Frontend Infrastructure | 0/2 | Not started | - |
 | 9. Login UI | 0/2 | Not started | - |
 | 10. Frontend API & Routing | 0/2 | Not started | - |
