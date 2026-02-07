@@ -116,7 +116,7 @@ async def register(
     Returns:
         RegisterResponse with user_id and confirmation message.
     """
-    result = service.register(
+    result = await service.register(
         email=request.email,
         password=request.password,
         display_name=request.display_name,
@@ -163,7 +163,7 @@ async def login(
     Raises:
         HTTPException: 401 if credentials are invalid.
     """
-    result = service.login(
+    result = await service.login(
         email=form_data.username,
         password=form_data.password,
     )
@@ -217,7 +217,7 @@ async def refresh_token(
             detail="Refresh token required",
         )
 
-    result = service.refresh(refresh_token)
+    result = await service.refresh(refresh_token)
 
     if isinstance(result, AuthError):
         _clear_refresh_cookie(response)
@@ -257,7 +257,7 @@ async def verify_email(
     Raises:
         HTTPException: 400 if token is invalid or expired.
     """
-    result = service.verify_email(token)
+    result = await service.verify_email(token)
 
     if isinstance(result, AuthError):
         raise HTTPException(

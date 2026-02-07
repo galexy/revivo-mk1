@@ -149,7 +149,7 @@ async def create_checking_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_checking(
+    result = await service.create_checking(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -202,7 +202,7 @@ async def create_savings_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_savings(
+    result = await service.create_savings(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -255,7 +255,7 @@ async def create_credit_card_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_credit_card(
+    result = await service.create_credit_card(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -311,7 +311,7 @@ async def create_loan_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_loan(
+    result = await service.create_loan(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -367,7 +367,7 @@ async def create_brokerage_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_brokerage(
+    result = await service.create_brokerage(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -419,7 +419,7 @@ async def create_ira_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_ira(
+    result = await service.create_ira(
         user_id=current_user.user_id,
         name=request.name,
         opening_balance=Money(
@@ -472,7 +472,7 @@ async def create_rewards_account(
             notes=request.institution.notes,
         )
 
-    result = service.create_rewards(
+    result = await service.create_rewards(
         user_id=current_user.user_id,
         name=request.name,
         rewards_balance=RewardsBalance(
@@ -623,7 +623,7 @@ async def update_account(
 
     # Apply updates (only name is supported via service for now)
     if request.name is not None:
-        result = service.update_account_name(
+        result = await service.update_account_name(
             parsed_id,
             request.name,
             current_user.user_id,
@@ -675,7 +675,7 @@ async def close_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.close_account(
+    result = await service.close_account(
         parsed_id,
         current_user.user_id,
         household_id=current_user.household_id,
@@ -720,7 +720,7 @@ async def reopen_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.reopen_account(
+    result = await service.reopen_account(
         parsed_id,
         current_user.user_id,
         household_id=current_user.household_id,
@@ -763,7 +763,7 @@ async def delete_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = service.delete_account(parsed_id, household_id=current_user.household_id)
+    result = await service.delete_account(parsed_id, household_id=current_user.household_id)
 
     if isinstance(result, AccountError):
         _handle_error(result)

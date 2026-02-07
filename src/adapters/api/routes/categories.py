@@ -56,7 +56,7 @@ def _category_to_response(category: Category) -> CategoryResponse:
 
 
 @router.post("", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
-def create_category(
+async def create_category(
     request: CreateCategoryRequest,
     service: CategoryService = Depends(get_category_service),
     current_user: CurrentUser = Depends(get_current_user),
@@ -65,7 +65,7 @@ def create_category(
     parent_id = CategoryId.from_string(request.parent_id) if request.parent_id else None
     category_type = CategoryType(request.category_type)
 
-    result = service.create_category(
+    result = await service.create_category(
         user_id=current_user.user_id,
         name=request.name,
         parent_id=parent_id,
@@ -84,7 +84,7 @@ def create_category(
 
 
 @router.get("", response_model=CategoryListResponse)
-def list_categories(
+async def list_categories(
     service: CategoryService = Depends(get_category_service),
     current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryListResponse:
@@ -92,7 +92,7 @@ def list_categories(
     user_id = current_user.user_id
 
     # Ensure system categories exist
-    service.ensure_system_categories(user_id, household_id=current_user.household_id)
+    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
 
     categories = service.get_user_categories(user_id)
     return CategoryListResponse(
@@ -102,14 +102,14 @@ def list_categories(
 
 
 @router.get("/tree", response_model=CategoryTreeResponse)
-def get_category_tree(
+async def get_category_tree(
     service: CategoryService = Depends(get_category_service),
     current_user: CurrentUser = Depends(get_current_user),
 ) -> CategoryTreeResponse:
     """Get categories organized as a tree structure."""
     user_id = current_user.user_id
 
-    service.ensure_system_categories(user_id, household_id=current_user.household_id)
+    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
     tree = service.get_category_tree(user_id)
 
     return CategoryTreeResponse(
@@ -146,7 +146,7 @@ def get_category(
 
 
 @router.patch("/{category_id}", response_model=CategoryResponse)
-def update_category(
+async def update_category(
     category_id: str,
     request: UpdateCategoryRequest,
     service: CategoryService = Depends(get_category_service),
@@ -158,7 +158,7 @@ def update_category(
 
     # Update name if provided
     if request.name is not None:
-        result = service.update_category_name(user_id, cat_id, request.name)
+        result = await service.update_category_name(user_id, cat_id, request.name)
         if isinstance(result, CategoryError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -170,7 +170,7 @@ def update_category(
         parent_id = (
             CategoryId.from_string(request.parent_id) if request.parent_id else None
         )
-        result = service.update_category_parent(user_id, cat_id, parent_id)
+        result = await service.update_category_parent(user_id, cat_id, parent_id)
         if isinstance(result, CategoryError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -187,7 +187,7 @@ def update_category(
 
 
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_category(
+async def delete_category(
     category_id: str,
     reassign_to: str | None = Query(
         default=None, description="Category to reassign transactions to"
@@ -199,7 +199,7 @@ def delete_category(
     cat_id = CategoryId.from_string(category_id)
     reassign_id = CategoryId.from_string(reassign_to) if reassign_to else None
 
-    result = service.delete_category(
+    result = await service.delete_category(
         current_user.user_id, cat_id, reassign_id,
         household_id=current_user.household_id,
     )

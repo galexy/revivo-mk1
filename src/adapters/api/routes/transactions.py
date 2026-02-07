@@ -91,7 +91,7 @@ def _transaction_to_response(txn: Transaction) -> TransactionResponse:
 @router.post(
     "", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED
 )
-def create_transaction(
+async def create_transaction(
     request: CreateTransactionRequest,
     service: TransactionService = Depends(get_transaction_service),
     current_user: CurrentUser = Depends(get_current_user),
@@ -121,7 +121,7 @@ def create_transaction(
             )
         splits.append(split)
 
-    result = service.create_transaction(
+    result = await service.create_transaction(
         user_id=current_user.user_id,
         account_id=account_id,
         effective_date=request.effective_date,
@@ -218,7 +218,7 @@ def get_transaction(
 
 
 @router.patch("/{transaction_id}", response_model=TransactionResponse)
-def update_transaction(
+async def update_transaction(
     transaction_id: str,
     request: UpdateTransactionRequest,
     service: TransactionService = Depends(get_transaction_service),
@@ -326,7 +326,7 @@ def update_transaction(
 
         new_amount = Money(request.amount.amount, request.amount.currency)
 
-        result = service.update_transaction_splits(
+        result = await service.update_transaction_splits(
             user_id, txn_id, new_splits, new_amount
         )
         if isinstance(result, TransactionError):
@@ -340,7 +340,7 @@ def update_transaction(
 
     # Update dates if provided
     if request.effective_date or request.posted_date:
-        result = service.update_transaction_dates(
+        result = await service.update_transaction_dates(
             user_id, txn_id, request.effective_date, request.posted_date
         )
         if isinstance(result, TransactionError):
@@ -351,7 +351,7 @@ def update_transaction(
 
     # Update memo if provided
     if request.memo is not None:
-        result = service.update_transaction_memo(user_id, txn_id, request.memo)
+        result = await service.update_transaction_memo(user_id, txn_id, request.memo)
         if isinstance(result, TransactionError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -369,7 +369,7 @@ def update_transaction(
 
 
 @router.post("/{transaction_id}/clear", response_model=TransactionResponse)
-def mark_transaction_cleared(
+async def mark_transaction_cleared(
     transaction_id: str,
     request: MarkClearedRequest | None = None,
     service: TransactionService = Depends(get_transaction_service),
@@ -379,7 +379,7 @@ def mark_transaction_cleared(
     txn_id = TransactionId.from_string(transaction_id)
     posted_date = request.posted_date if request else None
 
-    result = service.mark_transaction_cleared(current_user.user_id, txn_id, posted_date)
+    result = await service.mark_transaction_cleared(current_user.user_id, txn_id, posted_date)
 
     if isinstance(result, TransactionError):
         raise HTTPException(
@@ -391,7 +391,7 @@ def mark_transaction_cleared(
 
 
 @router.post("/{transaction_id}/reconcile", response_model=TransactionResponse)
-def mark_transaction_reconciled(
+async def mark_transaction_reconciled(
     transaction_id: str,
     service: TransactionService = Depends(get_transaction_service),
     current_user: CurrentUser = Depends(get_current_user),
@@ -399,7 +399,7 @@ def mark_transaction_reconciled(
     """Mark transaction as reconciled."""
     txn_id = TransactionId.from_string(transaction_id)
 
-    result = service.mark_transaction_reconciled(current_user.user_id, txn_id)
+    result = await service.mark_transaction_reconciled(current_user.user_id, txn_id)
 
     if isinstance(result, TransactionError):
         raise HTTPException(
@@ -411,7 +411,7 @@ def mark_transaction_reconciled(
 
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_transaction(
+async def delete_transaction(
     transaction_id: str,
     service: TransactionService = Depends(get_transaction_service),
     current_user: CurrentUser = Depends(get_current_user),
@@ -419,7 +419,7 @@ def delete_transaction(
     """Delete a transaction (and its mirrors if source)."""
     txn_id = TransactionId.from_string(transaction_id)
 
-    result = service.delete_transaction(current_user.user_id, txn_id)
+    result = await service.delete_transaction(current_user.user_id, txn_id)
 
     if isinstance(result, TransactionError):
         status_code = status.HTTP_400_BAD_REQUEST
