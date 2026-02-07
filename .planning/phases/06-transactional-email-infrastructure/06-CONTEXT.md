@@ -20,7 +20,11 @@ This phase establishes reusable infrastructure for all transactional emails (ver
 - HTML with plain text fallback for all emails
 - Sender identity configurable via environment variables (SMTP_FROM_NAME, SMTP_FROM_EMAIL)
 - Minimal branding: logo + clean layout, not heavy styling
-- Email templates in separate markup files outside code — research templating solutions (Jinja2-based or specialized email templating libraries)
+- **MJML for email templates** — compiles to table-based HTML compatible with all email clients
+  - .mjml source files are human-readable and version-controlled
+  - Compiled .html files contain Jinja2 variables for runtime rendering
+  - Build step: `make build-emails` (requires Node.js/npm for MJML)
+  - Both .mjml source and .html output are committed to git
 - Subject lines action-focused (e.g., "Confirm your email to get started")
 - Tone: friendly but professional
 - Include brief teaser about what user can do after verifying
@@ -54,8 +58,8 @@ This phase establishes reusable infrastructure for all transactional emails (ver
 - If email queuing fails during registration, registration fails (rollback user creation)
 
 ### Claude's Discretion
-- Email templating library choice (Jinja2-based or specialized)
-- Specific SMTP library choice
+- ~~Email templating library choice~~ → **Decided: MJML + Jinja2** (MJML compiles to HTML, Jinja2 renders at runtime)
+- Specific SMTP library choice (smtplib recommended)
 
 </decisions>
 
