@@ -1,0 +1,5 @@
+.planning/
+.venv/
+.git/
+.hypothesis/
+__pycache__/
