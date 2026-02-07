@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 6 (Transactional Email Infrastructure) - COMPLETE
+**Current focus:** Phase 7 (Nx Monorepo Restructure) - In progress
 
 ## Current Position
 
-Phase: 6 of 22 (Transactional Email Infrastructure)
-Plan: 5 of 5 complete
-Status: Phase complete
-Last activity: 2026-02-07 - Completed 06-05-PLAN.md (Async Event Bus, UoW, Services, Routes)
+Phase: 7 of 22 (Nx Monorepo Restructure)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-02-07 - Completed 07-01-PLAN.md (Nx Workspace Init)
 
-Progress: [██████░░░░] ~51%
+Progress: [██████░░░░] ~52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 45
-- Average duration: 4.5 min
-- Total execution time: 4.24 hours
+- Total plans completed: 46
+- Average duration: 4.4 min
+- Total execution time: 4.27 hours
 
 **By Phase:**
 
@@ -38,9 +38,11 @@ Progress: [██████░░░░] ~51%
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
+| 07-nx-monorepo-restructure | 1 | 2 min | 2.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 06-01 (3 min), 06-02 (4 min), 06-03 (3 min), 06-04 (15 min), 06-05 (12 min)
-- Trend: Phase 6 complete. Full async email flow verified end-to-end.
+- Last 5 plans: 06-02 (4 min), 06-03 (3 min), 06-04 (15 min), 06-05 (12 min), 07-01 (2 min)
+- Trend: Phase 7 started. Nx workspace initialized with minimal scaffolds.
 
 *Updated after each plan completion*
 
@@ -199,6 +201,9 @@ Recent decisions affecting current work:
 - UoW context manager stays sync, only commit() is async
 - Read-only service methods and routes stay sync for thread pool execution
 - asyncio.run() in sync tests for async function calls (no pytest-asyncio dependency)
+- Manual Nx setup (no `nx init`) for clean integration with existing Python+Node hybrid project
+- Nx project.json discovery (not npm workspaces) for monorepo project registration
+- Empty Nx project targets -- Phase 8 adds React/Tailwind build configuration
 
 ### Pending Todos
 
@@ -218,9 +223,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 06-05-PLAN.md, Phase 6 complete
+Stopped at: Completed 07-01-PLAN.md (Nx Workspace Init)
 Resume file: None
-Next action: Begin Phase 7 (Nx Monorepo Restructure)
+Next action: Continue Phase 7 with 07-02-PLAN.md (Backend as Nx Project)
 
 ## Roadmap Evolution
 
@@ -440,3 +445,14 @@ Key stats:
 - Proper error handling: defer_async failures caught by handler try/except
 
 Ready for Phase 7: Nx Monorepo Restructure
+
+## Phase 7 Progress
+
+**Phase 7: Nx Monorepo Restructure - IN PROGRESS**
+
+Plans completed (1 of 4):
+- 07-01: Nx Workspace Init (nx.json, apps/web, libs/ui scaffolds)
+
+Key stats:
+- 444 total tests passing (no regressions from Nx setup)
+- Nx 22.4.5 installed, 2 projects discoverable via `nx show projects`
