@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 7 of 22 (Nx Monorepo Restructure)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-02-07 - Completed 07-02-PLAN.md (Backend as Nx Project)
+Last activity: 2026-02-07 - Completed 07-03-PLAN.md (Domain Layer Extraction)
 
-Progress: [██████░░░░] ~53%
+Progress: [██████░░░░] ~55%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 47
+- Total plans completed: 48
 - Average duration: 5.1 min
-- Total execution time: 4.84 hours
+- Total execution time: 5.01 hours
 
 **By Phase:**
 
@@ -38,11 +38,11 @@ Progress: [██████░░░░] ~53%
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
-| 07-nx-monorepo-restructure | 2 | 36 min | 18.0 min |
+| 07-nx-monorepo-restructure | 3 | 46 min | 15.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (3 min), 06-04 (15 min), 06-05 (12 min), 07-01 (2 min), 07-02 (34 min)
-- Trend: 07-02 was longer due to uv workspace/typeid-python Rust build complications in offline env.
+- Last 5 plans: 06-04 (15 min), 06-05 (12 min), 07-01 (2 min), 07-02 (34 min), 07-03 (10 min)
+- Trend: 07-03 smoother than 07-02 but still required deviation fixes (hatch packages path, uv pip recovery, pytest import mode).
 
 *Updated after each plan completion*
 
@@ -208,6 +208,11 @@ Recent decisions affecting current work:
 - Root pyproject.toml kept as regular project (not uv workspace) to avoid typeid-python Rust build in offline env
 - Nx targets use .venv/bin/ paths and {workspaceRoot} cwd for Python tool execution
 - alembic.ini: prepend_sys_path includes both . and apps/api for import resolution
+- Domain layer extracted to libs/domain/domain/ as standalone shared library (imports use domain.* not src.domain.*)
+- Editable install: hatch packages=['apps/api/src', 'libs/domain/domain'] for both src and domain importability
+- uv pip install -e . --no-deps to avoid typeid-python Rust rebuild (use --no-deps flag always)
+- pytest --import-mode=importlib for monorepo with multiple test directories
+- import-linter root_packages=['src', 'domain'] for cross-package architecture enforcement
 
 ### Pending Todos
 
@@ -227,9 +232,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 07-02-PLAN.md (Backend as Nx Project)
+Stopped at: Completed 07-03-PLAN.md (Domain Layer Extraction)
 Resume file: None
-Next action: Continue Phase 7 with 07-03-PLAN.md
+Next action: Continue Phase 7 with 07-04-PLAN.md
 
 ## Roadmap Evolution
 
@@ -454,12 +459,14 @@ Ready for Phase 7: Nx Monorepo Restructure
 
 **Phase 7: Nx Monorepo Restructure - IN PROGRESS**
 
-Plans completed (2 of 4):
+Plans completed (3 of 4):
 - 07-01: Nx Workspace Init (nx.json, apps/web, libs/ui scaffolds)
 - 07-02: Backend as Nx Project (git mv to apps/api/, Nx project.json, config updates)
+- 07-03: Domain Layer Extraction (libs/domain/domain/, import rewrite, Nx project registration)
 
 Key stats:
-- 444 total tests passing (all from apps/api/tests/)
-- Nx 22.4.5, 3 projects discoverable via `nx show projects` (api, web, ui)
-- Backend at apps/api/ with serve/test/lint Nx targets
-- Alembic migrations apply from new location
+- 444 total tests passing (252 API + 192 domain, from separate test directories)
+- Nx 22.4.5, 4 projects discoverable via `nx show projects` (api, web, ui, domain)
+- Domain at libs/domain/ with test/lint Nx targets
+- import-linter: 2 contracts kept (domain isolation + hexagonal layers)
+- Alembic migrations apply cleanly, zero drift
