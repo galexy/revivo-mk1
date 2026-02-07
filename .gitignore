@@ -92,3 +92,4 @@ alembic/versions/__pycache__/
 
 # Node.js
 node_modules/
+.claude-local/

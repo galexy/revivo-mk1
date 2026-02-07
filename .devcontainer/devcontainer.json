@@ -59,8 +59,8 @@
   "remoteUser": "developer",
 
   "mounts": [
-    "source=personal-finance-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=personal-finance-claude-config-${devcontainerId},target=/home/developer/.claude,type=volume"
+    "source=personal-finance-bashhistory,target=/commandhistory,type=volume",
+    "source=${localWorkspaceFolder}/.claude-local,target=/home/developer/.claude,type=bind"
   ],
 
   "containerEnv": {
