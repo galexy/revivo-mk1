@@ -176,7 +176,7 @@ layers = [
 testpaths = ["apps/api/tests", "libs/domain/tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-v --tb=short"
+addopts = "-v --tb=short --import-mode=importlib"
 
 # ============================================================================
 # Coverage Configuration
