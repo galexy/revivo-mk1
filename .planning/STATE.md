@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 7 of 22 (Nx Monorepo Restructure)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-02-07 - Completed 07-01-PLAN.md (Nx Workspace Init)
+Last activity: 2026-02-07 - Completed 07-02-PLAN.md (Backend as Nx Project)
 
-Progress: [██████░░░░] ~52%
+Progress: [██████░░░░] ~53%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 46
-- Average duration: 4.4 min
-- Total execution time: 4.27 hours
+- Total plans completed: 47
+- Average duration: 5.1 min
+- Total execution time: 4.84 hours
 
 **By Phase:**
 
@@ -38,11 +38,11 @@ Progress: [██████░░░░] ~52%
 | 05-domain-event-publishing | 3 | 14 min | 4.7 min |
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
-| 07-nx-monorepo-restructure | 1 | 2 min | 2.0 min |
+| 07-nx-monorepo-restructure | 2 | 36 min | 18.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (4 min), 06-03 (3 min), 06-04 (15 min), 06-05 (12 min), 07-01 (2 min)
-- Trend: Phase 7 started. Nx workspace initialized with minimal scaffolds.
+- Last 5 plans: 06-03 (3 min), 06-04 (15 min), 06-05 (12 min), 07-01 (2 min), 07-02 (34 min)
+- Trend: 07-02 was longer due to uv workspace/typeid-python Rust build complications in offline env.
 
 *Updated after each plan completion*
 
@@ -204,6 +204,10 @@ Recent decisions affecting current work:
 - Manual Nx setup (no `nx init`) for clean integration with existing Python+Node hybrid project
 - Nx project.json discovery (not npm workspaces) for monorepo project registration
 - Empty Nx project targets -- Phase 8 adds React/Tailwind build configuration
+- Backend moved to apps/api/ via git mv (preserves history), editable install via hatch packages=['apps/api/src']
+- Root pyproject.toml kept as regular project (not uv workspace) to avoid typeid-python Rust build in offline env
+- Nx targets use .venv/bin/ paths and {workspaceRoot} cwd for Python tool execution
+- alembic.ini: prepend_sys_path includes both . and apps/api for import resolution
 
 ### Pending Todos
 
@@ -223,9 +227,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 07-01-PLAN.md (Nx Workspace Init)
+Stopped at: Completed 07-02-PLAN.md (Backend as Nx Project)
 Resume file: None
-Next action: Continue Phase 7 with 07-02-PLAN.md (Backend as Nx Project)
+Next action: Continue Phase 7 with 07-03-PLAN.md
 
 ## Roadmap Evolution
 
@@ -450,9 +454,12 @@ Ready for Phase 7: Nx Monorepo Restructure
 
 **Phase 7: Nx Monorepo Restructure - IN PROGRESS**
 
-Plans completed (1 of 4):
+Plans completed (2 of 4):
 - 07-01: Nx Workspace Init (nx.json, apps/web, libs/ui scaffolds)
+- 07-02: Backend as Nx Project (git mv to apps/api/, Nx project.json, config updates)
 
 Key stats:
-- 444 total tests passing (no regressions from Nx setup)
-- Nx 22.4.5 installed, 2 projects discoverable via `nx show projects`
+- 444 total tests passing (all from apps/api/tests/)
+- Nx 22.4.5, 3 projects discoverable via `nx show projects` (api, web, ui)
+- Backend at apps/api/ with serve/test/lint Nx targets
+- Alembic migrations apply from new location
