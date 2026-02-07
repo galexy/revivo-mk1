@@ -18,7 +18,7 @@ from src.adapters.api.app import create_app
 from src.adapters.persistence.orm.base import metadata
 from src.adapters.persistence.orm.mappers import clear_mappers, start_mappers
 from src.adapters.security.tokens import generate_verification_token
-from src.domain.model.category import SYSTEM_CATEGORY_UNCATEGORIZED
+from domain.model.category import SYSTEM_CATEGORY_UNCATEGORIZED
 
 
 @pytest.fixture(scope="module")

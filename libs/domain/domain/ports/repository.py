@@ -16,7 +16,7 @@ Key principles:
 
 from typing import Generic, Protocol, TypeVar
 
-from src.domain.exceptions import EntityNotFoundError
+from domain.exceptions import EntityNotFoundError
 
 # Type variables for generic repository
 T = TypeVar("T")  # Entity/Aggregate type

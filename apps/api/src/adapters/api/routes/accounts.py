@@ -25,11 +25,11 @@ from src.adapters.api.dependencies import (
 )
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
 from src.application.services.account_service import AccountError, AccountService
-from src.domain.model.account_types import AccountStatus, AccountType
-from src.domain.model.entity_id import AccountId
-from src.domain.model.institution import InstitutionDetails
-from src.domain.model.money import Money
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.model.account_types import AccountStatus, AccountType
+from domain.model.entity_id import AccountId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 
 from ..schemas.account import (
     AccountListResponse,

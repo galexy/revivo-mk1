@@ -2,8 +2,8 @@
 
 from typing import Protocol
 
-from src.domain.model.category import Category
-from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
+from domain.model.category import Category
+from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 
 class CategoryRepository(Protocol):

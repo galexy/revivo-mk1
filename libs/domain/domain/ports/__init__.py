@@ -10,9 +10,9 @@ Key ports:
 - EmailService: Transactional email delivery
 """
 
-from src.domain.ports.email_service import EmailDeliveryError, EmailService
-from src.domain.ports.repository import Repository
-from src.domain.ports.unit_of_work import UnitOfWork
+from domain.ports.email_service import EmailDeliveryError, EmailService
+from domain.ports.repository import Repository
+from domain.ports.unit_of_work import UnitOfWork
 
 __all__ = [
     "EmailDeliveryError",

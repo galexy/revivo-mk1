@@ -7,8 +7,8 @@ adapters layer (UserRepository).
 
 from typing import Protocol
 
-from src.domain.model.entity_id import UserId
-from src.domain.model.user import User
+from domain.model.entity_id import UserId
+from domain.model.user import User
 
 
 class UserRepositoryProtocol(Protocol):

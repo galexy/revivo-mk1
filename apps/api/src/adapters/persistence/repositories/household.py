@@ -6,8 +6,8 @@ Household entity for persistence via imperative mapping.
 
 from sqlalchemy.orm import Session
 
-from src.domain.model.entity_id import HouseholdId
-from src.domain.model.household import Household
+from domain.model.entity_id import HouseholdId
+from domain.model.household import Household
 
 
 class HouseholdRepository:

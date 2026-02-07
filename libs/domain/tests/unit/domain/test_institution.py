@@ -9,7 +9,7 @@ Verifies that InstitutionDetails:
 
 import pytest
 
-from src.domain.model.institution import InstitutionDetails
+from domain.model.institution import InstitutionDetails
 
 
 class TestInstitutionDetailsConstruction:

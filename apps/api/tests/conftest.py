@@ -26,7 +26,7 @@ settings.register_profile("dev", max_examples=50, deadline=None)
 @pytest.fixture
 def usd_100() -> "Money":
     """Create a Money instance for $100 USD."""
-    from src.domain.model.money import Money
+    from domain.model.money import Money
 
     return Money(Decimal("100.00"), "USD")
 
@@ -34,7 +34,7 @@ def usd_100() -> "Money":
 @pytest.fixture
 def usd_50() -> "Money":
     """Create a Money instance for $50 USD."""
-    from src.domain.model.money import Money
+    from domain.model.money import Money
 
     return Money(Decimal("50.00"), "USD")
 
@@ -42,7 +42,7 @@ def usd_50() -> "Money":
 @pytest.fixture
 def eur_100() -> "Money":
     """Create a Money instance for 100 EUR."""
-    from src.domain.model.money import Money
+    from domain.model.money import Money
 
     return Money(Decimal("100.00"), "EUR")
 

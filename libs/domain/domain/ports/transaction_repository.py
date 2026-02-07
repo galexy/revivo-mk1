@@ -7,8 +7,8 @@ from datetime import date
 from decimal import Decimal
 from typing import Protocol
 
-from src.domain.model.entity_id import AccountId, CategoryId, TransactionId, UserId
-from src.domain.model.transaction import Transaction
+from domain.model.entity_id import AccountId, CategoryId, TransactionId, UserId
+from domain.model.transaction import Transaction
 
 
 class TransactionRepository(Protocol):

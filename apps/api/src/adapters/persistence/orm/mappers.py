@@ -46,7 +46,7 @@ def _decompose_value_objects(session: Session, flush_context, instances) -> None
         flush_context: Internal flush context.
         instances: Optional list of objects to be flushed.
     """
-    from src.domain.model.account import Account
+    from domain.model.account import Account
 
     # Process new and dirty Account objects
     for obj in session.new | session.dirty:
@@ -111,12 +111,12 @@ def start_mappers() -> None:
         return
 
     # Import domain entities inside function to avoid circular imports
-    from src.domain.model.account import Account
-    from src.domain.model.category import Category
-    from src.domain.model.household import Household
-    from src.domain.model.payee import Payee
-    from src.domain.model.transaction import Transaction
-    from src.domain.model.user import User
+    from domain.model.account import Account
+    from domain.model.category import Category
+    from domain.model.household import Household
+    from domain.model.payee import Payee
+    from domain.model.transaction import Transaction
+    from domain.model.user import User
 
     from .tables import accounts, categories, households, payees, transactions, users
 

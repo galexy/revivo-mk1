@@ -2,8 +2,8 @@
 
 from typing import Protocol
 
-from src.domain.model.entity_id import HouseholdId, PayeeId, UserId
-from src.domain.model.payee import Payee
+from domain.model.entity_id import HouseholdId, PayeeId, UserId
+from domain.model.payee import Payee
 
 
 class PayeeRepository(Protocol):

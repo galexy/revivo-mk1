@@ -12,7 +12,7 @@ from decimal import Decimal
 
 import pytest
 
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.model.rewards_balance import RewardsBalance
 
 
 class TestRewardsBalanceConstruction:

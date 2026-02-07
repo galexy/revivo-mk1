@@ -6,8 +6,8 @@ User entity for persistence via imperative mapping.
 
 from sqlalchemy.orm import Session
 
-from src.domain.model.entity_id import UserId
-from src.domain.model.user import User
+from domain.model.entity_id import UserId
+from domain.model.user import User
 
 
 class UserRepository:

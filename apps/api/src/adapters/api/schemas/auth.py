@@ -22,8 +22,8 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 if TYPE_CHECKING:
-    from src.domain.model.household import Household
-    from src.domain.model.user import User
+    from domain.model.household import Household
+    from domain.model.user import User
 
 
 class RegisterRequest(BaseModel):

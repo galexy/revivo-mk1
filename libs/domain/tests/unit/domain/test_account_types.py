@@ -10,7 +10,7 @@ import json
 
 import pytest
 
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
 
 
 class TestAccountType:

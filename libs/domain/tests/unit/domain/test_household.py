@@ -8,7 +8,7 @@ class TestHouseholdId:
 
     def test_generate_creates_valid_id(self) -> None:
         """Generated HouseholdId has 'hh_' prefix."""
-        from src.domain.model.entity_id import HouseholdId
+        from domain.model.entity_id import HouseholdId
 
         hh_id = HouseholdId.generate()
 
@@ -17,7 +17,7 @@ class TestHouseholdId:
 
     def test_from_string_parses_valid_id(self) -> None:
         """HouseholdId can be parsed from valid string."""
-        from src.domain.model.entity_id import HouseholdId
+        from domain.model.entity_id import HouseholdId
 
         original = HouseholdId.generate()
         parsed = HouseholdId.from_string(str(original))
@@ -26,14 +26,14 @@ class TestHouseholdId:
 
     def test_from_string_rejects_wrong_prefix(self) -> None:
         """HouseholdId rejects non-hh prefixes."""
-        from src.domain.model.entity_id import HouseholdId
+        from domain.model.entity_id import HouseholdId
 
         with pytest.raises(ValueError, match="hh"):
             HouseholdId.from_string("user_01h455vb4pex5vsknk084sn02q")
 
     def test_prefix_property_returns_hh(self) -> None:
         """HouseholdId.prefix returns 'hh'."""
-        from src.domain.model.entity_id import HouseholdId
+        from domain.model.entity_id import HouseholdId
 
         hh_id = HouseholdId.generate()
 
@@ -45,7 +45,7 @@ class TestHousehold:
 
     def test_create_generates_id(self) -> None:
         """Household.create() generates a new HouseholdId."""
-        from src.domain.model.household import Household
+        from domain.model.household import Household
 
         household = Household.create(name="Smith Family")
 
@@ -54,7 +54,7 @@ class TestHousehold:
 
     def test_create_stores_name(self) -> None:
         """Household.create() stores name."""
-        from src.domain.model.household import Household
+        from domain.model.household import Household
 
         household = Household.create(name="Test Household")
 
@@ -62,7 +62,7 @@ class TestHousehold:
 
     def test_create_sets_timestamps(self) -> None:
         """Household.create() sets created_at and updated_at."""
-        from src.domain.model.household import Household
+        from domain.model.household import Household
 
         household = Household.create(name="Test")
 
@@ -72,7 +72,7 @@ class TestHousehold:
 
     def test_update_name_changes_name_and_updated_at(self) -> None:
         """update_name() changes name and updates timestamp."""
-        from src.domain.model.household import Household
+        from domain.model.household import Household
         import time
 
         household = Household.create(name="Old Name")

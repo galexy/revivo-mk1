@@ -27,7 +27,7 @@ from src.adapters.security.jwt import TokenError, decode_access_token
 from src.application.services.auth_service import AuthService
 from src.application.services.category_service import CategoryService
 from src.application.services.transaction_service import TransactionService
-from src.domain.model.entity_id import HouseholdId, UserId
+from domain.model.entity_id import HouseholdId, UserId
 
 logger = get_logger(__name__)
 

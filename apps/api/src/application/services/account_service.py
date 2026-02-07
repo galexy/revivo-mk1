@@ -21,16 +21,16 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from src.domain.events.account_events import AccountDeleted
-from src.domain.model.account import Account
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, HouseholdId, UserId
-from src.domain.model.institution import InstitutionDetails
-from src.domain.model.money import Money
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.events.account_events import AccountDeleted
+from domain.model.account import Account
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.entity_id import AccountId, HouseholdId, UserId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 
 if TYPE_CHECKING:
-    from src.domain.ports.unit_of_work import UnitOfWork
+    from domain.ports.unit_of_work import UnitOfWork
 
 
 @dataclass(frozen=True, slots=True)

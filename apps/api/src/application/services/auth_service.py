@@ -24,12 +24,12 @@ from typing import TYPE_CHECKING
 from src.adapters.security.jwt import create_access_token
 from src.adapters.security.password import hash_password, verify_password
 from src.adapters.security.tokens import generate_verification_token, verify_email_token
-from src.domain.model.entity_id import UserId
-from src.domain.model.household import Household
-from src.domain.model.user import User
+from domain.model.entity_id import UserId
+from domain.model.household import Household
+from domain.model.user import User
 
 if TYPE_CHECKING:
-    from src.domain.ports.unit_of_work import UnitOfWork
+    from domain.ports.unit_of_work import UnitOfWork
 
 
 @dataclass(frozen=True, slots=True)

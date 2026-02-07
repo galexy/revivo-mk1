@@ -8,7 +8,7 @@ from sqlalchemy import insert, select, text
 from sqlalchemy.exc import IntegrityError
 
 from src.adapters.persistence.orm.tables import encrypted_secrets, households, outbox, users
-from src.domain.model.entity_id import HouseholdId, UserId
+from domain.model.entity_id import HouseholdId, UserId
 
 
 @pytest.fixture

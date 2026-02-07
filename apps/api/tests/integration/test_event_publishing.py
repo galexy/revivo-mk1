@@ -20,9 +20,9 @@ from src.adapters.persistence.orm.base import metadata
 from src.adapters.persistence.orm.mappers import clear_mappers, start_mappers
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
 from src.application import event_bus
-from src.domain.events.user_events import EmailVerified, UserRegistered
-from src.domain.model.household import Household
-from src.domain.model.user import User
+from domain.events.user_events import EmailVerified, UserRegistered
+from domain.model.household import Household
+from domain.model.user import User
 
 
 @pytest.fixture(scope="module")

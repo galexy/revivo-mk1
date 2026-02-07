@@ -23,7 +23,7 @@ import smtplib
 from email.message import EmailMessage
 
 from src.adapters.logging import get_logger
-from src.domain.ports.email_service import EmailDeliveryError
+from domain.ports.email_service import EmailDeliveryError
 
 logger = get_logger(__name__)
 

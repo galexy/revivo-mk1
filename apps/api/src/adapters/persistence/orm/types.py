@@ -9,8 +9,8 @@ from sqlalchemy import String
 from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.types import TypeDecorator
 
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import (
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.entity_id import (
     AccountId,
     CategoryId,
     HouseholdId,
@@ -19,7 +19,7 @@ from src.domain.model.entity_id import (
     TransactionId,
     UserId,
 )
-from src.domain.model.transaction_types import TransactionSource, TransactionStatus
+from domain.model.transaction_types import TransactionSource, TransactionStatus
 
 
 class AccountIdType(TypeDecorator):

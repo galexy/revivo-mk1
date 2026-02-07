@@ -14,13 +14,13 @@ from decimal import Decimal
 import pytest
 
 from src.adapters.persistence.repositories.account import SqlAlchemyAccountRepository
-from src.domain.exceptions import EntityNotFoundError
-from src.domain.model.account import Account
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, HouseholdId, UserId
-from src.domain.model.institution import InstitutionDetails
-from src.domain.model.money import Money
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.exceptions import EntityNotFoundError
+from domain.model.account import Account
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.entity_id import AccountId, HouseholdId, UserId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 
 
 @pytest.fixture

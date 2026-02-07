@@ -95,7 +95,7 @@ class TestAuthServiceRegister:
     @staticmethod
     def _make_mock_uow(existing_email: str | None) -> MagicMock:
         """Create mock UnitOfWork with stubbed repositories."""
-        from src.domain.model.user import User
+        from domain.model.user import User
 
         uow = MagicMock()
         uow.__enter__ = MagicMock(return_value=uow)
@@ -193,7 +193,7 @@ class TestAuthServiceLogin:
         email_verified: bool = True,
     ) -> MagicMock:
         """Create mock UnitOfWork with optional user."""
-        from src.domain.model.entity_id import HouseholdId, UserId
+        from domain.model.entity_id import HouseholdId, UserId
 
         uow = MagicMock()
         uow.__enter__ = MagicMock(return_value=uow)
@@ -223,8 +223,8 @@ class TestAuthServiceVerifyEmail:
         """verify_email() marks user verified for valid token."""
         from src.adapters.security.tokens import generate_verification_token
         from src.application.services.auth_service import AuthService
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         token = generate_verification_token("user@example.com")
         hh_id = HouseholdId.generate()

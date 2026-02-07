@@ -23,7 +23,7 @@ from sqlalchemy import and_, delete, select, update
 from sqlalchemy.orm import Session
 
 from src.adapters.persistence.orm.tables import refresh_tokens
-from src.domain.model.entity_id import UserId
+from domain.model.entity_id import UserId
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 

@@ -16,18 +16,18 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Self
 
-from src.domain.events.account_events import (
+from domain.events.account_events import (
     AccountClosed,
     AccountCreated,
     AccountReopened,
     AccountUpdated,
 )
-from src.domain.events.base import DomainEvent
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import AccountId, HouseholdId, UserId
-from src.domain.model.institution import InstitutionDetails
-from src.domain.model.money import Money
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.events.base import DomainEvent
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.entity_id import AccountId, HouseholdId, UserId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 
 
 @dataclass(eq=False)

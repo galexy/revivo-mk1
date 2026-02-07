@@ -10,7 +10,7 @@ handlers should enqueue jobs to the job queue.
 
 Usage:
     from src.application import event_bus
-    from src.domain.events.user_events import UserRegistered
+    from domain.events.user_events import UserRegistered
 
     async def on_user_registered(event: UserRegistered) -> None:
         # Enqueue welcome email job

@@ -136,13 +136,13 @@ ignore_missing_imports = true
 # Import-linter Configuration (Architecture Enforcement)
 # ============================================================================
 [tool.importlinter]
-root_packages = ["src"]
+root_packages = ["src", "domain"]
 include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "Domain layer has no infrastructure dependencies"
 type = "forbidden"
-source_modules = ["src.domain"]
+source_modules = ["domain"]
 forbidden_modules = [
     "src.adapters",
     "src.application",
@@ -162,7 +162,7 @@ layers = [
     "src.adapters.api",
     "src.adapters.persistence",
     "src.application",
-    "src.domain",
+    "domain",
 ]
 
 # Note: We don't enforce adapter independence because the API adapter

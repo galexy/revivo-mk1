@@ -7,8 +7,8 @@ adapters layer (HouseholdRepository).
 
 from typing import Protocol
 
-from src.domain.model.entity_id import HouseholdId
-from src.domain.model.household import Household
+from domain.model.entity_id import HouseholdId
+from domain.model.household import Household
 
 
 class HouseholdRepositoryProtocol(Protocol):

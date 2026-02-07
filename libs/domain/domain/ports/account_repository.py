@@ -7,9 +7,9 @@ adapters layer (SqlAlchemyAccountRepository).
 
 from typing import Protocol
 
-from src.domain.model.account import Account
-from src.domain.model.account_types import AccountStatus, AccountType
-from src.domain.model.entity_id import AccountId, HouseholdId, UserId
+from domain.model.account import Account
+from domain.model.account_types import AccountStatus, AccountType
+from domain.model.entity_id import AccountId, HouseholdId, UserId
 
 
 class AccountRepository(Protocol):

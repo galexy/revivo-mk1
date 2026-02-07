@@ -6,8 +6,8 @@ Handles persistence of Payee entity with autocomplete support.
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
-from src.domain.model.payee import Payee
+from domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
+from domain.model.payee import Payee
 
 
 class SqlAlchemyPayeeRepository:

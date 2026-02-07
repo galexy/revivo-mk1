@@ -13,18 +13,18 @@ from decimal import Decimal
 
 import pytest
 
-from src.domain.events.account_events import (
+from domain.events.account_events import (
     AccountClosed,
     AccountCreated,
     AccountReopened,
     AccountUpdated,
 )
-from src.domain.model.account import Account
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
-from src.domain.model.entity_id import UserId
-from src.domain.model.institution import InstitutionDetails
-from src.domain.model.money import Money
-from src.domain.model.rewards_balance import RewardsBalance
+from domain.model.account import Account
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.entity_id import UserId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 
 
 # --- Fixtures ---

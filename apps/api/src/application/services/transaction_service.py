@@ -9,18 +9,18 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from src.domain.events.transaction_events import (
+from domain.events.transaction_events import (
     MirrorTransactionCreated,
     MirrorTransactionDeleted,
 )
-from src.domain.model.entity_id import AccountId, CategoryId, HouseholdId, PayeeId, TransactionId, UserId
-from src.domain.model.money import Money
-from src.domain.model.split_line import SplitLine
-from src.domain.model.transaction import Transaction
-from src.domain.model.transaction_types import TransactionSource, TransactionStatus
+from domain.model.entity_id import AccountId, CategoryId, HouseholdId, PayeeId, TransactionId, UserId
+from domain.model.money import Money
+from domain.model.split_line import SplitLine
+from domain.model.transaction import Transaction
+from domain.model.transaction_types import TransactionSource, TransactionStatus
 
 if TYPE_CHECKING:
-    from src.domain.ports.unit_of_work import UnitOfWork
+    from domain.ports.unit_of_work import UnitOfWork
 
 
 @dataclass(frozen=True, slots=True)

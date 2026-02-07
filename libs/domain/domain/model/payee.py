@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Self
 
-from src.domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
+from domain.model.entity_id import CategoryId, HouseholdId, PayeeId, UserId
 
 
 @dataclass(eq=False)

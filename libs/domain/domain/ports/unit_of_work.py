@@ -15,13 +15,13 @@ Key principles:
 from typing import TYPE_CHECKING, Any, Protocol, Self
 
 if TYPE_CHECKING:
-    from src.domain.events.base import DomainEvent
-    from src.domain.ports.account_repository import AccountRepository
-    from src.domain.ports.category_repository import CategoryRepository
-    from src.domain.ports.household_repository import HouseholdRepositoryProtocol
-    from src.domain.ports.payee_repository import PayeeRepository
-    from src.domain.ports.transaction_repository import TransactionRepository
-    from src.domain.ports.user_repository import UserRepositoryProtocol
+    from domain.events.base import DomainEvent
+    from domain.ports.account_repository import AccountRepository
+    from domain.ports.category_repository import CategoryRepository
+    from domain.ports.household_repository import HouseholdRepositoryProtocol
+    from domain.ports.payee_repository import PayeeRepository
+    from domain.ports.transaction_repository import TransactionRepository
+    from domain.ports.user_repository import UserRepositoryProtocol
 
 
 class UnitOfWork(Protocol):

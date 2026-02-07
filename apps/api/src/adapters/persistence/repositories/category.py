@@ -7,12 +7,12 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from src.adapters.persistence.orm.tables import split_lines
-from src.domain.model.category import (
+from domain.model.category import (
     SYSTEM_CATEGORY_UNCATEGORIZED,
     Category,
     CategoryType,
 )
-from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
+from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 
 class SqlAlchemyCategoryRepository:

@@ -8,7 +8,7 @@ import os
 
 from src.adapters.logging import get_logger
 from src.adapters.security.tokens import generate_verification_token
-from src.domain.events.user_events import EmailVerified, UserRegistered
+from domain.events.user_events import EmailVerified, UserRegistered
 
 logger = get_logger(__name__)
 

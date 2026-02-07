@@ -14,8 +14,8 @@ specific splits by ID, and mirrors can be correctly matched to source splits.
 from dataclasses import dataclass
 from typing import Self
 
-from src.domain.model.entity_id import AccountId, CategoryId, SplitId
-from src.domain.model.money import Money
+from domain.model.entity_id import AccountId, CategoryId, SplitId
+from domain.model.money import Money
 
 
 @dataclass(frozen=True, slots=True)

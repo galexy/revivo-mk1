@@ -16,14 +16,14 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Self
 
-from src.domain.events.base import DomainEvent
-from src.domain.events.transaction_events import (
+from domain.events.base import DomainEvent
+from domain.events.transaction_events import (
     TransactionCreated,
     TransactionDeleted,
     TransactionStatusChanged,
     TransactionUpdated,
 )
-from src.domain.model.entity_id import (
+from domain.model.entity_id import (
     AccountId,
     HouseholdId,
     PayeeId,
@@ -31,9 +31,9 @@ from src.domain.model.entity_id import (
     TransactionId,
     UserId,
 )
-from src.domain.model.money import Money
-from src.domain.model.split_line import SplitLine
-from src.domain.model.transaction_types import TransactionSource, TransactionStatus
+from domain.model.money import Money
+from domain.model.split_line import SplitLine
+from domain.model.transaction_types import TransactionSource, TransactionStatus
 
 
 @dataclass(eq=False)

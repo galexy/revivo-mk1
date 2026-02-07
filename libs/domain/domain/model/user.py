@@ -69,7 +69,7 @@ class User:
         Returns:
             New User instance with generated ID and UserRegistered event
         """
-        from src.domain.events.user_events import UserRegistered
+        from domain.events.user_events import UserRegistered
 
         now = datetime.now(UTC)
         user = cls(
@@ -100,7 +100,7 @@ class User:
         Idempotent: calling on already-verified user is a no-op.
         Emits EmailVerified event only on first verification.
         """
-        from src.domain.events.user_events import EmailVerified
+        from domain.events.user_events import EmailVerified
 
         if self.email_verified:
             return  # Already verified, no-op

@@ -12,7 +12,7 @@ import time
 import pytest
 from typeid.core.errors import InvalidTypeIDStringException, SuffixValidationException
 
-from src.domain.model.entity_id import (
+from domain.model.entity_id import (
     AccountId,
     BudgetId,
     CategoryId,

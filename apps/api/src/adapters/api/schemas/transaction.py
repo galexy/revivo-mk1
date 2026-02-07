@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from src.domain.model.transaction_types import TransactionSource, TransactionStatus
+from domain.model.transaction_types import TransactionSource, TransactionStatus
 
 
 class MoneySchema(BaseModel):

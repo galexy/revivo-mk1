@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Self
 from sqlalchemy import insert
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.domain.events.base import DomainEvent
+from domain.events.base import DomainEvent
 
 from .orm.tables import outbox
 

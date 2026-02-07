@@ -8,8 +8,8 @@ class TestUserCreate:
 
     def test_create_generates_id(self) -> None:
         """User.create() generates a new UserId."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -24,8 +24,8 @@ class TestUserCreate:
 
     def test_create_normalizes_email_to_lowercase(self) -> None:
         """User.create() lowercases and strips email."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -39,8 +39,8 @@ class TestUserCreate:
 
     def test_create_strips_display_name(self) -> None:
         """User.create() strips whitespace from display_name."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -54,8 +54,8 @@ class TestUserCreate:
 
     def test_create_sets_email_verified_false(self) -> None:
         """User.create() sets email_verified to False."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -70,9 +70,9 @@ class TestUserCreate:
 
     def test_create_emits_user_registered_event(self) -> None:
         """User.create() emits UserRegistered domain event."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
-        from src.domain.events.user_events import UserRegistered
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
+        from domain.events.user_events import UserRegistered
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -95,8 +95,8 @@ class TestUserVerifyEmail:
 
     def test_verify_email_sets_verified_true(self) -> None:
         """verify_email() sets email_verified to True."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create("test@example.com", "Test", "hash", hh_id)
@@ -109,9 +109,9 @@ class TestUserVerifyEmail:
 
     def test_verify_email_emits_email_verified_event(self) -> None:
         """verify_email() emits EmailVerified domain event."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
-        from src.domain.events.user_events import EmailVerified
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
+        from domain.events.user_events import EmailVerified
 
         hh_id = HouseholdId.generate()
         user = User.create("test@example.com", "Test", "hash", hh_id)
@@ -126,8 +126,8 @@ class TestUserVerifyEmail:
 
     def test_verify_email_is_idempotent(self) -> None:
         """verify_email() on already verified user is a no-op."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create("test@example.com", "Test", "hash", hh_id)
@@ -149,8 +149,8 @@ class TestUserCollectEvents:
 
     def test_collect_events_clears_after_collection(self) -> None:
         """collect_events() clears the event list."""
-        from src.domain.model.entity_id import HouseholdId
-        from src.domain.model.user import User
+        from domain.model.entity_id import HouseholdId
+        from domain.model.user import User
 
         hh_id = HouseholdId.generate()
         user = User.create("test@example.com", "Test", "hash", hh_id)

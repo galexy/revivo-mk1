@@ -2,9 +2,9 @@
 
 import pytest
 
-from src.domain.model.entity_id import AccountId, CategoryId, SplitId
-from src.domain.model.money import Money
-from src.domain.model.split_line import SplitLine
+from domain.model.entity_id import AccountId, CategoryId, SplitId
+from domain.model.money import Money
+from domain.model.split_line import SplitLine
 
 
 class TestSplitLineIdentity:

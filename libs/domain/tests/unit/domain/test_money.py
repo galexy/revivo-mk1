@@ -13,7 +13,7 @@ from decimal import Decimal
 import pytest
 from hypothesis import given, strategies as st
 
-from src.domain.model.money import Money
+from domain.model.money import Money
 
 # Strategy for valid decimal amounts with 4 decimal places
 money_amounts = st.decimals(

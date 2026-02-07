@@ -6,11 +6,11 @@ Handles category CRUD, hierarchy management, and system category initialization.
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from src.domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
-from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
+from domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
+from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 if TYPE_CHECKING:
-    from src.domain.ports.unit_of_work import UnitOfWork
+    from domain.ports.unit_of_work import UnitOfWork
 
 
 @dataclass(frozen=True, slots=True)

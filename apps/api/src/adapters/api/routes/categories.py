@@ -29,8 +29,8 @@ from src.adapters.api.schemas.category import (
     UpdateCategoryRequest,
 )
 from src.application.services.category_service import CategoryError, CategoryService
-from src.domain.model.category import Category, CategoryType
-from src.domain.model.entity_id import CategoryId
+from domain.model.category import Category, CategoryType
+from domain.model.entity_id import CategoryId
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 

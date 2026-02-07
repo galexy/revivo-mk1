@@ -13,13 +13,13 @@ from datetime import UTC, datetime
 from enum import StrEnum, auto
 from typing import Self
 
-from src.domain.events.base import DomainEvent
-from src.domain.events.transaction_events import (
+from domain.events.base import DomainEvent
+from domain.events.transaction_events import (
     CategoryCreated,
     CategoryDeleted,
     CategoryUpdated,
 )
-from src.domain.model.entity_id import CategoryId, HouseholdId, UserId
+from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 # System category names that cannot be modified
 SYSTEM_CATEGORY_UNCATEGORIZED = "Uncategorized"

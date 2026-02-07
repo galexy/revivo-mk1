@@ -16,8 +16,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from src.domain.model.account import Account
-from src.domain.model.account_types import AccountStatus, AccountSubtype, AccountType
+from domain.model.account import Account
+from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
 
 
 # --- Value Object Schemas ---

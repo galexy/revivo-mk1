@@ -5,7 +5,7 @@ receives domain events and may enqueue jobs for async processing.
 """
 
 from src.application.event_bus import register
-from src.domain.events.user_events import EmailVerified, UserRegistered
+from domain.events.user_events import EmailVerified, UserRegistered
 
 from .user_handlers import on_email_verified, on_user_registered
 
