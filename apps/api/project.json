@@ -2,6 +2,7 @@
   "name": "api",
   "projectType": "application",
   "sourceRoot": "apps/api/src",
+  "implicitDependencies": ["domain"],
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
