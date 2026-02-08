@@ -7,14 +7,14 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": ".venv/bin/uvicorn src.adapters.api.app:app --host 0.0.0.0 --port 8000 --reload",
+        "command": "uv run --no-sync fastapi dev apps/api/src/adapters/api/app.py --host 0.0.0.0",
         "cwd": "{workspaceRoot}"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": ".venv/bin/python -m pytest apps/api/tests/ -v --tb=short",
+        "command": "uv run --no-sync pytest apps/api/tests/ -v --tb=short",
         "cwd": "{workspaceRoot}"
       },
       "inputs": ["{projectRoot}/**/*.py", "{workspaceRoot}/libs/domain/**/*.py"],
@@ -23,7 +23,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": ".venv/bin/ruff check apps/api/src/ apps/api/tests/",
+        "command": "uv run --no-sync ruff check apps/api/src/ apps/api/tests/",
         "cwd": "{workspaceRoot}"
       },
       "inputs": ["{projectRoot}/**/*.py"],
