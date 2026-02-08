@@ -78,8 +78,10 @@ RUN ARCH=$(dpkg --print-architecture) && \
     dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
     rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
 
-# Switch to non-root user
+# Install Rust toolchain
 USER $USERNAME
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/home/$USERNAME/.cargo/bin:$PATH"
 
 # Install global npm packages
 RUN mkdir -p /usr/local/share/npm-global 2>/dev/null || true
