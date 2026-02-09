@@ -1,18 +1,23 @@
 """SQLAlchemy implementation of CategoryRepository.
 
 Handles persistence of Category entity with value object reconstruction.
+
+NOTE: SQLAlchemy imperative mapping makes domain class attributes behave as
+Column descriptors at runtime, but pyright sees them as their declared Python
+types. The type: ignore comments on .where() and .order_by() clauses are
+expected and correct.
 """
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.orm.tables import split_lines
 from domain.model.category import (
     SYSTEM_CATEGORY_UNCATEGORIZED,
     Category,
     CategoryType,
 )
 from domain.model.entity_id import CategoryId, HouseholdId, UserId
+from src.adapters.persistence.orm.tables import split_lines
 
 
 class SqlAlchemyCategoryRepository:
@@ -62,8 +67,10 @@ class SqlAlchemyCategoryRepository:
         """
         stmt = (
             select(Category)
-            .where(Category.user_id == str(user_id))
-            .order_by(Category.sort_order, Category.name)
+            .where(
+                Category.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+            )
+            .order_by(Category.sort_order, Category.name)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: int/str attrs become Column at runtime
         )
         result = self._session.execute(stmt)
         categories = list(result.scalars().all())
@@ -84,8 +91,10 @@ class SqlAlchemyCategoryRepository:
         """
         stmt = (
             select(Category)
-            .where(Category.parent_id == str(parent_id))
-            .order_by(Category.sort_order, Category.name)
+            .where(
+                Category.parent_id == str(parent_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+            )
+            .order_by(Category.sort_order, Category.name)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
         )
         result = self._session.execute(stmt)
         children = list(result.scalars().all())
@@ -107,9 +116,11 @@ class SqlAlchemyCategoryRepository:
         """
         stmt = (
             select(Category)
-            .where(Category.user_id == str(user_id))
-            .where(Category.is_system == True)  # noqa: E712
-            .where(Category.name == name)
+            .where(
+                Category.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
+            .where(Category.is_system == True)  # type: ignore[arg-type]  # noqa: E712  # SQLAlchemy imperative mapping
+            .where(Category.name == name)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
         )
         category = self._session.scalar(stmt)
         if category is not None:
@@ -185,29 +196,35 @@ class SqlAlchemyCategoryRepository:
             category: Category entity loaded from database.
         """
         # Reconstruct CategoryId from string
-        if isinstance(category.id, str):
-            object.__setattr__(category, "id", CategoryId.from_string(category.id))
+        if isinstance(category.id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(category, "id", CategoryId.from_string(category.id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct UserId from string
-        if isinstance(category.user_id, str):
+        if isinstance(category.user_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "user_id", UserId.from_string(category.user_id)
+                category,
+                "user_id",
+                UserId.from_string(category.user_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct HouseholdId from string
-        if hasattr(category, "household_id") and isinstance(category.household_id, str):
+        if hasattr(category, "household_id") and isinstance(category.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "household_id", HouseholdId.from_string(category.household_id)
+                category,
+                "household_id",
+                HouseholdId.from_string(category.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct parent_id CategoryId from string
-        if category.parent_id is not None and isinstance(category.parent_id, str):
+        if category.parent_id is not None and isinstance(category.parent_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "parent_id", CategoryId.from_string(category.parent_id)
+                category,
+                "parent_id",
+                CategoryId.from_string(category.parent_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct CategoryType enum from string
-        if isinstance(category.category_type, str):
+        if isinstance(category.category_type, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
                 category, "category_type", CategoryType(category.category_type)
             )

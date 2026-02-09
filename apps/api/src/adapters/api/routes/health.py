@@ -5,7 +5,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from ..dependencies import get_settings
+from src.adapters.api.dependencies import get_settings
 
 router = APIRouter(tags=["health"])
 

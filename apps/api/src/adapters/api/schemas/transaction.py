@@ -17,7 +17,9 @@ class MoneySchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    amount: Decimal = Field(..., description="Monetary amount with up to 4 decimal places")
+    amount: Decimal = Field(
+        ..., description="Monetary amount with up to 4 decimal places"
+    )
     currency: str = Field(
         default="USD",
         min_length=3,
@@ -80,7 +82,8 @@ class CreateTransactionRequest(BaseModel):
     account_id: str = Field(..., description="Account for this transaction")
     effective_date: date = Field(..., description="When transaction logically occurred")
     posted_date: date | None = Field(
-        default=None, description="When transaction cleared (defaults to effective_date)"
+        default=None,
+        description="When transaction cleared (defaults to effective_date)",
     )
     amount: MoneySchema = Field(
         ..., description="Net flow (positive=inflow, negative=outflow)"
@@ -109,7 +112,8 @@ class UpdateTransactionRequest(BaseModel):
     payee_name: str | None = None
     check_number: str | None = None
     splits: list[SplitLineRequest] | None = Field(
-        default=None, description="New splits (if provided, amount must also be provided)"
+        default=None,
+        description="New splits (if provided, amount must also be provided)",
     )
     amount: MoneySchema | None = Field(
         default=None, description="New amount (required if splits provided)"
@@ -159,7 +163,9 @@ class TransactionFilterParams(BaseModel):
     date_to: date | None = None
     amount_min: Decimal | None = None
     amount_max: Decimal | None = None
-    search: str | None = Field(default=None, description="Full-text search on payee/memo")
+    search: str | None = Field(
+        default=None, description="Full-text search on payee/memo"
+    )
     limit: int = Field(default=100, le=500)
     offset: int = Field(default=0, ge=0)
 

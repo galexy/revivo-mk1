@@ -26,6 +26,8 @@ Authentication domain handling:
 - RefreshToken is NOT mapped - it uses SQLAlchemy Core (infrastructure record)
 """
 
+import contextlib
+
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
@@ -34,7 +36,11 @@ from .base import mapper_registry
 _mappers_started = False
 
 
-def _decompose_value_objects(session: Session, flush_context, instances) -> None:
+def _decompose_value_objects(
+    session: Session,
+    flush_context: object,  # UOWTransaction internal type
+    instances: object | None,  # Optional list of objects to flush
+) -> None:
     """Decompose value objects to flat columns before persistence.
 
     This event handler runs before flush and expands value objects
@@ -52,37 +58,37 @@ def _decompose_value_objects(session: Session, flush_context, instances) -> None
     for obj in session.new | session.dirty:
         if isinstance(obj, Account):
             # Decompose opening_balance Money
-            if obj.opening_balance is not None:
-                obj.opening_balance_amount = obj.opening_balance.amount
-                obj.opening_balance_currency = obj.opening_balance.currency
+            if obj.opening_balance is not None:  # type: ignore[reportUnnecessaryComparison]  # SQLAlchemy may set to None at runtime
+                obj.opening_balance_amount = obj.opening_balance.amount  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.opening_balance_currency = obj.opening_balance.currency  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
 
             # Decompose credit_limit Money
             if obj.credit_limit is not None:
-                obj.credit_limit_amount = obj.credit_limit.amount
-                obj.credit_limit_currency = obj.credit_limit.currency
+                obj.credit_limit_amount = obj.credit_limit.amount  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.credit_limit_currency = obj.credit_limit.currency  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
             else:
-                obj.credit_limit_amount = None
-                obj.credit_limit_currency = None
+                obj.credit_limit_amount = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.credit_limit_currency = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
 
             # Decompose institution InstitutionDetails
             if obj.institution is not None:
-                obj.institution_name = obj.institution.name
-                obj.institution_website = obj.institution.website
-                obj.institution_phone = obj.institution.phone
-                obj.institution_notes = obj.institution.notes
+                obj.institution_name = obj.institution.name  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_website = obj.institution.website  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_phone = obj.institution.phone  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_notes = obj.institution.notes  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
             else:
-                obj.institution_name = None
-                obj.institution_website = None
-                obj.institution_phone = None
-                obj.institution_notes = None
+                obj.institution_name = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_website = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_phone = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.institution_notes = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
 
             # Decompose rewards_balance RewardsBalance
             if obj.rewards_balance is not None:
-                obj.rewards_value = obj.rewards_balance.value
-                obj.rewards_unit = obj.rewards_balance.unit
+                obj.rewards_value = obj.rewards_balance.value  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.rewards_unit = obj.rewards_balance.unit  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
             else:
-                obj.rewards_value = None
-                obj.rewards_unit = None
+                obj.rewards_value = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+                obj.rewards_unit = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
 
 
 def start_mappers() -> None:
@@ -205,10 +211,8 @@ def clear_mappers() -> None:
     global _mappers_started
 
     # Remove event listener
-    try:
+    with contextlib.suppress(Exception):
         event.remove(Session, "before_flush", _decompose_value_objects)
-    except Exception:
-        pass  # Listener might not be registered
 
     mapper_registry.dispose()
     _mappers_started = False

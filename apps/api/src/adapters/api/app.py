@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         try:
             from src.adapters.jobs import job_queue
 
-            async with job_queue.open_async():
+            async with job_queue.open_async():  # type: ignore[reportUnknownMemberType]  # Procrastinate App.open_async() has incomplete type stubs
                 worker_task = asyncio.create_task(
                     job_queue.run_worker_async(install_signal_handlers=False)
                 )
@@ -104,7 +104,7 @@ def create_app() -> FastAPI:
     )
 
     @app.exception_handler(ValueError)
-    async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
+    async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]  # registered via @app.exception_handler decorator
         """Convert ValueError to 400 Bad Request.
 
         Handles:
@@ -122,7 +122,7 @@ def create_app() -> FastAPI:
         )
 
     @app.exception_handler(TypeIDException)
-    async def typeid_error_handler(
+    async def typeid_error_handler(  # pyright: ignore[reportUnusedFunction]  # registered via @app.exception_handler decorator
         request: Request, exc: TypeIDException
     ) -> JSONResponse:
         """Convert TypeIDException to 400 Bad Request.

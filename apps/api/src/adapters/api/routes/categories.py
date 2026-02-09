@@ -16,6 +16,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from domain.model.category import Category, CategoryType
+from domain.model.entity_id import CategoryId
 from src.adapters.api.dependencies import (
     CurrentUser,
     get_category_service,
@@ -29,8 +31,6 @@ from src.adapters.api.schemas.category import (
     UpdateCategoryRequest,
 )
 from src.application.services.category_service import CategoryError, CategoryService
-from domain.model.category import Category, CategoryType
-from domain.model.entity_id import CategoryId
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -92,7 +92,9 @@ async def list_categories(
     user_id = current_user.user_id
 
     # Ensure system categories exist
-    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
+    await service.ensure_system_categories(
+        user_id, household_id=current_user.household_id
+    )
 
     categories = service.get_user_categories(user_id)
     return CategoryListResponse(
@@ -109,14 +111,20 @@ async def get_category_tree(
     """Get categories organized as a tree structure."""
     user_id = current_user.user_id
 
-    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
-    tree = service.get_category_tree(user_id)
+    await service.ensure_system_categories(
+        user_id, household_id=current_user.household_id
+    )
+    tree: dict[str, list[Category] | dict[str, list[Category]]] = (
+        service.get_category_tree(user_id)
+    )
+    root_categories: list[Category] = tree["root"]  # type: ignore[assignment]  # dict value is list[Category]
+    children_map: dict[str, list[Category]] = tree["children"]  # type: ignore[assignment]  # dict value is dict[str, list[Category]]
 
     return CategoryTreeResponse(
-        root=[_category_to_response(c) for c in tree["root"]],
+        root=[_category_to_response(c) for c in root_categories],
         children={
             parent_id: [_category_to_response(c) for c in children]
-            for parent_id, children in tree["children"].items()
+            for parent_id, children in children_map.items()
         },
     )
 
@@ -200,7 +208,9 @@ async def delete_category(
     reassign_id = CategoryId.from_string(reassign_to) if reassign_to else None
 
     result = await service.delete_category(
-        current_user.user_id, cat_id, reassign_id,
+        current_user.user_id,
+        cat_id,
+        reassign_id,
         household_id=current_user.household_id,
     )
 

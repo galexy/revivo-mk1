@@ -10,11 +10,15 @@ Auth fixtures provide reusable authentication context for tests:
 - auth_headers: Authorization header dict for authenticated requests
 """
 
+from __future__ import annotations
+
 import uuid
+from decimal import Decimal
 
 import pytest
-from decimal import Decimal
-from hypothesis import settings, Verbosity
+from hypothesis import settings
+
+from domain.model.money import Money
 
 # Configure hypothesis profiles for different environments
 # CI profile: More thorough testing with 200 examples
@@ -24,26 +28,20 @@ settings.register_profile("dev", max_examples=50, deadline=None)
 
 
 @pytest.fixture
-def usd_100() -> "Money":
+def usd_100() -> Money:
     """Create a Money instance for $100 USD."""
-    from domain.model.money import Money
-
     return Money(Decimal("100.00"), "USD")
 
 
 @pytest.fixture
-def usd_50() -> "Money":
+def usd_50() -> Money:
     """Create a Money instance for $50 USD."""
-    from domain.model.money import Money
-
     return Money(Decimal("50.00"), "USD")
 
 
 @pytest.fixture
-def eur_100() -> "Money":
+def eur_100() -> Money:
     """Create a Money instance for 100 EUR."""
-    from domain.model.money import Money
-
     return Money(Decimal("100.00"), "EUR")
 
 
@@ -66,7 +64,6 @@ def registered_user(client, test_user_data: dict) -> dict:
 
     Requires a `client` fixture (TestClient) in scope.
     """
-    from fastapi.testclient import TestClient
 
     from src.adapters.security.tokens import generate_verification_token
 

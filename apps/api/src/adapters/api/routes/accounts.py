@@ -13,25 +13,22 @@ All endpoints use dependency injection for AccountService and current user.
 Routes are protected by JWT authentication via get_current_user dependency.
 """
 
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typeid.errors import SuffixValidationException
 
-from src.adapters.api.dependencies import (
-    CurrentUser,
-    get_current_user,
-    get_unit_of_work,
-)
-from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
-from src.application.services.account_service import AccountError, AccountService
 from domain.model.account_types import AccountStatus, AccountType
 from domain.model.entity_id import AccountId
 from domain.model.institution import InstitutionDetails
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
-
-from ..schemas.account import (
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_current_user,
+    get_unit_of_work,
+)
+from src.adapters.api.schemas.account import (
     AccountListResponse,
     AccountResponse,
     CreateBrokerageAccountRequest,
@@ -43,6 +40,8 @@ from ..schemas.account import (
     CreateSavingsAccountRequest,
     UpdateAccountRequest,
 )
+from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
+from src.application.services.account_service import AccountError, AccountService
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -72,7 +71,7 @@ CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 # --- Helper Functions ---
 
 
-def _handle_error(error: AccountError) -> None:
+def _handle_error(error: AccountError) -> NoReturn:
     """Convert AccountError to HTTPException.
 
     Args:
@@ -92,7 +91,7 @@ def _handle_error(error: AccountError) -> None:
     raise HTTPException(status_code=http_status, detail=error.message)
 
 
-def _institution_from_schema(
+def _institution_from_schema(  # pyright: ignore[reportUnusedFunction]  # helper kept for future use
     schema: "CreateCheckingAccountRequest",
 ) -> InstitutionDetails | None:
     """Convert institution schema to domain object.
@@ -565,7 +564,7 @@ async def get_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = service.get_account(parsed_id, household_id=current_user.household_id)
 
@@ -612,7 +611,7 @@ async def update_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     # Get account to verify it exists and belongs to household
     account_result = service.get_account(
@@ -673,7 +672,7 @@ async def close_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = await service.close_account(
         parsed_id,
@@ -718,7 +717,7 @@ async def reopen_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = await service.reopen_account(
         parsed_id,
@@ -761,9 +760,11 @@ async def delete_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
-    result = await service.delete_account(parsed_id, household_id=current_user.household_id)
+    result = await service.delete_account(
+        parsed_id, household_id=current_user.household_id
+    )
 
     if isinstance(result, AccountError):
         _handle_error(result)

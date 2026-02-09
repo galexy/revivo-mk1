@@ -6,9 +6,9 @@ For side effects (email, external calls), they enqueue jobs.
 
 import os
 
+from domain.events.user_events import EmailVerified, UserRegistered
 from src.adapters.logging import get_logger
 from src.adapters.security.tokens import generate_verification_token
-from domain.events.user_events import EmailVerified, UserRegistered
 
 logger = get_logger(__name__)
 

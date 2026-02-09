@@ -11,7 +11,8 @@ Uses hypothesis to verify Money arithmetic properties:
 from decimal import Decimal
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from domain.model.money import Money
 
@@ -105,17 +106,17 @@ class TestMoneyValidation:
 
     def test_rejects_invalid_currency_code_too_short(self):
         """Currency must be 3 letters."""
-        with pytest.raises(ValueError, match="(?i)currency"):
+        with pytest.raises(ValueError, match=r"(?i)currency"):
             Money(Decimal("100"), "US")
 
     def test_rejects_invalid_currency_code_too_long(self):
         """Currency must be 3 letters."""
-        with pytest.raises(ValueError, match="(?i)currency"):
+        with pytest.raises(ValueError, match=r"(?i)currency"):
             Money(Decimal("100"), "USDD")
 
     def test_rejects_currency_with_numbers(self):
         """Currency must be alphabetic."""
-        with pytest.raises(ValueError, match="(?i)currency"):
+        with pytest.raises(ValueError, match=r"(?i)currency"):
             Money(Decimal("100"), "US1")
 
     def test_normalizes_precision_to_four_decimals(self):
@@ -187,13 +188,13 @@ class TestMoneyComparison:
         """Cannot compare different currencies."""
         usd = Money(Decimal("100"), "USD")
         eur = Money(Decimal("50"), "EUR")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd < eur
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd <= eur
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd > eur
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Cannot perform operation"):
             _ = usd >= eur
 
 

@@ -22,8 +22,8 @@ Usage:
 import smtplib
 from email.message import EmailMessage
 
-from src.adapters.logging import get_logger
 from domain.ports.email_service import EmailDeliveryError
+from src.adapters.logging import get_logger
 
 logger = get_logger(__name__)
 

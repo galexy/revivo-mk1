@@ -39,12 +39,12 @@ class TestRewardsBalanceConstruction:
 
     def test_rejects_empty_unit(self):
         """Should reject empty unit string."""
-        with pytest.raises(ValueError, match="(?i)unit cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)unit cannot be empty"):
             RewardsBalance(Decimal("1000"), "")
 
     def test_rejects_whitespace_only_unit(self):
         """Should reject whitespace-only unit string."""
-        with pytest.raises(ValueError, match="(?i)unit cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)unit cannot be empty"):
             RewardsBalance(Decimal("1000"), "   ")
 
     def test_accepts_integer_value(self):

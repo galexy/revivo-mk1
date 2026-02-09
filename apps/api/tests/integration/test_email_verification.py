@@ -9,7 +9,7 @@ Tests verify:
 
 import os
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -20,7 +20,6 @@ from src.adapters.persistence.orm.base import metadata
 from src.adapters.persistence.orm.mappers import clear_mappers, start_mappers
 from src.adapters.security.tokens import generate_verification_token
 from tests.mocks.email import MockEmailAdapter
-
 
 # --- Module-scoped database fixtures (same pattern as test_auth.py) ---
 
@@ -108,9 +107,7 @@ class TestRegistrationEnqueuesEmail:
         send_verification_email.defer_async = mock_defer_async
 
         try:
-            response = client_with_handlers.post(
-                "/auth/register", json=test_user_data
-            )
+            response = client_with_handlers.post("/auth/register", json=test_user_data)
 
             assert response.status_code == 202
             # Verify defer_async was called with correct keyword args

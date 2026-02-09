@@ -8,9 +8,10 @@ Value is stored as Decimal for consistency with Money but normalized
 to integer (no decimals for points/miles).
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Self
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,12 +51,14 @@ class RewardsBalance:
         # Normalize unit string
         object.__setattr__(self, "unit", self.unit.strip())
 
-    def _check_same_unit(self, other: Self) -> None:
+    def _check_same_unit(self, other: RewardsBalance) -> None:
         """Raise ValueError if units don't match."""
         if self.unit != other.unit:
-            raise ValueError(f"Cannot perform operation between {self.unit} and {other.unit}")
+            raise ValueError(
+                f"Cannot perform operation between {self.unit} and {other.unit}"
+            )
 
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: RewardsBalance) -> RewardsBalance:
         """Add two RewardsBalance of same unit.
 
         Args:
@@ -70,7 +73,7 @@ class RewardsBalance:
         self._check_same_unit(other)
         return RewardsBalance(self.value + other.value, self.unit)
 
-    def __sub__(self, other: Self) -> Self:
+    def __sub__(self, other: RewardsBalance) -> RewardsBalance:
         """Subtract other from self (same unit).
 
         Args:

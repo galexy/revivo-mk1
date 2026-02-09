@@ -78,7 +78,9 @@ class Account:
     updated_by: UserId | None = None
 
     # Domain events (not persisted directly)
-    _events: list[DomainEvent] = field(default_factory=list, repr=False)
+    _events: list[DomainEvent] = field(
+        default_factory=lambda: list[DomainEvent](), repr=False
+    )
 
     @property
     def events(self) -> list[DomainEvent]:

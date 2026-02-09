@@ -72,8 +72,9 @@ class TestHousehold:
 
     def test_update_name_changes_name_and_updated_at(self) -> None:
         """update_name() changes name and updates timestamp."""
-        from domain.model.household import Household
         import time
+
+        from domain.model.household import Household
 
         household = Household.create(name="Old Name")
         old_updated = household.updated_at

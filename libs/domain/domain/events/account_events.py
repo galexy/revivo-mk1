@@ -48,8 +48,6 @@ class AccountClosed(DomainEvent):
     aggregate_type, and occurred_at.
     """
 
-    pass
-
 
 @dataclass(frozen=True)
 class AccountReopened(DomainEvent):
@@ -59,8 +57,6 @@ class AccountReopened(DomainEvent):
     aggregate_type, and occurred_at.
     """
 
-    pass
-
 
 @dataclass(frozen=True)
 class AccountDeleted(DomainEvent):
@@ -69,5 +65,3 @@ class AccountDeleted(DomainEvent):
     No additional fields - base class provides aggregate_id,
     aggregate_type, and occurred_at.
     """
-
-    pass

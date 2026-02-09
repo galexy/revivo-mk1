@@ -152,8 +152,6 @@ class CategoryDeleted(DomainEvent):
     aggregate_type, and occurred_at.
     """
 
-    pass
-
 
 @dataclass(frozen=True)
 class PayeeCreated(DomainEvent):
@@ -188,5 +186,3 @@ class PayeeDeleted(DomainEvent):
     No additional fields - base class provides aggregate_id,
     aggregate_type, and occurred_at.
     """
-
-    pass

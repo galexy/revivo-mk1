@@ -13,7 +13,14 @@ from domain.events.transaction_events import (
     MirrorTransactionCreated,
     MirrorTransactionDeleted,
 )
-from domain.model.entity_id import AccountId, CategoryId, HouseholdId, PayeeId, TransactionId, UserId
+from domain.model.entity_id import (
+    AccountId,
+    CategoryId,
+    HouseholdId,
+    PayeeId,
+    TransactionId,
+    UserId,
+)
 from domain.model.money import Money
 from domain.model.split_line import SplitLine
 from domain.model.transaction import Transaction
@@ -113,7 +120,7 @@ class TransactionService:
         source_transaction: Transaction,
     ) -> list[Transaction]:
         """Create mirror transactions for transfer splits."""
-        mirrors = []
+        mirrors: list[Transaction] = []
 
         for split in source_transaction.splits:
             if split.is_transfer and split.transfer_account_id:
@@ -177,20 +184,19 @@ class TransactionService:
 
         # Delete mirrors for removed transfer splits
         for acct_id in old_transfers:
-            if acct_id not in new_transfers:
-                if acct_id in mirrors_by_account:
-                    mirror = mirrors_by_account[acct_id]
-                    self._uow.collect_events(
-                        [
-                            MirrorTransactionDeleted(
-                                aggregate_id=str(mirror.id),
-                                aggregate_type="Transaction",
-                                source_transaction_id=str(source_transaction.id),
-                                mirror_transaction_id=str(mirror.id),
-                            )
-                        ]
-                    )
-                    self._uow.transactions.delete(mirror.id)
+            if acct_id not in new_transfers and acct_id in mirrors_by_account:
+                mirror = mirrors_by_account[acct_id]
+                self._uow.collect_events(
+                    [
+                        MirrorTransactionDeleted(
+                            aggregate_id=str(mirror.id),
+                            aggregate_type="Transaction",
+                            source_transaction_id=str(source_transaction.id),
+                            mirror_transaction_id=str(mirror.id),
+                        )
+                    ]
+                )
+                self._uow.transactions.delete(mirror.id)
 
         # Create/update mirrors for new/changed transfer splits
         for acct_id, split in new_transfers.items():

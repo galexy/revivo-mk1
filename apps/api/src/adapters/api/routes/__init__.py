@@ -1,3 +1,3 @@
 """API route modules."""
 
-from . import auth  # noqa: F401
+from . import auth as auth  # re-export for app.py

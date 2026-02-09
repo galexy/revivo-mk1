@@ -2,27 +2,37 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 env:
   PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
 
 jobs:
-  lint:
-    name: Lint & Type Check
+  quality:
+    name: Code Quality
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine affected projects
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: main
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
-          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            uv.lock
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,23 +43,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
 
-      - name: Install Nx
-        run: npm install
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Install Python dependencies
         run: uv sync --all-packages
 
-      - name: Lint
-        run: npx nx run-many -t lint
+      - name: Lint (affected)
+        run: npx nx affected -t lint --base=$NX_BASE --head=$NX_HEAD
 
-      - name: Type check
-        run: npx nx run-many -t typecheck
+      - name: Type check (affected)
+        run: npx nx affected -t typecheck --base=$NX_BASE --head=$NX_HEAD
 
-      - name: Run ruff formatter check
-        run: uv run ruff format --check .
+      - name: Format check (affected)
+        run: npx nx affected -t format --base=$NX_BASE --head=$NX_HEAD
 
-      - name: Run import-linter
+      - name: Import architecture check
+        # import-linter is workspace-scoped (validates cross-project boundaries)
+        # Not an Nx target because it checks relationships between projects
         run: uv run lint-imports
 
   test:
@@ -80,11 +93,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine affected projects
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: main
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
-          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            uv.lock
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -95,12 +118,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
 
-      - name: Install Nx
-        run: npm install
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Install Python dependencies
         run: uv sync --all-packages
 
-      - name: Run tests
-        run: npx nx run-many -t test
+      - name: Test (affected)
+        run: npx nx affected -t test --base=$NX_BASE --head=$NX_HEAD

@@ -20,6 +20,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId
+from domain.model.money import Money
+from domain.model.split_line import SplitLine
+from domain.model.transaction import Transaction
 from src.adapters.api.dependencies import (
     CurrentUser,
     get_current_user,
@@ -38,10 +42,6 @@ from src.application.services.transaction_service import (
     TransactionError,
     TransactionService,
 )
-from domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId
-from domain.model.money import Money
-from domain.model.split_line import SplitLine
-from domain.model.transaction import Transaction
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -101,7 +101,7 @@ async def create_transaction(
     account_id = AccountId.from_string(request.account_id)
     amount = Money(request.amount.amount, request.amount.currency)
 
-    splits = []
+    splits: list[SplitLine] = []
     for split_req in request.splits:
         try:
             split = SplitLine.create(
@@ -118,7 +118,7 @@ async def create_transaction(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"code": "INVALID_SPLIT", "message": str(e)},
-            )
+            ) from e
         splits.append(split)
 
     result = await service.create_transaction(
@@ -272,7 +272,7 @@ async def update_transaction(
         # Convert splits to domain objects, preserving IDs if provided
         # Also validate provided split IDs exist on this transaction
         existing_split_ids = {str(s.id) for s in existing_txn.splits}
-        new_splits = []
+        new_splits: list[SplitLine] = []
         for split_req in request.splits:
             try:
                 # If split ID provided, parse it first (validates format) then check existence
@@ -321,7 +321,7 @@ async def update_transaction(
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail={"code": "INVALID_SPLIT", "message": str(e)},
-                )
+                ) from e
             new_splits.append(split)
 
         new_amount = Money(request.amount.amount, request.amount.currency)
@@ -379,7 +379,9 @@ async def mark_transaction_cleared(
     txn_id = TransactionId.from_string(transaction_id)
     posted_date = request.posted_date if request else None
 
-    result = await service.mark_transaction_cleared(current_user.user_id, txn_id, posted_date)
+    result = await service.mark_transaction_cleared(
+        current_user.user_id, txn_id, posted_date
+    )
 
     if isinstance(result, TransactionError):
         raise HTTPException(

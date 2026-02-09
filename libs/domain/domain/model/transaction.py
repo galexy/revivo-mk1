@@ -68,7 +68,7 @@ class Transaction:
     source: TransactionSource
 
     # Always-split model: 1+ split lines
-    splits: list[SplitLine] = field(default_factory=list)
+    splits: list[SplitLine] = field(default_factory=lambda: list[SplitLine]())
 
     # Payee (managed entity)
     payee_id: PayeeId | None = None
@@ -88,7 +88,9 @@ class Transaction:
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Domain events
-    _events: list[DomainEvent] = field(default_factory=list, repr=False)
+    _events: list[DomainEvent] = field(
+        default_factory=lambda: list[DomainEvent](), repr=False
+    )
 
     @property
     def events(self) -> list[DomainEvent]:

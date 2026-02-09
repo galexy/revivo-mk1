@@ -33,10 +33,13 @@ class RegisterRequest(BaseModel):
     """
 
     email: EmailStr = Field(..., description="User email address")
-    password: str = Field(..., description="Password (8+ chars, mixed case, number, symbol)")
+    password: str = Field(
+        ..., description="Password (8+ chars, mixed case, number, symbol)"
+    )
     display_name: str = Field(..., description="User display name")
     household_name: str | None = Field(
-        default=None, description="Household name (defaults to '{display_name}'s Household')"
+        default=None,
+        description="Household name (defaults to '{display_name}'s Household')",
     )
 
     @field_validator("password")
@@ -126,7 +129,9 @@ class UserProfileResponse(BaseModel):
     email: str = Field(..., description="User email address")
     display_name: str = Field(..., description="User display name")
     email_verified: bool = Field(..., description="Whether email is verified")
-    created_at: datetime = Field(..., description="Account creation timestamp (member since)")
+    created_at: datetime = Field(
+        ..., description="Account creation timestamp (member since)"
+    )
     household: HouseholdResponse = Field(..., description="User's household info")
 
     @classmethod

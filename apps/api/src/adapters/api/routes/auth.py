@@ -22,16 +22,19 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.application.services.auth_service import AuthError, AuthService
-
-from ..dependencies import CurrentUser, get_auth_service, get_current_user
-from ..schemas.auth import (
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_auth_service,
+    get_current_user,
+)
+from src.adapters.api.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
     UserProfileResponse,
     VerifyEmailResponse,
 )
+from src.application.services.auth_service import AuthError, AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -312,7 +315,9 @@ async def get_current_user_profile(
     """
     result = service.get_user_profile(current_user.user_id)
     if result is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user, household = result
     return UserProfileResponse.from_domain(user, household)

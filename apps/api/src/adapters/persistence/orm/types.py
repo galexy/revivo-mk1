@@ -3,7 +3,15 @@
 These type decorators handle conversion between domain value objects
 and their database representations, enabling transparent persistence
 of domain types like EntityIds and Enums.
+
 """
+# pyright: reportMissingTypeArgument=false
+# pyright: reportUnnecessaryIsInstance=false
+# NOTE: reportMissingTypeArgument is suppressed because SQLAlchemy's TypeDecorator
+# generic parameter is complex and not needed for correct runtime behavior.
+# reportUnnecessaryIsInstance is suppressed because StrEnum subclasses are always
+# str at the type level, but the isinstance checks are needed for runtime safety
+# when values come from the database as plain strings.
 
 from sqlalchemy import String
 from sqlalchemy.engine.interfaces import Dialect
@@ -31,7 +39,9 @@ class AccountIdType(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountId | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountId | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountId to string for database storage."""
         if value is None:
             return None
@@ -53,7 +63,9 @@ class UserIdType(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: UserId | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: UserId | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert UserId to string for database storage."""
         if value is None:
             return None
@@ -75,7 +87,9 @@ class AccountTypeEnum(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountType | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountType | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountType to string value for database storage."""
         if value is None:
             return None
@@ -97,7 +111,9 @@ class AccountStatusEnum(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountStatus | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountStatus | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountStatus to string value for database storage."""
         if value is None:
             return None

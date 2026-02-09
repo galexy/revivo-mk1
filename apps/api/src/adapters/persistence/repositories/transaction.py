@@ -2,15 +2,20 @@
 
 Handles persistence of Transaction aggregate with SplitLine value objects.
 Money value objects are stored as primitive columns and reconstructed on load.
+
+NOTE: SQLAlchemy imperative mapping makes domain class attributes behave as
+Column descriptors at runtime, but pyright sees them as their declared Python
+types. The type: ignore comments on .where() and .order_by() clauses are
+expected and correct.
 """
 
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import ColumnElement, and_, func, select
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.orm.tables import split_lines, transactions
 from domain.model.entity_id import (
     AccountId,
     CategoryId,
@@ -24,6 +29,7 @@ from domain.model.money import Money
 from domain.model.split_line import SplitLine
 from domain.model.transaction import Transaction
 from domain.model.transaction_types import TransactionSource, TransactionStatus
+from src.adapters.persistence.orm.tables import split_lines, transactions
 
 
 class SqlAlchemyTransactionRepository:
@@ -58,7 +64,7 @@ class SqlAlchemyTransactionRepository:
         )
         rows = self._session.execute(stmt).fetchall()
 
-        result = []
+        result: list[SplitLine] = []
         for row in rows:
             amount = Money(row.amount, row.currency)
             category_id = (
@@ -145,47 +151,52 @@ class SqlAlchemyTransactionRepository:
             txn: Transaction entity loaded from database.
         """
         # Reconstruct TransactionId from string
-        if isinstance(txn.id, str):
-            object.__setattr__(txn, "id", TransactionId.from_string(txn.id))
+        if isinstance(txn.id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(txn, "id", TransactionId.from_string(txn.id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct UserId from string
-        if isinstance(txn.user_id, str):
-            object.__setattr__(txn, "user_id", UserId.from_string(txn.user_id))
+        if isinstance(txn.user_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(txn, "user_id", UserId.from_string(txn.user_id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct HouseholdId from string
-        if hasattr(txn, "household_id") and isinstance(txn.household_id, str):
+        if hasattr(txn, "household_id") and isinstance(txn.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                txn, "household_id", HouseholdId.from_string(txn.household_id)
+                txn,
+                "household_id",
+                HouseholdId.from_string(txn.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct AccountId from string
-        if isinstance(txn.account_id, str):
-            object.__setattr__(txn, "account_id", AccountId.from_string(txn.account_id))
+        if isinstance(txn.account_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(txn, "account_id", AccountId.from_string(txn.account_id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct PayeeId from string
-        if txn.payee_id is not None and isinstance(txn.payee_id, str):
-            object.__setattr__(txn, "payee_id", PayeeId.from_string(txn.payee_id))
+        if txn.payee_id is not None and isinstance(txn.payee_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(txn, "payee_id", PayeeId.from_string(txn.payee_id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct source_transaction_id from string
         if txn.source_transaction_id is not None and isinstance(
-            txn.source_transaction_id, str
+            txn.source_transaction_id,
+            str,  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
         ):
             object.__setattr__(
                 txn,
                 "source_transaction_id",
-                TransactionId.from_string(txn.source_transaction_id),
+                TransactionId.from_string(txn.source_transaction_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct source_split_id from string
-        if txn.source_split_id is not None and isinstance(txn.source_split_id, str):
+        if txn.source_split_id is not None and isinstance(txn.source_split_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                txn, "source_split_id", SplitId.from_string(txn.source_split_id)
+                txn,
+                "source_split_id",
+                SplitId.from_string(txn.source_split_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct enums from string values
-        if isinstance(txn.status, str):
+        if isinstance(txn.status, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(txn, "status", TransactionStatus(txn.status))
-        if isinstance(txn.source, str):
+        if isinstance(txn.source, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(txn, "source", TransactionSource(txn.source))
 
         # Ensure _events list exists (transient field, not loaded from DB)
@@ -283,8 +294,12 @@ class SqlAlchemyTransactionRepository:
         """
         stmt = (
             select(Transaction)
-            .where(Transaction.account_id == str(account_id))
-            .order_by(Transaction.effective_date.desc())
+            .where(
+                Transaction.account_id == str(account_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+            )
+            .order_by(
+                Transaction.effective_date.desc()  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+            )
             .limit(limit)
             .offset(offset)
         )
@@ -310,8 +325,12 @@ class SqlAlchemyTransactionRepository:
         """
         stmt = (
             select(Transaction)
-            .where(Transaction.user_id == str(user_id))
-            .order_by(Transaction.effective_date.desc())
+            .where(
+                Transaction.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+            )
+            .order_by(
+                Transaction.effective_date.desc()  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+            )
             .limit(limit)
             .offset(offset)
         )
@@ -332,7 +351,7 @@ class SqlAlchemyTransactionRepository:
             List of mirror Transaction aggregates.
         """
         stmt = select(Transaction).where(
-            Transaction.source_transaction_id == str(source_transaction_id)
+            Transaction.source_transaction_id == str(source_transaction_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
         )
         result = self._session.execute(stmt)
         txns = list(result.scalars().all())
@@ -359,9 +378,13 @@ class SqlAlchemyTransactionRepository:
         ts_query = func.plainto_tsquery("english", query)
         stmt = (
             select(Transaction)
-            .where(Transaction.user_id == str(user_id))
+            .where(
+                Transaction.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
             .where(transactions.c.search_vector.op("@@")(ts_query))
-            .order_by(Transaction.effective_date.desc())
+            .order_by(
+                Transaction.effective_date.desc()  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+            )
             .limit(limit)
             .offset(offset)
         )
@@ -397,14 +420,18 @@ class SqlAlchemyTransactionRepository:
         Returns:
             List of matching Transaction aggregates.
         """
-        conditions = [Transaction.user_id == str(user_id)]
+        conditions: list[ColumnElement[Any]] = [
+            Transaction.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+        ]
 
         if account_id:
-            conditions.append(Transaction.account_id == str(account_id))
+            conditions.append(
+                Transaction.account_id == str(account_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
         if date_from:
-            conditions.append(Transaction.effective_date >= date_from)
+            conditions.append(Transaction.effective_date >= date_from)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
         if date_to:
-            conditions.append(Transaction.effective_date <= date_to)
+            conditions.append(Transaction.effective_date <= date_to)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
         if amount_min is not None:
             conditions.append(transactions.c.amount >= amount_min)
         if amount_max is not None:
@@ -418,7 +445,9 @@ class SqlAlchemyTransactionRepository:
                 .where(and_(*conditions))
                 .where(split_lines.c.category_id == str(category_id))
                 .distinct()
-                .order_by(Transaction.effective_date.desc())
+                .order_by(
+                    Transaction.effective_date.desc()  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+                )
                 .limit(limit)
                 .offset(offset)
             )
@@ -426,7 +455,9 @@ class SqlAlchemyTransactionRepository:
             stmt = (
                 select(Transaction)
                 .where(and_(*conditions))
-                .order_by(Transaction.effective_date.desc())
+                .order_by(
+                    Transaction.effective_date.desc()  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+                )
                 .limit(limit)
                 .offset(offset)
             )

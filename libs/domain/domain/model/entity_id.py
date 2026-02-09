@@ -14,10 +14,12 @@ Key benefits:
 - Time-sortable: UUID7-based, lexicographically sortable by creation time
 - Type-safe: Separate classes prevent mixing different ID types
 - URL-safe: Base32 encoding, no special characters
+
 """
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 
 from dataclasses import dataclass
-from typing import Self
+from typing import Any, Self
 
 from typeid import TypeID
 
@@ -62,7 +64,7 @@ class EntityId:
             ValueError: If the ID format is invalid.
         """
         # TypeID validates format on parse
-        TypeID.from_string(value)
+        _: Any = TypeID.from_string(value)
         return cls(value=value)
 
     @property
@@ -103,7 +105,7 @@ class AccountId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "acct":
             raise ValueError(f"Expected 'acct' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -146,7 +148,7 @@ class TransactionId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "txn":
             raise ValueError(f"Expected 'txn' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -189,7 +191,7 @@ class UserId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "user":
             raise ValueError(f"Expected 'user' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -232,7 +234,7 @@ class HouseholdId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "hh":
             raise ValueError(f"Expected 'hh' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -275,7 +277,7 @@ class CategoryId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "cat":
             raise ValueError(f"Expected 'cat' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -318,7 +320,7 @@ class BudgetId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "budg":
             raise ValueError(f"Expected 'budg' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -361,7 +363,7 @@ class PayeeId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "payee":
             raise ValueError(f"Expected 'payee' prefix, got '{tid.prefix}'")
         return cls(value=value)
@@ -404,7 +406,7 @@ class SplitId:
         Raises:
             ValueError: If ID format is invalid or prefix doesn't match.
         """
-        tid = TypeID.from_string(value)
+        tid: Any = TypeID.from_string(value)
         if tid.prefix != "split":
             raise ValueError(f"Expected 'split' prefix, got '{tid.prefix}'")
         return cls(value=value)

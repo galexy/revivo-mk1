@@ -315,9 +315,7 @@ class TestReadEndpoints:
         )
         account_id = create_response.json()["id"]
 
-        response = client.get(
-            f"/api/v1/accounts/{account_id}", headers=auth_headers
-        )
+        response = client.get(f"/api/v1/accounts/{account_id}", headers=auth_headers)
 
         assert response.status_code == 200
         assert response.json()["id"] == account_id
@@ -333,9 +331,7 @@ class TestReadEndpoints:
 
     def test_get_invalid_id_format(self, client, auth_headers):
         """GET /api/v1/accounts/{id} returns 400 for invalid ID."""
-        response = client.get(
-            "/api/v1/accounts/invalid-id", headers=auth_headers
-        )
+        response = client.get("/api/v1/accounts/invalid-id", headers=auth_headers)
 
         assert response.status_code == 400
 
@@ -376,9 +372,7 @@ class TestLifecycleEndpoints:
             headers=auth_headers,
         )
         account_id = create_response.json()["id"]
-        client.post(
-            f"/api/v1/accounts/{account_id}/close", headers=auth_headers
-        )
+        client.post(f"/api/v1/accounts/{account_id}/close", headers=auth_headers)
 
         # Try to close again
         response = client.post(
@@ -399,9 +393,7 @@ class TestLifecycleEndpoints:
             headers=auth_headers,
         )
         account_id = create_response.json()["id"]
-        client.post(
-            f"/api/v1/accounts/{account_id}/close", headers=auth_headers
-        )
+        client.post(f"/api/v1/accounts/{account_id}/close", headers=auth_headers)
 
         response = client.post(
             f"/api/v1/accounts/{account_id}/reopen", headers=auth_headers
@@ -444,9 +436,7 @@ class TestLifecycleEndpoints:
         )
         account_id = create_response.json()["id"]
 
-        response = client.delete(
-            f"/api/v1/accounts/{account_id}", headers=auth_headers
-        )
+        response = client.delete(f"/api/v1/accounts/{account_id}", headers=auth_headers)
 
         assert response.status_code == 204
 
@@ -543,9 +533,7 @@ class TestHouseholdIsolation:
         other_headers = self._create_second_user(client)
 
         # Try to access first user's account -> 404
-        response = client.get(
-            f"/api/v1/accounts/{account_id}", headers=other_headers
-        )
+        response = client.get(f"/api/v1/accounts/{account_id}", headers=other_headers)
         assert response.status_code == 404
 
     def test_cannot_list_other_household_accounts(

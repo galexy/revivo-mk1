@@ -3,6 +3,11 @@
 Handles persistence of Account aggregate with value object reconstruction.
 Value objects (Money, InstitutionDetails, RewardsBalance) are stored as
 primitive columns and reconstructed when loading from database.
+
+NOTE: SQLAlchemy imperative mapping makes domain class attributes behave as
+Column descriptors at runtime, but pyright sees them as their declared Python
+types. The type: ignore comments on .where() and .order_by() clauses are
+expected and correct.
 """
 
 from decimal import Decimal
@@ -98,14 +103,20 @@ class SqlAlchemyAccountRepository:
             List of Account entities with reconstructed value objects.
         """
         # Note: Account.user_id is stored as string in database
-        stmt = select(Account).where(Account.user_id == str(user_id))
+        stmt = select(Account).where(
+            Account.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+        )
 
         if status is not None:
-            stmt = stmt.where(Account.status == status.value)
+            stmt = stmt.where(
+                Account.status == status.value  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
         if account_type is not None:
-            stmt = stmt.where(Account.account_type == account_type.value)
+            stmt = stmt.where(
+                Account.account_type == account_type.value  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
 
-        stmt = stmt.order_by(Account.sort_order, Account.name)
+        stmt = stmt.order_by(Account.sort_order, Account.name)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: int/str attrs become Column at runtime
 
         result = self._session.execute(stmt)
         accounts = list(result.scalars().all())
@@ -131,14 +142,20 @@ class SqlAlchemyAccountRepository:
         Returns:
             List of Account entities with reconstructed value objects.
         """
-        stmt = select(Account).where(Account.household_id == str(household_id))
+        stmt = select(Account).where(
+            Account.household_id == str(household_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+        )
 
         if status is not None:
-            stmt = stmt.where(Account.status == status.value)
+            stmt = stmt.where(
+                Account.status == status.value  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
         if account_type is not None:
-            stmt = stmt.where(Account.account_type == account_type.value)
+            stmt = stmt.where(
+                Account.account_type == account_type.value  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
 
-        stmt = stmt.order_by(Account.sort_order, Account.name)
+        stmt = stmt.order_by(Account.sort_order, Account.name)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: int/str attrs become Column at runtime
 
         result = self._session.execute(stmt)
         accounts = list(result.scalars().all())
@@ -185,25 +202,27 @@ class SqlAlchemyAccountRepository:
             account: Account entity loaded from database.
         """
         # Reconstruct AccountId and UserId from strings
-        if isinstance(account.id, str):
-            object.__setattr__(account, "id", AccountId.from_string(account.id))
-        if isinstance(account.user_id, str):
-            object.__setattr__(account, "user_id", UserId.from_string(account.user_id))
+        if isinstance(account.id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB, isinstance narrows for reconstruction
+            object.__setattr__(account, "id", AccountId.from_string(account.id))  # type: ignore[arg-type]  # str at runtime from DB
+        if isinstance(account.user_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(account, "user_id", UserId.from_string(account.user_id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct HouseholdId from string
-        if hasattr(account, "household_id") and isinstance(account.household_id, str):
+        if hasattr(account, "household_id") and isinstance(account.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                account, "household_id", HouseholdId.from_string(account.household_id)
+                account,
+                "household_id",
+                HouseholdId.from_string(account.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct enums from string values
-        if isinstance(account.account_type, str):
+        if isinstance(account.account_type, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
                 account, "account_type", AccountType(account.account_type)
             )
-        if isinstance(account.status, str):
+        if isinstance(account.status, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(account, "status", AccountStatus(account.status))
-        if account.subtype is not None and isinstance(account.subtype, str):
+        if account.subtype is not None and isinstance(account.subtype, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(account, "subtype", AccountSubtype(account.subtype))
 
         # Reconstruct created_by and updated_by UserId
@@ -228,7 +247,7 @@ class SqlAlchemyAccountRepository:
                 "opening_balance",
                 Money(Decimal(str(opening_amount)), opening_currency),
             )
-        elif isinstance(account.opening_balance, Money):
+        elif isinstance(account.opening_balance, Money):  # type: ignore[arg-type]  # SQLAlchemy may load non-Money type from DB
             # Already a Money object, nothing to do
             pass
         elif account.opening_balance is not None:

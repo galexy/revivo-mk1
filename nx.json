@@ -11,6 +11,12 @@
     },
     "lint": {
       "cache": true
+    },
+    "typecheck": {
+      "cache": true
+    },
+    "format": {
+      "cache": true
     }
   }
 }

@@ -63,8 +63,8 @@ def session(engine, setup_database):
     """
     connection = engine.connect()
     transaction = connection.begin()
-    Session = sessionmaker(bind=connection)
-    session = Session()
+    test_session_factory = sessionmaker(bind=connection)
+    session = test_session_factory()
 
     yield session
 

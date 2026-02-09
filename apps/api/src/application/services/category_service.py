@@ -6,7 +6,7 @@ Handles category CRUD, hierarchy management, and system category initialization.
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
+from domain.model.category import Category, CategoryType
 from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 if TYPE_CHECKING:
@@ -57,7 +57,9 @@ class CategoryService:
             if parent_id:
                 parent = self._uow.categories.get(parent_id)
                 if parent is None:
-                    return CategoryError("PARENT_NOT_FOUND", "Parent category not found")
+                    return CategoryError(
+                        "PARENT_NOT_FOUND", "Parent category not found"
+                    )
                 if parent.user_id != user_id:
                     return CategoryError(
                         "PARENT_NOT_OWNED", "Parent category does not belong to user"
@@ -95,7 +97,9 @@ class CategoryService:
         with self._uow:
             return self._uow.categories.get_by_user(user_id)
 
-    def get_category_tree(self, user_id: UserId) -> dict:
+    def get_category_tree(
+        self, user_id: UserId
+    ) -> dict[str, list[Category] | dict[str, list[Category]]]:
         """Get categories organized as a tree structure.
 
         Returns dict with 'root' categories and 'children' mapping.
@@ -104,7 +108,7 @@ class CategoryService:
             all_categories = self._uow.categories.get_by_user(user_id)
 
             # Organize into tree
-            root_categories = []
+            root_categories: list[Category] = []
             children_by_parent: dict[str, list[Category]] = {}
 
             for cat in all_categories:
@@ -164,7 +168,9 @@ class CategoryService:
             if new_parent_id:
                 new_parent = self._uow.categories.get(new_parent_id)
                 if new_parent is None:
-                    return CategoryError("PARENT_NOT_FOUND", "New parent category not found")
+                    return CategoryError(
+                        "PARENT_NOT_FOUND", "New parent category not found"
+                    )
                 if new_parent.user_id != user_id:
                     return CategoryError(
                         "PARENT_NOT_OWNED", "New parent does not belong to user"
@@ -211,7 +217,9 @@ class CategoryService:
             if category.user_id != user_id:
                 return CategoryError("NOT_OWNED", "Category does not belong to user")
             if category.is_system:
-                return CategoryError("CANNOT_DELETE_SYSTEM", "Cannot delete system category")
+                return CategoryError(
+                    "CANNOT_DELETE_SYSTEM", "Cannot delete system category"
+                )
 
             # Check for child categories
             children = self._uow.categories.get_children(category_id)

@@ -16,7 +16,9 @@ class CreateCategoryRequest(BaseModel):
     parent_id: str | None = Field(
         default=None, description="Parent category ID for subcategories"
     )
-    icon: str | None = Field(default=None, max_length=50, description="Emoji or icon name")
+    icon: str | None = Field(
+        default=None, max_length=50, description="Emoji or icon name"
+    )
     category_type: str = Field(
         default="expense",
         pattern="^(income|expense)$",

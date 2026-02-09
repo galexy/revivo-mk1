@@ -71,9 +71,8 @@ def check_email_captured() -> bool:
                 subject = latest.get("Subject", "")
                 print(f"[OK] {count} message(s) in Mailpit - latest: '{subject}'")
                 return True
-            else:
-                print("[FAIL] No messages found in Mailpit")
-                return False
+            print("[FAIL] No messages found in Mailpit")
+            return False
     except Exception as e:
         print(f"[FAIL] Check messages: {e}")
         return False
@@ -92,12 +91,11 @@ def main() -> int:
     if all(results):
         print("ALL CHECKS PASSED - Mailpit is fully operational")
         return 0
-    else:
-        passed = sum(results)
-        total = len(results)
-        print(f"CHECKS: {passed}/{total} passed")
-        print("Ensure Mailpit is running (rebuild devcontainer if needed)")
-        return 1
+    passed = sum(results)
+    total = len(results)
+    print(f"CHECKS: {passed}/{total} passed")
+    print("Ensure Mailpit is running (rebuild devcontainer if needed)")
+    return 1
 
 
 if __name__ == "__main__":

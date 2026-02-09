@@ -19,6 +19,7 @@ from functools import lru_cache
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from domain.model.entity_id import HouseholdId, UserId
 from src.adapters.logging import get_logger
 from src.adapters.persistence.database import create_sync_session_factory
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
@@ -27,7 +28,6 @@ from src.adapters.security.jwt import TokenError, decode_access_token
 from src.application.services.auth_service import AuthService
 from src.application.services.category_service import CategoryService
 from src.application.services.transaction_service import TransactionService
-from domain.model.entity_id import HouseholdId, UserId
 
 logger = get_logger(__name__)
 

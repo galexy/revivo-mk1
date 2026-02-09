@@ -1,7 +1,5 @@
 """Tests for User domain model."""
 
-import pytest
-
 
 class TestUserCreate:
     """Tests for User.create() factory method."""
@@ -70,9 +68,9 @@ class TestUserCreate:
 
     def test_create_emits_user_registered_event(self) -> None:
         """User.create() emits UserRegistered domain event."""
+        from domain.events.user_events import UserRegistered
         from domain.model.entity_id import HouseholdId
         from domain.model.user import User
-        from domain.events.user_events import UserRegistered
 
         hh_id = HouseholdId.generate()
         user = User.create(
@@ -109,9 +107,9 @@ class TestUserVerifyEmail:
 
     def test_verify_email_emits_email_verified_event(self) -> None:
         """verify_email() emits EmailVerified domain event."""
+        from domain.events.user_events import EmailVerified
         from domain.model.entity_id import HouseholdId
         from domain.model.user import User
-        from domain.events.user_events import EmailVerified
 
         hh_id = HouseholdId.generate()
         user = User.create("test@example.com", "Test", "hash", hh_id)

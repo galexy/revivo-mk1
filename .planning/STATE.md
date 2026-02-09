@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 7 (Nx Monorepo Restructure) - Complete
+**Current focus:** Phase 8 (CI & Code Quality) - Complete
 
 ## Current Position
 
-Phase: 7 of 22 (Nx Monorepo Restructure)
-Plan: 4 of 4 complete
+Phase: 8 of 32 (CI & Code Quality)
+Plan: 5 of 5 (COMPLETE)
 Status: Phase complete
-Last activity: 2026-02-07 - Completed 07-04-PLAN.md (CLAUDE.md Update & Final Verification)
+Last activity: 2026-02-09 - Completed 08-05-PLAN.md (Nx/CI Integration Gap Closure)
 
-Progress: [██████░░░░] ~56%
+Progress: [██████░░░░] ~62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 49
-- Average duration: 5.0 min
-- Total execution time: 5.08 hours
+- Total plans completed: 54
+- Average duration: 4.9 min
+- Total execution time: 6.03 hours
 
 **By Phase:**
 
@@ -39,10 +39,11 @@ Progress: [██████░░░░] ~56%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
+| 08-ci-code-quality | 5 | 56 min | 11.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-05 (12 min), 07-01 (2 min), 07-02 (34 min), 07-03 (10 min), 07-04 (4 min)
-- Trend: 07-04 was fast (docs + verification only). Phase 7 averaged 12.5 min/plan due to 07-02 complexity.
+- Last 5 plans: 08-01 (10 min), 08-02 (25 min), 08-03 (16 min), 08-04 (4 min), 08-05 (1 min)
+- Trend: Phase 8 complete. All quality gates run through Nx consistently.
 
 *Updated after each plan completion*
 
@@ -215,6 +216,31 @@ Recent decisions affecting current work:
 - import-linter root_packages=['src', 'domain'] for cross-package architecture enforcement
 - CLAUDE.md documents monorepo structure, import conventions, Nx commands, future phase notes
 - ROADMAP.md Phase 7 requirements: descriptive label (not ARCH-06/ARCH-07 which belong to Phase 8/10)
+- Per-project pyrightconfig.json in Nx monorepo (each project has own strict config, pyright auto-discovers)
+- from __future__ import annotations + concrete return types for frozen dataclass arithmetic (Self requires cls())
+- File-level pyright pragma for untyped third-party libraries (entity_id.py for typeid)
+- Typed default_factory: lambda: list[T]() for pyright strict (bare list infers list[Unknown])
+- Rename DomainException to DomainError (N818 naming convention)
+- Per-project pyrightconfig.json includes tests (catches type errors in test code too)
+- File-level pyright pragmas for SQLAlchemy-heavy modules (tables.py, types.py) where patterns are too pervasive for per-line ignores
+- pyrightconfig.json executionEnvironments to relax mock-related rules (reportUnknownMemberType etc.) in tests/ directory
+- Explicit re-export pattern (X as X) in __init__.py for pyright strict re-export detection
+- NoReturn annotation on error handlers that always raise (enables type narrowing in callers)
+- Per-file-ignores for ARG001/ARG002 in routes, persistence, and tests (framework-required unused params)
+- noqa: PT012 for multi-statement pytest.raises where IntegrityError can occur on either execute or commit
+- TYPE_CHECKING block for runtime-unused imports when __future__ annotations enabled
+- datetime.now(UTC).date() as standard pattern for timezone-aware date creation
+- Absolute imports only in src/ (no relative parent imports)
+- Coverage targets separate from test targets (npx nx coverage vs npx nx test)
+- Terminal-only coverage output (--cov-report=term-missing), no HTML artifacts
+- Branch coverage enabled (--cov-branch) for finance app signal
+- CI uses nx affected (not run-many) with nrwl/nx-set-shas@v4 for SHA resolution
+- Two CI jobs: quality (lint/typecheck/format/import-linter) and test (with postgres)
+- npm ci for deterministic CI builds (not npm install)
+- fetch-depth: 0 for nx affected git history
+- Per-project format Nx targets (ruff format --check) for nx affected execution
+- import-linter documented as workspace-scoped (validates cross-project boundaries)
+- targetDefaults cache includes test, lint, typecheck, and format for Nx caching
 
 ### Pending Todos
 
@@ -233,10 +259,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-07
-Stopped at: Completed 07-04-PLAN.md (Phase 7 complete)
+Last session: 2026-02-09
+Stopped at: Phase 8 complete (5/5 plans, verified 5/5 must-haves)
 Resume file: None
-Next action: Begin Phase 8 (Frontend Infrastructure)
+Next action: Phase 9 (Type Safety & Test Cleanup), Phase 10 (Value Object ORM Mapping), Phase 11 (Domain Test Coverage)
+Next action: Phase 9 (Type Safety & Test Cleanup), Phase 10 (Value Object ORM Mapping), Phase 11 (Domain Test Coverage)
 
 ## Roadmap Evolution
 
@@ -483,4 +510,56 @@ Key stats:
 - Git history preserved across all file moves
 - Service operational, alembic migrations clean, zero drift
 
-Ready for Phase 8: Frontend Infrastructure
+Ready for Phase 8: CI & Code Quality
+
+## Phase 8 Milestone
+
+**Phase 8: CI & Code Quality - COMPLETE**
+
+All success criteria met:
+1. GitHub Actions CI configured with all quality gates blocking (lint, typecheck, test, format, import-linter)
+2. All pyright strict errors resolved — domain: 52→0, api: 2067→0
+3. All ruff lint errors resolved — domain: 33→0, api: 173→0
+4. Code coverage Nx targets configured (api: 81%, domain: 48%)
+5. import-linter passes (2/2 contracts kept)
+
+Plans completed (4 of 4):
+- 08-01: Tooling config + domain fixes (pyrightconfig.json, py.typed, ruff config, format)
+- 08-02: API pyright strict errors (2067→0 with justified type: ignore annotations)
+- 08-03: API ruff lint errors (173→0, absolute imports, timezone-aware datetime)
+- 08-04: Coverage targets + CI restructure (nx affected, uv+npm caching, blocking gates)
+
+Key stats:
+- 444 total tests passing (252 API + 192 domain)
+- All quality gates pass locally: lint, typecheck, test, format, import-linter
+- CI uses nx affected with nrwl/nx-set-shas@v4 for PR-scoped execution
+- Verification: 5/5 success criteria confirmed
+
+Ready for Phase 9: Frontend Infrastructure
+
+## Phase 8 Milestone
+
+**Phase 8: CI & Code Quality - COMPLETE**
+
+All success criteria met:
+1. Pyright strict mode with zero errors across api and domain projects
+2. Ruff lint with zero errors across api and domain projects
+3. Ruff format check passes (all files formatted)
+4. import-linter passes (2/2 architecture contracts kept)
+5. CI pipeline with nx affected, dependency caching, and all blocking quality gates
+6. Coverage targets for api (81%) and domain (48%) projects
+
+Plans completed (4 of 4):
+- 08-01: Tooling and Domain Cleanup (pyrightconfig.json, py.typed, ruff config, domain 0 errors)
+- 08-02: Fix API Pyright Errors (2067 -> 0 strict errors across 42 files)
+- 08-03: Fix API Ruff Lint Errors (173 -> 0 lint errors across 40 files)
+- 08-04: CI Pipeline Configuration (nx affected, caching, coverage targets, all blocking gates)
+
+Key stats:
+- 444 total tests passing (252 API + 192 domain)
+- Zero pyright strict errors, zero ruff lint errors
+- CI: 2 parallel jobs (quality + test), nx affected for efficiency
+- Coverage baseline: API 81%, Domain 48%
+- 10 formatting fixes in 08-04 for clean format check gate
+
+Ready for next phase in roadmap

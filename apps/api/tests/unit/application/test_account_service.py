@@ -17,7 +17,6 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock
 
 import pytest
 
-from src.application.services.account_service import AccountError, AccountService
 from domain.events.account_events import (
     AccountClosed,
     AccountCreated,
@@ -31,7 +30,7 @@ from domain.model.entity_id import AccountId, UserId
 from domain.model.institution import InstitutionDetails
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
-
+from src.application.services.account_service import AccountError, AccountService
 
 # --- Fixtures ---
 
@@ -95,11 +94,13 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates checking account, adds to repo, collects events, commits."""
-        result = asyncio.run(service.create_checking(
-            user_id=user_id,
-            name="My Checking",
-            opening_balance=usd_balance,
-        ))
+        result = asyncio.run(
+            service.create_checking(
+                user_id=user_id,
+                name="My Checking",
+                opening_balance=usd_balance,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.CHECKING
@@ -122,11 +123,13 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates savings account with correct type."""
-        result = asyncio.run(service.create_savings(
-            user_id=user_id,
-            name="Emergency Fund",
-            opening_balance=usd_balance,
-        ))
+        result = asyncio.run(
+            service.create_savings(
+                user_id=user_id,
+                name="Emergency Fund",
+                opening_balance=usd_balance,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.SAVINGS
@@ -140,12 +143,14 @@ class TestAccountCreation:
         balance = Money(Decimal("500"), "USD")
         limit = Money(Decimal("5000"), "USD")
 
-        result = asyncio.run(service.create_credit_card(
-            user_id=user_id,
-            name="Visa Rewards",
-            opening_balance=balance,
-            credit_limit=limit,
-        ))
+        result = asyncio.run(
+            service.create_credit_card(
+                user_id=user_id,
+                name="Visa Rewards",
+                opening_balance=balance,
+                credit_limit=limit,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.CREDIT_CARD
@@ -159,12 +164,14 @@ class TestAccountCreation:
         usd_balance = Money(Decimal("500"), "USD")
         eur_limit = Money(Decimal("5000"), "EUR")
 
-        result = asyncio.run(service.create_credit_card(
-            user_id=user_id,
-            name="Card",
-            opening_balance=usd_balance,
-            credit_limit=eur_limit,
-        ))
+        result = asyncio.run(
+            service.create_credit_card(
+                user_id=user_id,
+                name="Card",
+                opening_balance=usd_balance,
+                credit_limit=eur_limit,
+            )
+        )
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"
@@ -175,14 +182,16 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates loan with APR, term_months, subtype."""
-        result = asyncio.run(service.create_loan(
-            user_id=user_id,
-            name="Car Loan",
-            opening_balance=usd_balance,
-            subtype=AccountSubtype.AUTO_LOAN,
-            apr=Decimal("0.0599"),
-            term_months=60,
-        ))
+        result = asyncio.run(
+            service.create_loan(
+                user_id=user_id,
+                name="Car Loan",
+                opening_balance=usd_balance,
+                subtype=AccountSubtype.AUTO_LOAN,
+                apr=Decimal("0.0599"),
+                term_months=60,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.LOAN
@@ -195,11 +204,13 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates brokerage account."""
-        result = asyncio.run(service.create_brokerage(
-            user_id=user_id,
-            name="Fidelity",
-            opening_balance=usd_balance,
-        ))
+        result = asyncio.run(
+            service.create_brokerage(
+                user_id=user_id,
+                name="Fidelity",
+                opening_balance=usd_balance,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.BROKERAGE
@@ -209,12 +220,14 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Creates IRA with IRA subtype."""
-        result = asyncio.run(service.create_ira(
-            user_id=user_id,
-            name="Roth IRA",
-            opening_balance=usd_balance,
-            subtype=AccountSubtype.ROTH_IRA,
-        ))
+        result = asyncio.run(
+            service.create_ira(
+                user_id=user_id,
+                name="Roth IRA",
+                opening_balance=usd_balance,
+                subtype=AccountSubtype.ROTH_IRA,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.IRA
@@ -225,12 +238,14 @@ class TestAccountCreation:
         self, service: AccountService, mock_uow, user_id: UserId, usd_balance: Money
     ):
         """Returns AccountError for non-IRA subtype."""
-        result = asyncio.run(service.create_ira(
-            user_id=user_id,
-            name="IRA",
-            opening_balance=usd_balance,
-            subtype=AccountSubtype.AUTO_LOAN,
-        ))
+        result = asyncio.run(
+            service.create_ira(
+                user_id=user_id,
+                name="IRA",
+                opening_balance=usd_balance,
+                subtype=AccountSubtype.AUTO_LOAN,
+            )
+        )
 
         assert isinstance(result, AccountError)
         assert result.code == "VALIDATION_ERROR"
@@ -243,11 +258,13 @@ class TestAccountCreation:
         """Creates rewards account with RewardsBalance."""
         rewards = RewardsBalance(Decimal("50000"), "Alaska Miles")
 
-        result = asyncio.run(service.create_rewards(
-            user_id=user_id,
-            name="Alaska Miles",
-            rewards_balance=rewards,
-        ))
+        result = asyncio.run(
+            service.create_rewards(
+                user_id=user_id,
+                name="Alaska Miles",
+                rewards_balance=rewards,
+            )
+        )
 
         assert isinstance(result, Account)
         assert result.account_type == AccountType.REWARDS

@@ -26,7 +26,6 @@ from domain.model.institution import InstitutionDetails
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
 
-
 # --- Fixtures ---
 
 
@@ -356,10 +355,10 @@ class TestAccountPropertyUpdates:
             opening_balance=usd_balance,
         )
 
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             account.update_name("")
 
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             account.update_name("   ")
 
     def test_update_notes(self, user_id: UserId, usd_balance: Money):
@@ -388,7 +387,10 @@ class TestAccountPropertyUpdates:
         assert account.notes is None
 
     def test_update_institution(
-        self, user_id: UserId, usd_balance: Money, sample_institution: InstitutionDetails
+        self,
+        user_id: UserId,
+        usd_balance: Money,
+        sample_institution: InstitutionDetails,
     ):
         """Updates institution."""
         account = Account.create_checking(
@@ -433,7 +435,9 @@ class TestAccountProperties:
 
         assert account.available_credit == credit_limit
 
-    def test_available_credit_for_non_credit_card(self, user_id: UserId, usd_balance: Money):
+    def test_available_credit_for_non_credit_card(
+        self, user_id: UserId, usd_balance: Money
+    ):
         """Returns None for non-credit card accounts."""
         account = Account.create_checking(
             user_id=user_id,
@@ -451,7 +455,10 @@ class TestAccountWithInstitution:
     """Tests for Account with institution details."""
 
     def test_create_with_institution(
-        self, user_id: UserId, usd_balance: Money, sample_institution: InstitutionDetails
+        self,
+        user_id: UserId,
+        usd_balance: Money,
+        sample_institution: InstitutionDetails,
     ):
         """Can create account with institution."""
         account = Account.create_checking(
@@ -462,6 +469,7 @@ class TestAccountWithInstitution:
         )
 
         assert account.institution == sample_institution
+        assert account.institution is not None
         assert account.institution.name == "Test Bank"
 
     def test_create_with_account_number(self, user_id: UserId, usd_balance: Money):

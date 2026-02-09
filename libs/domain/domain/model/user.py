@@ -7,7 +7,7 @@ perform hashing - that's an infrastructure concern (security adapter).
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Self
+from typing import Any, Self
 
 from .entity_id import HouseholdId, UserId
 
@@ -43,7 +43,9 @@ class User:
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Collected domain events (cleared after persistence)
-    _events: list = field(default_factory=list, repr=False, compare=False)
+    _events: list[Any] = field(
+        default_factory=lambda: list[Any](), repr=False, compare=False
+    )
 
     @classmethod
     def create(
@@ -122,7 +124,7 @@ class User:
         self.display_name = name.strip()
         self.updated_at = datetime.now(UTC)
 
-    def collect_events(self) -> list:
+    def collect_events(self) -> list[Any]:
         """Return and clear collected domain events.
 
         Events are returned as a list and the internal list is cleared.
