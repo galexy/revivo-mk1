@@ -51,3 +51,7 @@ class InstitutionDetails:
         # Normalize name by stripping whitespace
         # Use object.__setattr__ because frozen=True blocks normal assignment
         object.__setattr__(self, "name", self.name.strip())
+
+    def __composite_values__(self) -> tuple[str, str | None, str | None, str | None]:
+        """Return flat column values for SQLAlchemy composite() mapping."""
+        return (self.name, self.website, self.phone, self.notes)

@@ -51,6 +51,10 @@ class RewardsBalance:
         # Normalize unit string
         object.__setattr__(self, "unit", self.unit.strip())
 
+    def __composite_values__(self) -> tuple[Decimal, str]:
+        """Return flat column values for SQLAlchemy composite() mapping."""
+        return (self.value, self.unit)
+
     def _check_same_unit(self, other: RewardsBalance) -> None:
         """Raise ValueError if units don't match."""
         if self.unit != other.unit:

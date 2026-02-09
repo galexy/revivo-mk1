@@ -1,16 +1,14 @@
 """SQLAlchemy implementation of AccountRepository.
 
-Handles persistence of Account aggregate with value object reconstruction.
-Value objects (Money, InstitutionDetails, RewardsBalance) are stored as
-primitive columns and reconstructed when loading from database.
+Handles persistence of Account aggregate with EntityId/Enum reconstruction.
+Value objects (Money, InstitutionDetails, RewardsBalance) are automatically
+mapped via SQLAlchemy composite() and require no manual reconstruction.
 
 NOTE: SQLAlchemy imperative mapping makes domain class attributes behave as
 Column descriptors at runtime, but pyright sees them as their declared Python
 types. The type: ignore comments on .where() and .order_by() clauses are
 expected and correct.
 """
-
-from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -19,17 +17,14 @@ from domain.exceptions import EntityNotFoundError
 from domain.model.account import Account
 from domain.model.account_types import AccountStatus, AccountSubtype, AccountType
 from domain.model.entity_id import AccountId, HouseholdId, UserId
-from domain.model.institution import InstitutionDetails
-from domain.model.money import Money
-from domain.model.rewards_balance import RewardsBalance
 
 
 class SqlAlchemyAccountRepository:
     """SQLAlchemy implementation of AccountRepository.
 
-    Handles value object reconstruction when loading from database.
-    SQLAlchemy loads primitive values; this repository converts them
-    back to domain value objects.
+    Handles EntityId and Enum reconstruction when loading from database.
+    Value objects (Money, InstitutionDetails, RewardsBalance) are automatically
+    mapped via composite() and require no manual handling.
     """
 
     def __init__(self, session: Session) -> None:
@@ -43,10 +38,6 @@ class SqlAlchemyAccountRepository:
     def add(self, account: Account) -> None:
         """Add account to session for persistence.
 
-        Value objects are automatically converted to primitives by SQLAlchemy
-        because we map to primitive columns. The mapper handles the conversion
-        via attribute access on the Account instance.
-
         Args:
             account: Account entity to persist.
         """
@@ -59,11 +50,11 @@ class SqlAlchemyAccountRepository:
             account_id: The account identifier.
 
         Returns:
-            Account entity with reconstructed value objects, or None.
+            Account entity with reconstructed EntityIds and Enums, or None.
         """
         account = self._session.get(Account, str(account_id))
         if account is not None:
-            self._reconstruct_value_objects(account)
+            self._reconstruct_entity_ids_and_enums(account)
         return account
 
     def get_or_raise(self, account_id: AccountId) -> Account:
@@ -73,7 +64,7 @@ class SqlAlchemyAccountRepository:
             account_id: The account identifier.
 
         Returns:
-            Account entity with reconstructed value objects.
+            Account entity with reconstructed EntityIds and Enums.
 
         Raises:
             EntityNotFoundError: If account doesn't exist.
@@ -100,7 +91,7 @@ class SqlAlchemyAccountRepository:
             account_type: Optional filter by account type.
 
         Returns:
-            List of Account entities with reconstructed value objects.
+            List of Account entities with reconstructed EntityIds and Enums.
         """
         # Note: Account.user_id is stored as string in database
         stmt = select(Account).where(
@@ -122,7 +113,7 @@ class SqlAlchemyAccountRepository:
         accounts = list(result.scalars().all())
 
         for account in accounts:
-            self._reconstruct_value_objects(account)
+            self._reconstruct_entity_ids_and_enums(account)
 
         return accounts
 
@@ -140,7 +131,7 @@ class SqlAlchemyAccountRepository:
             account_type: Optional filter by account type.
 
         Returns:
-            List of Account entities with reconstructed value objects.
+            List of Account entities with reconstructed EntityIds and Enums.
         """
         stmt = select(Account).where(
             Account.household_id == str(household_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
@@ -161,7 +152,7 @@ class SqlAlchemyAccountRepository:
         accounts = list(result.scalars().all())
 
         for account in accounts:
-            self._reconstruct_value_objects(account)
+            self._reconstruct_entity_ids_and_enums(account)
 
         return accounts
 
@@ -189,14 +180,15 @@ class SqlAlchemyAccountRepository:
         """
         return False
 
-    def _reconstruct_value_objects(self, account: Account) -> None:
-        """Reconstruct value objects from database primitives.
+    def _reconstruct_entity_ids_and_enums(self, account: Account) -> None:
+        """Reconstruct EntityIds and Enums from database strings.
 
-        SQLAlchemy loads primitive column values. This method converts
-        them back to domain value objects (Money, InstitutionDetails, etc.).
+        TypeDecorators return strings from the database. This method converts
+        them to domain types (EntityIds and Enums).
 
-        Uses object.__setattr__ to bypass SQLAlchemy instrumentation
-        and ensure domain value objects are properly reconstructed.
+        Value objects (Money, InstitutionDetails, RewardsBalance) are
+        automatically handled by composite() mappings and don't need
+        reconstruction here.
 
         Args:
             account: Account entity loaded from database.
@@ -233,57 +225,6 @@ class SqlAlchemyAccountRepository:
         if account.updated_by is not None and isinstance(account.updated_by, str):
             object.__setattr__(
                 account, "updated_by", UserId.from_string(account.updated_by)
-            )
-
-        # Reconstruct Money - opening_balance (required field)
-        # SQLAlchemy maps to opening_balance_amount and opening_balance_currency columns
-        # but Account dataclass has opening_balance field, so we need to handle the
-        # mapping between the flat columns and the value object.
-        opening_amount = getattr(account, "opening_balance_amount", None)
-        opening_currency = getattr(account, "opening_balance_currency", None)
-        if opening_amount is not None and opening_currency is not None:
-            object.__setattr__(
-                account,
-                "opening_balance",
-                Money(Decimal(str(opening_amount)), opening_currency),
-            )
-        elif isinstance(account.opening_balance, Money):  # type: ignore[arg-type]  # SQLAlchemy may load non-Money type from DB
-            # Already a Money object, nothing to do
-            pass
-        elif account.opening_balance is not None:
-            # Might be a Decimal if mapper set it directly, wrap in Money
-            # This shouldn't normally happen with proper mapping
-            pass
-
-        # Reconstruct Money - credit_limit (optional, for credit cards)
-        credit_amount = getattr(account, "credit_limit_amount", None)
-        credit_currency = getattr(account, "credit_limit_currency", None)
-        if credit_amount is not None and credit_currency is not None:
-            object.__setattr__(
-                account,
-                "credit_limit",
-                Money(Decimal(str(credit_amount)), credit_currency),
-            )
-
-        # Reconstruct InstitutionDetails (optional)
-        institution_name = getattr(account, "institution_name", None)
-        if institution_name is not None:
-            institution = InstitutionDetails(
-                name=institution_name,
-                website=getattr(account, "institution_website", None),
-                phone=getattr(account, "institution_phone", None),
-                notes=getattr(account, "institution_notes", None),
-            )
-            object.__setattr__(account, "institution", institution)
-
-        # Reconstruct RewardsBalance (optional, for rewards accounts)
-        rewards_value = getattr(account, "rewards_value", None)
-        rewards_unit = getattr(account, "rewards_unit", None)
-        if rewards_value is not None and rewards_unit is not None:
-            object.__setattr__(
-                account,
-                "rewards_balance",
-                RewardsBalance(Decimal(str(rewards_value)), rewards_unit),
             )
 
         # Ensure _events list exists (transient field, not loaded from DB)
