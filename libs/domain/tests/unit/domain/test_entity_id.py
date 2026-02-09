@@ -10,7 +10,7 @@ Verifies that TypeID-based entity IDs:
 import time
 
 import pytest
-from typeid.core.errors import InvalidTypeIDStringException, SuffixValidationException
+from typeid.errors import InvalidTypeIDStringException, SuffixValidationException
 
 from domain.model.entity_id import (
     AccountId,

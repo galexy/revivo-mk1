@@ -16,7 +16,7 @@ Routes are protected by JWT authentication via get_current_user dependency.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from typeid.core.errors import SuffixValidationException
+from typeid.errors import SuffixValidationException
 
 from src.adapters.api.dependencies import (
     CurrentUser,

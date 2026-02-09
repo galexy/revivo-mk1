@@ -3,9 +3,10 @@ name = "personal-finance-domain"
 version = "0.1.0"
 description = "Personal Finance domain layer - models, events, ports"
 requires-python = ">=3.12"
+license = { text = "MIT" }
 
 dependencies = [
-    "typeid-python>=0.3.0",
+    "typeid-python>=0.3.9",
     "returns>=0.23.0",
 ]
 

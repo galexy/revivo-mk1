@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from typeid.core.errors import TypeIDException
+from typeid.errors import TypeIDException
 
 from src.adapters.logging import configure_logging, get_logger
 from src.adapters.persistence.orm.mappers import start_mappers
