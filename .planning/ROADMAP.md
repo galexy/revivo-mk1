@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
 - [x] **Phase 9: Type Safety & Test Cleanup** - CategoryTree TypedDict, remove redundant immutability tests
 - [ ] **Phase 10: Value Object ORM Mapping** - SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
-- [ ] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
+- [x] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
 - [ ] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 13: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
@@ -318,7 +318,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 11-01-PLAN.md — Transaction, Category, Payee domain unit tests
+- [x] 11-01-PLAN.md — Transaction, Category, Payee domain unit tests
 
 ### Phase 12: Frontend Infrastructure
 **Goal**: Set up frontend tooling and testing infrastructure
@@ -685,7 +685,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 8. CI & Code Quality | 5/5 | Complete | 2026-02-09 |
 | 9. Type Safety & Test Cleanup | 1/1 | Complete | 2026-02-09 |
 | 10. Value Object ORM Mapping | 1/1 | Complete | 2026-02-09 |
-| 11. Domain Test Coverage | 0/1 | Not started | - |
+| 11. Domain Test Coverage | 1/1 | Complete | 2026-02-09 |
 | 12. Frontend Infrastructure | 0/2 | Not started | - |
 | 13. Login UI | 0/2 | Not started | - |
 | 14. Frontend API & Routing | 0/2 | Not started | - |
