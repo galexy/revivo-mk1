@@ -29,6 +29,15 @@
       },
       "inputs": ["{projectRoot}/**/*.py"],
       "outputs": []
+    },
+    "coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-domain pytest tests/ -v --tb=short --cov=domain --cov-config=../../pyproject.toml --cov-report=term-missing --cov-branch",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
     }
   }
 }
