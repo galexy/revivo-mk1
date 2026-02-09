@@ -30,7 +30,11 @@ from src.adapters.api.schemas.category import (
     CreateCategoryRequest,
     UpdateCategoryRequest,
 )
-from src.application.services.category_service import CategoryError, CategoryService
+from src.application.services.category_service import (
+    CategoryError,
+    CategoryService,
+    CategoryTree,
+)
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -114,11 +118,9 @@ async def get_category_tree(
     await service.ensure_system_categories(
         user_id, household_id=current_user.household_id
     )
-    tree: dict[str, list[Category] | dict[str, list[Category]]] = (
-        service.get_category_tree(user_id)
-    )
-    root_categories: list[Category] = tree["root"]  # type: ignore[assignment]  # dict value is list[Category]
-    children_map: dict[str, list[Category]] = tree["children"]  # type: ignore[assignment]  # dict value is dict[str, list[Category]]
+    tree: CategoryTree = service.get_category_tree(user_id)
+    root_categories = tree["root"]
+    children_map = tree["children"]
 
     return CategoryTreeResponse(
         root=[_category_to_response(c) for c in root_categories],

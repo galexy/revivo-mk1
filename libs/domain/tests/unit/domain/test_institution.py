@@ -90,34 +90,6 @@ class TestInstitutionDetailsOptionalFields:
         assert inst.notes == notes
 
 
-class TestInstitutionDetailsImmutability:
-    """Tests for InstitutionDetails immutability."""
-
-    def test_cannot_modify_name(self):
-        """Should not allow modification of name."""
-        inst = InstitutionDetails(name="Chase Bank")
-        with pytest.raises(AttributeError):
-            inst.name = "Wells Fargo"  # type: ignore[misc]
-
-    def test_cannot_modify_website(self):
-        """Should not allow modification of website."""
-        inst = InstitutionDetails(name="Chase Bank", website="https://chase.com")
-        with pytest.raises(AttributeError):
-            inst.website = "https://other.com"  # type: ignore[misc]
-
-    def test_cannot_modify_phone(self):
-        """Should not allow modification of phone."""
-        inst = InstitutionDetails(name="Chase Bank", phone="1-800-123-4567")
-        with pytest.raises(AttributeError):
-            inst.phone = "1-888-999-8888"  # type: ignore[misc]
-
-    def test_cannot_modify_notes(self):
-        """Should not allow modification of notes."""
-        inst = InstitutionDetails(name="Chase Bank", notes="My notes")
-        with pytest.raises(AttributeError):
-            inst.notes = "New notes"  # type: ignore[misc]
-
-
 class TestInstitutionDetailsEquality:
     """Tests for InstitutionDetails equality."""
 

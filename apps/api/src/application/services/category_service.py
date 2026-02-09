@@ -4,13 +4,20 @@ Handles category CRUD, hierarchy management, and system category initialization.
 """
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from domain.model.category import Category, CategoryType
 from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 if TYPE_CHECKING:
     from domain.ports.unit_of_work import UnitOfWork
+
+
+class CategoryTree(TypedDict):
+    """Type for category tree structure with root and children mapping."""
+
+    root: list[Category]
+    children: dict[str, list[Category]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,9 +104,7 @@ class CategoryService:
         with self._uow:
             return self._uow.categories.get_by_user(user_id)
 
-    def get_category_tree(
-        self, user_id: UserId
-    ) -> dict[str, list[Category] | dict[str, list[Category]]]:
+    def get_category_tree(self, user_id: UserId) -> CategoryTree:
         """Get categories organized as a tree structure.
 
         Returns dict with 'root' categories and 'children' mapping.

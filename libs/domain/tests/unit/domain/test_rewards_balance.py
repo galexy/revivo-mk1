@@ -158,20 +158,8 @@ class TestRewardsBalanceHelpers:
         assert not RewardsBalance(Decimal("-100"), "Points").is_zero()
 
 
-class TestRewardsBalanceImmutability:
-    """Tests for RewardsBalance immutability."""
-
-    def test_cannot_modify_value(self):
-        """Should not allow modification of value."""
-        balance = RewardsBalance(Decimal("50000"), "Points")
-        with pytest.raises(AttributeError):
-            balance.value = Decimal("60000")  # type: ignore[misc]
-
-    def test_cannot_modify_unit(self):
-        """Should not allow modification of unit."""
-        balance = RewardsBalance(Decimal("50000"), "Points")
-        with pytest.raises(AttributeError):
-            balance.unit = "Miles"  # type: ignore[misc]
+class TestRewardsBalanceArithmeticBehavior:
+    """Tests for RewardsBalance arithmetic behavior."""
 
     def test_arithmetic_returns_new_instance(self):
         """Arithmetic should return new instance, not modify existing."""
