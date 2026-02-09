@@ -9,9 +9,8 @@ imperative (classical) mapping. This approach:
 Mappings are registered once at application startup via start_mappers().
 
 Value object handling:
-- Money, InstitutionDetails, RewardsBalance are decomposed to flat columns
-  before persistence via a before_flush event listener
-- Reconstruction from flat columns to value objects happens in the repository
+- Money, InstitutionDetails, RewardsBalance use SQLAlchemy composite()
+  to map value objects to multiple database columns automatically
 - Type conversions for EntityIds and Enums use custom TypeDecorators
 
 Transaction domain handling:
@@ -26,69 +25,40 @@ Authentication domain handling:
 - RefreshToken is NOT mapped - it uses SQLAlchemy Core (infrastructure record)
 """
 
-import contextlib
-
-from sqlalchemy import event
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import composite
 
 from .base import mapper_registry
 
 _mappers_started = False
 
 
-def _decompose_value_objects(
-    session: Session,
-    flush_context: object,  # UOWTransaction internal type
-    instances: object | None,  # Optional list of objects to flush
-) -> None:
-    """Decompose value objects to flat columns before persistence.
+def _money_factory(amount: object, currency: object) -> object:
+    """Factory for Money composite that returns None when both values are None."""
+    from domain.model.money import Money
 
-    This event handler runs before flush and expands value objects
-    (Money, InstitutionDetails, RewardsBalance) into their component
-    columns for storage.
+    if amount is None and currency is None:
+        return None
+    return Money(amount, currency)  # type: ignore[arg-type]  # amount/currency are Decimal/str from DB
 
-    Args:
-        session: The Session about to flush.
-        flush_context: Internal flush context.
-        instances: Optional list of objects to be flushed.
-    """
-    from domain.model.account import Account
 
-    # Process new and dirty Account objects
-    for obj in session.new | session.dirty:
-        if isinstance(obj, Account):
-            # Decompose opening_balance Money
-            if obj.opening_balance is not None:  # type: ignore[reportUnnecessaryComparison]  # SQLAlchemy may set to None at runtime
-                obj.opening_balance_amount = obj.opening_balance.amount  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.opening_balance_currency = obj.opening_balance.currency  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+def _institution_factory(
+    name: object, website: object, phone: object, notes: object
+) -> object:
+    """Factory for InstitutionDetails composite that returns None when name is None."""
+    from domain.model.institution import InstitutionDetails
 
-            # Decompose credit_limit Money
-            if obj.credit_limit is not None:
-                obj.credit_limit_amount = obj.credit_limit.amount  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.credit_limit_currency = obj.credit_limit.currency  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-            else:
-                obj.credit_limit_amount = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.credit_limit_currency = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+    if name is None:
+        return None
+    return InstitutionDetails(name, website, phone, notes)  # type: ignore[arg-type]  # values are str/None from DB
 
-            # Decompose institution InstitutionDetails
-            if obj.institution is not None:
-                obj.institution_name = obj.institution.name  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_website = obj.institution.website  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_phone = obj.institution.phone  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_notes = obj.institution.notes  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-            else:
-                obj.institution_name = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_website = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_phone = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.institution_notes = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
 
-            # Decompose rewards_balance RewardsBalance
-            if obj.rewards_balance is not None:
-                obj.rewards_value = obj.rewards_balance.value  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.rewards_unit = obj.rewards_balance.unit  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-            else:
-                obj.rewards_value = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
-                obj.rewards_unit = None  # type: ignore[attr-defined]  # SQLAlchemy-injected attribute from imperative mapping
+def _rewards_factory(value: object, unit: object) -> object:
+    """Factory for RewardsBalance composite that returns None when both values are None."""
+    from domain.model.rewards_balance import RewardsBalance
+
+    if value is None and unit is None:
+        return None
+    return RewardsBalance(value, unit)  # type: ignore[arg-type]  # value is Decimal, unit is str from DB
 
 
 def start_mappers() -> None:
@@ -100,7 +70,7 @@ def start_mappers() -> None:
     Mappings:
     - Account: Maps Account class to accounts table.
       EntityIds and Enums use TypeDecorators for automatic conversion.
-      Value objects are decomposed before flush and reconstructed after load.
+      Value objects use composite() for automatic decomposition/reconstruction.
     - Category: Maps Category class to categories table.
       Simple entity with hierarchy support (parent_id).
     - Payee: Maps Payee class to payees table.
@@ -129,19 +99,40 @@ def start_mappers() -> None:
     # Account aggregate mapping
     # - EntityIds (id, user_id, etc.): TypeDecorators handle string conversion
     # - Enums (account_type, status, subtype): TypeDecorators handle value conversion
-    # - Value objects: Excluded from direct mapping
-    #   * Decomposed to flat columns via before_flush event
-    #   * Reconstructed in repository after loading
+    # - Value objects: composite() maps to multiple database columns automatically
+    #   * Money: opening_balance, credit_limit
+    #   * InstitutionDetails: institution
+    #   * RewardsBalance: rewards_balance
     mapper_registry.map_imperatively(
         Account,
         accounts,
         exclude_properties=[
             "_events",  # _events is transient, not persisted
-            "opening_balance",  # Decomposed/reconstructed via events/repository
-            "credit_limit",  # Decomposed/reconstructed via events/repository
-            "institution",  # Decomposed/reconstructed via events/repository
-            "rewards_balance",  # Decomposed/reconstructed via events/repository
         ],
+        properties={
+            "opening_balance": composite(
+                _money_factory,
+                accounts.c.opening_balance_amount,
+                accounts.c.opening_balance_currency,
+            ),
+            "credit_limit": composite(
+                _money_factory,
+                accounts.c.credit_limit_amount,
+                accounts.c.credit_limit_currency,
+            ),
+            "institution": composite(
+                _institution_factory,
+                accounts.c.institution_name,
+                accounts.c.institution_website,
+                accounts.c.institution_phone,
+                accounts.c.institution_notes,
+            ),
+            "rewards_balance": composite(
+                _rewards_factory,
+                accounts.c.rewards_value,
+                accounts.c.rewards_unit,
+            ),
+        },
     )
 
     # Category entity mapping
@@ -196,9 +187,6 @@ def start_mappers() -> None:
         ],
     )
 
-    # Register event listener for value object decomposition
-    event.listen(Session, "before_flush", _decompose_value_objects)
-
     _mappers_started = True
 
 
@@ -209,10 +197,5 @@ def clear_mappers() -> None:
     re-register mappings. Useful for test isolation.
     """
     global _mappers_started
-
-    # Remove event listener
-    with contextlib.suppress(Exception):
-        event.remove(Session, "before_flush", _decompose_value_objects)
-
     mapper_registry.dispose()
     _mappers_started = False
