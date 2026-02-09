@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 8 of 22 (CI & Code Quality)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-02-09 - Completed 08-02-PLAN.md (Fix API Pyright Errors)
+Last activity: 2026-02-09 - Completed 08-03-PLAN.md (Fix API Ruff Lint Errors)
 
-Progress: [██████░░░░] ~59%
+Progress: [██████░░░░] ~60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 51
+- Total plans completed: 52
 - Average duration: 5.1 min
-- Total execution time: 5.67 hours
+- Total execution time: 5.94 hours
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: [██████░░░░] ~59%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
-| 08-ci-code-quality | 2 | 35 min | 17.5 min |
+| 08-ci-code-quality | 3 | 51 min | 17.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-02 (34 min), 07-03 (10 min), 07-04 (4 min), 08-01 (10 min), 08-02 (25 min)
-- Trend: 08-02 reduced 2067 pyright errors to 0 across 21 API files.
+- Last 5 plans: 07-03 (10 min), 07-04 (4 min), 08-01 (10 min), 08-02 (25 min), 08-03 (16 min)
+- Trend: 08-03 eliminated 173 ruff lint errors across 40 files.
 
 *Updated after each plan completion*
 
@@ -226,6 +226,11 @@ Recent decisions affecting current work:
 - pyrightconfig.json executionEnvironments to relax mock-related rules (reportUnknownMemberType etc.) in tests/ directory
 - Explicit re-export pattern (X as X) in __init__.py for pyright strict re-export detection
 - NoReturn annotation on error handlers that always raise (enables type narrowing in callers)
+- Per-file-ignores for ARG001/ARG002 in routes, persistence, and tests (framework-required unused params)
+- noqa: PT012 for multi-statement pytest.raises where IntegrityError can occur on either execute or commit
+- TYPE_CHECKING block for runtime-unused imports when __future__ annotations enabled
+- datetime.now(UTC).date() as standard pattern for timezone-aware date creation
+- Absolute imports only in src/ (no relative parent imports)
 
 ### Pending Todos
 
@@ -245,9 +250,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed 08-02-PLAN.md (Fix API Pyright Errors)
+Stopped at: Completed 08-03-PLAN.md (Fix API Ruff Lint Errors)
 Resume file: None
-Next action: Execute 08-03-PLAN.md (Fix API ruff lint errors)
+Next action: Execute 08-04-PLAN.md (CI pipeline configuration)
 
 ## Roadmap Evolution
 
