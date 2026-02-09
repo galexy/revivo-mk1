@@ -55,6 +55,10 @@ class Money:
         # Normalize currency to uppercase
         object.__setattr__(self, "currency", self.currency.upper())
 
+    def __composite_values__(self) -> tuple[Decimal, str]:
+        """Return flat column values for SQLAlchemy composite() mapping."""
+        return (self.amount, self.currency)
+
     def _check_same_currency(self, other: Money) -> None:
         """Raise ValueError if currencies don't match."""
         if self.currency != other.currency:
