@@ -15,13 +15,14 @@ import json
 from typing import TYPE_CHECKING, Self
 
 from sqlalchemy import insert
-from sqlalchemy.orm import Session, sessionmaker
-
-from domain.events.base import DomainEvent
 
 from .orm.tables import outbox
 
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Session, sessionmaker
+
+    from domain.events.base import DomainEvent
+
     from .repositories.account import SqlAlchemyAccountRepository
     from .repositories.category import SqlAlchemyCategoryRepository
     from .repositories.household import HouseholdRepository

@@ -26,6 +26,8 @@ Authentication domain handling:
 - RefreshToken is NOT mapped - it uses SQLAlchemy Core (infrastructure record)
 """
 
+import contextlib
+
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
@@ -209,10 +211,8 @@ def clear_mappers() -> None:
     global _mappers_started
 
     # Remove event listener
-    try:
+    with contextlib.suppress(Exception):
         event.remove(Session, "before_flush", _decompose_value_objects)
-    except Exception:
-        pass  # Listener might not be registered
 
     mapper_registry.dispose()
     _mappers_started = False

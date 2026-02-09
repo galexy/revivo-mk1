@@ -118,7 +118,7 @@ async def create_transaction(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"code": "INVALID_SPLIT", "message": str(e)},
-            )
+            ) from e
         splits.append(split)
 
     result = await service.create_transaction(
@@ -321,7 +321,7 @@ async def update_transaction(
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail={"code": "INVALID_SPLIT", "message": str(e)},
-                )
+                ) from e
             new_splits.append(split)
 
         new_amount = Money(request.amount.amount, request.amount.currency)

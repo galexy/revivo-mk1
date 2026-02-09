@@ -184,8 +184,7 @@ class TransactionService:
 
         # Delete mirrors for removed transfer splits
         for acct_id in old_transfers:
-            if acct_id not in new_transfers:
-                if acct_id in mirrors_by_account:
+            if acct_id not in new_transfers and acct_id in mirrors_by_account:
                     mirror = mirrors_by_account[acct_id]
                     self._uow.collect_events(
                         [

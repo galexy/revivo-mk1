@@ -22,16 +22,19 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.application.services.auth_service import AuthError, AuthService
-
-from ..dependencies import CurrentUser, get_auth_service, get_current_user
-from ..schemas.auth import (
+from src.adapters.api.dependencies import (
+    CurrentUser,
+    get_auth_service,
+    get_current_user,
+)
+from src.adapters.api.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
     UserProfileResponse,
     VerifyEmailResponse,
 )
+from src.application.services.auth_service import AuthError, AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

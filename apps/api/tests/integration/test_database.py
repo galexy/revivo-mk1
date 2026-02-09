@@ -206,7 +206,7 @@ class TestUserTable:
         )
         session.commit()
 
-        with pytest.raises(IntegrityError):
+        with pytest.raises(IntegrityError):  # noqa: PT012
             session.execute(
                 insert(users).values(
                     id=user_id_2.value,
@@ -305,7 +305,7 @@ class TestEncryptedSecretsTable:
         session.commit()
 
         # Duplicate should fail
-        with pytest.raises(IntegrityError):
+        with pytest.raises(IntegrityError):  # noqa: PT012
             session.execute(
                 insert(encrypted_secrets).values(
                     user_id=user_id.value,

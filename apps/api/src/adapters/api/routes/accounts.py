@@ -28,10 +28,7 @@ from src.adapters.api.dependencies import (
     get_current_user,
     get_unit_of_work,
 )
-from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
-from src.application.services.account_service import AccountError, AccountService
-
-from ..schemas.account import (
+from src.adapters.api.schemas.account import (
     AccountListResponse,
     AccountResponse,
     CreateBrokerageAccountRequest,
@@ -43,6 +40,8 @@ from ..schemas.account import (
     CreateSavingsAccountRequest,
     UpdateAccountRequest,
 )
+from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
+from src.application.services.account_service import AccountError, AccountService
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -565,7 +564,7 @@ async def get_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = service.get_account(parsed_id, household_id=current_user.household_id)
 
@@ -612,7 +611,7 @@ async def update_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     # Get account to verify it exists and belongs to household
     account_result = service.get_account(
@@ -673,7 +672,7 @@ async def close_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = await service.close_account(
         parsed_id,
@@ -718,7 +717,7 @@ async def reopen_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = await service.reopen_account(
         parsed_id,
@@ -761,7 +760,7 @@ async def delete_account(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid account ID format: {e}",
-        )
+        ) from e
 
     result = await service.delete_account(
         parsed_id, household_id=current_user.household_id
