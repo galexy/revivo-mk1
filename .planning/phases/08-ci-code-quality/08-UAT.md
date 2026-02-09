@@ -64,7 +64,7 @@ result: pass
 
 total: 10
 passed: 6
-issues: 6
+issues: 7
 pending: 0
 skipped: 0
 
@@ -152,6 +152,19 @@ skipped: 0
     - "composite() requires: (1) constructor accepts flat column values as positional args, (2) __composite_values__() returns flat tuple"
     - "Nullable composites: when all component columns are NULL, SQLAlchemy returns None for the composite attribute — works naturally with credit_limit: Money | None"
     - "Frozen dataclass value objects are fine as composite types — composite only needs to SET the attribute on the parent (Account is not frozen), not mutate the value object itself"
+  debug_session: ""
+- truth: "Redundant immutability tests should be removed now that pyright strict enforces frozen dataclass constraints"
+  status: failed
+  reason: "User reported: TestInstitutionDetailsImmutability tests are redundant with pyright strict type checking"
+  severity: minor
+  test: 2
+  root_cause: "TestInstitutionDetailsImmutability (4 tests) verify that frozen dataclass fields can't be assigned at runtime. With pyright strict mode, these assignments are caught at compile time (the tests themselves require type: ignore[misc] to even compile). The tests are testing Python's frozen=True behavior, not domain logic."
+  artifacts:
+    - path: "libs/domain/tests/unit/domain/test_institution.py"
+      issue: "TestInstitutionDetailsImmutability class (lines 93-118) has 4 tests with type: ignore[misc] that are redundant with pyright strict"
+  missing:
+    - "Remove TestInstitutionDetailsImmutability class from test_institution.py"
+    - "Check for similar redundant immutability tests in test_money.py, test_rewards_balance.py, test_split_line.py, test_entity_id.py"
   debug_session: ""
 - truth: "Domain coverage should be higher than 48%"
   status: failed
