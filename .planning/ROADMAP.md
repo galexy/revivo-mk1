@@ -276,7 +276,7 @@ Plans:
 - [x] 08-02-PLAN.md — API pyright strict error fixes (repositories, mappers, routes, tests)
 - [x] 08-03-PLAN.md — API ruff lint error fixes (DTZ, imports, unused args, exception chaining)
 - [x] 08-04-PLAN.md — Coverage Nx targets + CI restructure (nx affected, caching, blocking checks)
-- [ ] 08-05-PLAN.md — Nx format targets, CI nx affected for format, pyright warning fix
+- [x] 08-05-PLAN.md — Nx format targets, CI nx affected for format, pyright warning fix
 
 ### Phase 9: Type Safety & Test Cleanup
 **Goal**: Improve type safety by replacing loosely-typed returns with TypedDicts, and remove tests made redundant by pyright strict mode
@@ -682,7 +682,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
-| 8. CI & Code Quality | 4/5 | In progress | - |
+| 8. CI & Code Quality | 5/5 | Complete | 2026-02-09 |
 | 9. Type Safety & Test Cleanup | 0/1 | Not started | - |
 | 10. Value Object ORM Mapping | 0/1 | Not started | - |
 | 11. Domain Test Coverage | 0/1 | Not started | - |
