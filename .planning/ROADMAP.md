@@ -24,7 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
 - [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [x] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
-- [ ] **Phase 9: Type Safety & Test Cleanup** - CategoryTree TypedDict, remove redundant immutability tests
+- [x] **Phase 9: Type Safety & Test Cleanup** - CategoryTree TypedDict, remove redundant immutability tests
 - [ ] **Phase 10: Value Object ORM Mapping** - SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
 - [ ] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
 - [ ] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
@@ -289,7 +289,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 09-01-PLAN.md — CategoryTree TypedDict + remove redundant immutability tests
+- [x] 09-01-PLAN.md — CategoryTree TypedDict + remove redundant immutability tests
 
 ### Phase 10: Value Object ORM Mapping
 **Goal**: Replace manual value object decomposition/reconstruction with SQLAlchemy composite() mappings
@@ -683,7 +683,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
 | 8. CI & Code Quality | 5/5 | Complete | 2026-02-09 |
-| 9. Type Safety & Test Cleanup | 0/1 | Not started | - |
+| 9. Type Safety & Test Cleanup | 1/1 | Complete | 2026-02-09 |
 | 10. Value Object ORM Mapping | 0/1 | Not started | - |
 | 11. Domain Test Coverage | 0/1 | Not started | - |
 | 12. Frontend Infrastructure | 0/2 | Not started | - |
