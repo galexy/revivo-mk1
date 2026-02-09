@@ -19,6 +19,7 @@ Managed by Nx with hatch packages for Python editable installs.
 │   │   ├── src/      # Source code (adapters, application, main.py)
 │   │   ├── tests/    # API integration and unit tests
 │   │   ├── alembic/  # Database migrations
+│   │   ├── alembic.ini # Alembic config
 │   │   ├── scripts/  # Operational scripts
 │   │   └── docs/     # Runbooks
 │   └── web/          # React frontend (Phase 8+)
@@ -29,7 +30,6 @@ Managed by Nx with hatch packages for Python editable installs.
 │   └── ui/           # shadcn/ui components (Phase 8+)
 ├── nx.json           # Nx workspace config
 ├── pyproject.toml    # Root project config (deps, tool config, hatch packages)
-└── alembic.ini       # Alembic config (points to apps/api/alembic/)
 ```
 
 ## Import Conventions

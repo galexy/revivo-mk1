@@ -22,7 +22,8 @@
         "ckolkman.vscode-postgres",
         "ms-python.debugpy",
         "tamasfe.even-better-toml",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "nrwl.angular-console"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
