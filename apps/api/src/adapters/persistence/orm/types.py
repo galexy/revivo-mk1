@@ -31,7 +31,9 @@ class AccountIdType(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountId | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountId | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountId to string for database storage."""
         if value is None:
             return None
@@ -53,7 +55,9 @@ class UserIdType(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: UserId | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: UserId | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert UserId to string for database storage."""
         if value is None:
             return None
@@ -75,7 +79,9 @@ class AccountTypeEnum(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountType | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountType | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountType to string value for database storage."""
         if value is None:
             return None
@@ -97,7 +103,9 @@ class AccountStatusEnum(TypeDecorator):
     impl = String
     cache_ok = True
 
-    def process_bind_param(self, value: AccountStatus | str | None, dialect: Dialect) -> str | None:
+    def process_bind_param(
+        self, value: AccountStatus | str | None, dialect: Dialect
+    ) -> str | None:
         """Convert AccountStatus to string value for database storage."""
         if value is None:
             return None

@@ -13,7 +13,14 @@ from domain.events.transaction_events import (
     MirrorTransactionCreated,
     MirrorTransactionDeleted,
 )
-from domain.model.entity_id import AccountId, CategoryId, HouseholdId, PayeeId, TransactionId, UserId
+from domain.model.entity_id import (
+    AccountId,
+    CategoryId,
+    HouseholdId,
+    PayeeId,
+    TransactionId,
+    UserId,
+)
 from domain.model.money import Money
 from domain.model.split_line import SplitLine
 from domain.model.transaction import Transaction

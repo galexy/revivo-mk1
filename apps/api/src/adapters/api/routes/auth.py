@@ -312,7 +312,9 @@ async def get_current_user_profile(
     """
     result = service.get_user_profile(current_user.user_id)
     if result is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user, household = result
     return UserProfileResponse.from_domain(user, household)

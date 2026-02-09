@@ -243,7 +243,14 @@ class TestEntityIdEdgeCases:
 
     def test_invalid_format_rejected(self):
         """Completely invalid format is rejected."""
-        with pytest.raises((ValueError, TypeError, InvalidTypeIDStringException, SuffixValidationException)):
+        with pytest.raises(
+            (
+                ValueError,
+                TypeError,
+                InvalidTypeIDStringException,
+                SuffixValidationException,
+            )
+        ):
             AccountId.from_string("not_a_valid_id")
 
     def test_empty_string_rejected(self):

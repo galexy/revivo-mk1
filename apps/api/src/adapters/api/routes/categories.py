@@ -92,7 +92,9 @@ async def list_categories(
     user_id = current_user.user_id
 
     # Ensure system categories exist
-    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
+    await service.ensure_system_categories(
+        user_id, household_id=current_user.household_id
+    )
 
     categories = service.get_user_categories(user_id)
     return CategoryListResponse(
@@ -109,7 +111,9 @@ async def get_category_tree(
     """Get categories organized as a tree structure."""
     user_id = current_user.user_id
 
-    await service.ensure_system_categories(user_id, household_id=current_user.household_id)
+    await service.ensure_system_categories(
+        user_id, household_id=current_user.household_id
+    )
     tree = service.get_category_tree(user_id)
 
     return CategoryTreeResponse(
@@ -200,7 +204,9 @@ async def delete_category(
     reassign_id = CategoryId.from_string(reassign_to) if reassign_to else None
 
     result = await service.delete_category(
-        current_user.user_id, cat_id, reassign_id,
+        current_user.user_id,
+        cat_id,
+        reassign_id,
         household_id=current_user.household_id,
     )
 

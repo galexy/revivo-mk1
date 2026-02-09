@@ -28,7 +28,9 @@ class MoneySchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    amount: Decimal = Field(..., description="Monetary amount with up to 4 decimal places")
+    amount: Decimal = Field(
+        ..., description="Monetary amount with up to 4 decimal places"
+    )
     currency: str = Field(
         default="USD",
         description="ISO 4217 3-letter currency code",
@@ -79,7 +81,9 @@ class RewardsBalanceSchema(BaseModel):
 class CreateCheckingAccountRequest(BaseModel):
     """Request schema for creating a checking account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
     opening_balance: MoneySchema = Field(..., description="Initial balance")
     opening_date: datetime | None = Field(
         default=None, description="Date account was opened (defaults to now)"
@@ -96,7 +100,9 @@ class CreateCheckingAccountRequest(BaseModel):
 class CreateSavingsAccountRequest(BaseModel):
     """Request schema for creating a savings account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
     opening_balance: MoneySchema = Field(..., description="Initial balance")
     opening_date: datetime | None = Field(
         default=None, description="Date account was opened (defaults to now)"
@@ -113,8 +119,12 @@ class CreateSavingsAccountRequest(BaseModel):
 class CreateCreditCardAccountRequest(BaseModel):
     """Request schema for creating a credit card account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
-    opening_balance: MoneySchema = Field(..., description="Initial balance (current charges)")
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
+    opening_balance: MoneySchema = Field(
+        ..., description="Initial balance (current charges)"
+    )
     credit_limit: MoneySchema = Field(..., description="Credit limit")
     opening_date: datetime | None = Field(
         default=None, description="Date account was opened (defaults to now)"
@@ -128,18 +138,25 @@ class CreateCreditCardAccountRequest(BaseModel):
 class CreateLoanAccountRequest(BaseModel):
     """Request schema for creating a loan account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
-    opening_balance: MoneySchema = Field(..., description="Initial loan balance (principal)")
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
+    opening_balance: MoneySchema = Field(
+        ..., description="Initial loan balance (principal)"
+    )
     subtype: AccountSubtype | None = Field(
         default=None, description="Loan type (mortgage, auto, personal, line_of_credit)"
     )
     apr: Annotated[Decimal, Field(ge=0, le=1)] | None = Field(
-        default=None, description="Annual percentage rate as decimal (e.g., 0.0599 for 5.99%)"
+        default=None,
+        description="Annual percentage rate as decimal (e.g., 0.0599 for 5.99%)",
     )
     term_months: Annotated[int, Field(ge=1, le=600)] | None = Field(
         default=None, description="Loan term in months"
     )
-    due_date: datetime | None = Field(default=None, description="Final payment due date")
+    due_date: datetime | None = Field(
+        default=None, description="Final payment due date"
+    )
     opening_date: datetime | None = Field(
         default=None, description="Date loan originated (defaults to now)"
     )
@@ -152,7 +169,9 @@ class CreateLoanAccountRequest(BaseModel):
 class CreateBrokerageAccountRequest(BaseModel):
     """Request schema for creating a brokerage account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
     opening_balance: MoneySchema = Field(..., description="Initial cash balance")
     opening_date: datetime | None = Field(
         default=None, description="Date account was opened (defaults to now)"
@@ -166,7 +185,9 @@ class CreateBrokerageAccountRequest(BaseModel):
 class CreateIraAccountRequest(BaseModel):
     """Request schema for creating an IRA account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
     opening_balance: MoneySchema = Field(..., description="Initial balance")
     subtype: AccountSubtype | None = Field(
         default=None, description="IRA type (traditional_ira, roth_ira, sep_ira)"
@@ -183,7 +204,9 @@ class CreateIraAccountRequest(BaseModel):
 class CreateRewardsAccountRequest(BaseModel):
     """Request schema for creating a rewards account."""
 
-    name: str = Field(..., description="Account display name", min_length=1, max_length=200)
+    name: str = Field(
+        ..., description="Account display name", min_length=1, max_length=200
+    )
     rewards_balance: RewardsBalanceSchema = Field(
         ..., description="Initial rewards balance (points/miles)"
     )
@@ -236,7 +259,9 @@ class AccountResponse(BaseModel):
     # Type-specific fields
     subtype: AccountSubtype | None = Field(default=None, description="Account subtype")
     credit_limit: MoneySchema | None = Field(default=None, description="Credit limit")
-    available_credit: MoneySchema | None = Field(default=None, description="Available credit")
+    available_credit: MoneySchema | None = Field(
+        default=None, description="Available credit"
+    )
     apr: Decimal | None = Field(default=None, description="Annual percentage rate")
     term_months: int | None = Field(default=None, description="Loan term in months")
     due_date: datetime | None = Field(default=None, description="Due date for loans")
@@ -245,13 +270,17 @@ class AccountResponse(BaseModel):
     )
 
     # Institution
-    institution: InstitutionSchema | None = Field(default=None, description="Institution details")
+    institution: InstitutionSchema | None = Field(
+        default=None, description="Institution details"
+    )
     account_number_last4: str | None = Field(
         default=None, description="Last 4 digits of account number"
     )
 
     # Lifecycle
-    closing_date: datetime | None = Field(default=None, description="Date account was closed")
+    closing_date: datetime | None = Field(
+        default=None, description="Date account was closed"
+    )
     notes: str | None = Field(default=None, description="Account notes")
 
     # Audit
@@ -276,7 +305,11 @@ class AccountResponse(BaseModel):
         # Mask account number - show only last 4 digits
         account_number_last4 = None
         if decrypted_account_number:
-            account_number_last4 = decrypted_account_number[-4:] if len(decrypted_account_number) >= 4 else decrypted_account_number
+            account_number_last4 = (
+                decrypted_account_number[-4:]
+                if len(decrypted_account_number) >= 4
+                else decrypted_account_number
+            )
 
         # Build opening balance schema
         opening_balance = MoneySchema(

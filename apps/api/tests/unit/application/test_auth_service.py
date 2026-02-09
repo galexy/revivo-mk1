@@ -210,7 +210,10 @@ class TestAuthServiceLogin:
         else:
             uow.users.get_by_email.return_value = None
 
-        uow.refresh_tokens.create_token.return_value = ("raw_refresh_token", MagicMock())
+        uow.refresh_tokens.create_token.return_value = (
+            "raw_refresh_token",
+            MagicMock(),
+        )
         uow.commit = AsyncMock()
 
         return uow

@@ -388,7 +388,10 @@ class TestAccountPropertyUpdates:
         assert account.notes is None
 
     def test_update_institution(
-        self, user_id: UserId, usd_balance: Money, sample_institution: InstitutionDetails
+        self,
+        user_id: UserId,
+        usd_balance: Money,
+        sample_institution: InstitutionDetails,
     ):
         """Updates institution."""
         account = Account.create_checking(
@@ -433,7 +436,9 @@ class TestAccountProperties:
 
         assert account.available_credit == credit_limit
 
-    def test_available_credit_for_non_credit_card(self, user_id: UserId, usd_balance: Money):
+    def test_available_credit_for_non_credit_card(
+        self, user_id: UserId, usd_balance: Money
+    ):
         """Returns None for non-credit card accounts."""
         account = Account.create_checking(
             user_id=user_id,
@@ -451,7 +456,10 @@ class TestAccountWithInstitution:
     """Tests for Account with institution details."""
 
     def test_create_with_institution(
-        self, user_id: UserId, usd_balance: Money, sample_institution: InstitutionDetails
+        self,
+        user_id: UserId,
+        usd_balance: Money,
+        sample_institution: InstitutionDetails,
     ):
         """Can create account with institution."""
         account = Account.create_checking(

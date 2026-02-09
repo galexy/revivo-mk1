@@ -39,7 +39,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uv run --package personal-finance-api pyright src/",
+        "command": "uv run --package personal-finance-api pyright",
         "cwd": "{projectRoot}"
       },
       "inputs": [

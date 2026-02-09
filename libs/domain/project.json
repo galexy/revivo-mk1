@@ -24,7 +24,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uv run --package personal-finance-domain pyright domain/",
+        "command": "uv run --package personal-finance-domain pyright",
         "cwd": "{projectRoot}"
       },
       "inputs": ["{projectRoot}/**/*.py"],

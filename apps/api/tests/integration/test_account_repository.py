@@ -79,7 +79,9 @@ def usd_balance():
 class TestAccountPersistence:
     """Test Account CRUD operations."""
 
-    def test_add_and_get_checking_account(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_and_get_checking_account(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist and retrieve a checking account."""
         account = Account.create_checking(
             user_id=user_id,
@@ -104,7 +106,9 @@ class TestAccountPersistence:
         assert loaded.opening_balance.amount == usd_balance.amount
         assert loaded.opening_balance.currency == usd_balance.currency
 
-    def test_add_savings_account(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_savings_account(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist savings account."""
         account = Account.create_savings(
             user_id=user_id,
@@ -124,7 +128,9 @@ class TestAccountPersistence:
         assert loaded is not None
         assert loaded.account_type == AccountType.SAVINGS
 
-    def test_add_credit_card_with_limit(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_credit_card_with_limit(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist credit card with credit limit."""
         credit_limit = Money(Decimal("5000.00"), "USD")
         account = Account.create_credit_card(
@@ -149,7 +155,9 @@ class TestAccountPersistence:
         assert loaded.credit_limit.amount == credit_limit.amount
         assert loaded.credit_limit.currency == credit_limit.currency
 
-    def test_add_loan_with_details(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_loan_with_details(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist loan with APR, term, subtype."""
         account = Account.create_loan(
             user_id=user_id,
@@ -175,7 +183,9 @@ class TestAccountPersistence:
         assert loaded.apr == Decimal("0.0599")
         assert loaded.term_months == 360
 
-    def test_add_brokerage_account(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_brokerage_account(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist brokerage account."""
         account = Account.create_brokerage(
             user_id=user_id,
@@ -195,7 +205,9 @@ class TestAccountPersistence:
         assert loaded is not None
         assert loaded.account_type == AccountType.BROKERAGE
 
-    def test_add_ira_account(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_ira_account(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist IRA account with subtype."""
         account = Account.create_ira(
             user_id=user_id,
@@ -241,7 +253,9 @@ class TestAccountPersistence:
         assert loaded.rewards_balance.value == Decimal("50000")
         assert loaded.rewards_balance.unit == "Alaska Miles"
 
-    def test_add_account_with_institution(self, repository, session, user_id, household_id, usd_balance):
+    def test_add_account_with_institution(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can persist account with institution details."""
         institution = InstitutionDetails(
             name="Chase Bank",
@@ -285,8 +299,12 @@ class TestAccountPersistence:
     def test_get_by_user(self, repository, session, user_id, household_id, usd_balance):
         """Can get all accounts for a user."""
         # Create multiple accounts
-        checking = Account.create_checking(user_id, "Checking", usd_balance, household_id=household_id)
-        savings = Account.create_savings(user_id, "Savings", usd_balance, household_id=household_id)
+        checking = Account.create_checking(
+            user_id, "Checking", usd_balance, household_id=household_id
+        )
+        savings = Account.create_savings(
+            user_id, "Savings", usd_balance, household_id=household_id
+        )
         checking.clear_events()
         savings.clear_events()
 
@@ -301,10 +319,16 @@ class TestAccountPersistence:
         assert AccountType.CHECKING in account_types
         assert AccountType.SAVINGS in account_types
 
-    def test_get_by_user_with_type_filter(self, repository, session, user_id, household_id, usd_balance):
+    def test_get_by_user_with_type_filter(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can filter accounts by type."""
-        checking = Account.create_checking(user_id, "Checking", usd_balance, household_id=household_id)
-        savings = Account.create_savings(user_id, "Savings", usd_balance, household_id=household_id)
+        checking = Account.create_checking(
+            user_id, "Checking", usd_balance, household_id=household_id
+        )
+        savings = Account.create_savings(
+            user_id, "Savings", usd_balance, household_id=household_id
+        )
         checking.clear_events()
         savings.clear_events()
 
@@ -317,10 +341,16 @@ class TestAccountPersistence:
         assert len(accounts) == 1
         assert accounts[0].account_type == AccountType.CHECKING
 
-    def test_get_by_user_with_status_filter(self, repository, session, user_id, household_id, usd_balance):
+    def test_get_by_user_with_status_filter(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can filter accounts by status."""
-        active = Account.create_checking(user_id, "Active", usd_balance, household_id=household_id)
-        closed = Account.create_savings(user_id, "Closed", usd_balance, household_id=household_id)
+        active = Account.create_checking(
+            user_id, "Active", usd_balance, household_id=household_id
+        )
+        closed = Account.create_savings(
+            user_id, "Closed", usd_balance, household_id=household_id
+        )
         closed.close()
         active.clear_events()
         closed.clear_events()
@@ -335,9 +365,13 @@ class TestAccountPersistence:
         assert len(active_accounts) == 1
         assert len(closed_accounts) == 1
 
-    def test_delete_account(self, repository, session, user_id, household_id, usd_balance):
+    def test_delete_account(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Can delete an account."""
-        account = Account.create_checking(user_id, "Delete Me", usd_balance, household_id=household_id)
+        account = Account.create_checking(
+            user_id, "Delete Me", usd_balance, household_id=household_id
+        )
         account_id = account.id
         account.clear_events()
 
@@ -364,9 +398,13 @@ class TestAccountPersistence:
 class TestAccountUpdate:
     """Test account update operations via repository."""
 
-    def test_update_persists(self, repository, session, user_id, household_id, usd_balance):
+    def test_update_persists(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Changes to loaded account persist on commit."""
-        account = Account.create_checking(user_id, "Original", usd_balance, household_id=household_id)
+        account = Account.create_checking(
+            user_id, "Original", usd_balance, household_id=household_id
+        )
         account_id = account.id
         account.clear_events()
 
@@ -384,9 +422,13 @@ class TestAccountUpdate:
         reloaded = repository.get(account_id)
         assert reloaded.name == "Updated"
 
-    def test_close_persists(self, repository, session, user_id, household_id, usd_balance):
+    def test_close_persists(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Closing an account persists status change."""
-        account = Account.create_checking(user_id, "Test", usd_balance, household_id=household_id)
+        account = Account.create_checking(
+            user_id, "Test", usd_balance, household_id=household_id
+        )
         account_id = account.id
         account.clear_events()
 
@@ -403,9 +445,13 @@ class TestAccountUpdate:
         assert reloaded.status == AccountStatus.CLOSED
         assert reloaded.closing_date is not None
 
-    def test_reopen_persists(self, repository, session, user_id, household_id, usd_balance):
+    def test_reopen_persists(
+        self, repository, session, user_id, household_id, usd_balance
+    ):
         """Reopening an account persists status change."""
-        account = Account.create_checking(user_id, "Test", usd_balance, household_id=household_id)
+        account = Account.create_checking(
+            user_id, "Test", usd_balance, household_id=household_id
+        )
         account.close()
         account_id = account.id
         account.clear_events()

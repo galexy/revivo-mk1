@@ -7,7 +7,12 @@ import pytest
 from sqlalchemy import insert, select, text
 from sqlalchemy.exc import IntegrityError
 
-from src.adapters.persistence.orm.tables import encrypted_secrets, households, outbox, users
+from src.adapters.persistence.orm.tables import (
+    encrypted_secrets,
+    households,
+    outbox,
+    users,
+)
 from domain.model.entity_id import HouseholdId, UserId
 
 
@@ -143,7 +148,8 @@ class TestOutboxPattern:
         # Verify the partial index filters correctly by checking our unprocessed event
         # is in the set of events with processed_at = NULL
         unprocessed_ids = [
-            r.aggregate_id for r in session.execute(
+            r.aggregate_id
+            for r in session.execute(
                 select(outbox).where(outbox.c.processed_at.is_(None))
             ).fetchall()
         ]
@@ -266,7 +272,9 @@ class TestEncryptedSecretsTable:
         decrypted = field_encryption.decrypt(result.encrypted_value)
         assert decrypted == "plaid_access_token_xxx"
 
-    def test_user_secret_type_unique_constraint(self, session, household_id, field_encryption):
+    def test_user_secret_type_unique_constraint(
+        self, session, household_id, field_encryption
+    ):
         """Each user can have only one secret of each type."""
         user_id = UserId.generate()
 

@@ -13,7 +13,7 @@ dependencies = []
 dev = [
     "ruff>=0.8.0",
     "mypy>=1.14.0",
-    "pyright>=1.1.0",
+    "pyright==1.1.408",
     "import-linter>=2.1.0",
     "pytest>=8.3.0",
     "hypothesis>=6.121.0",
@@ -46,6 +46,7 @@ target-version = "py312"
 [tool.ruff.lint]
 select = [
     "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
     "F",      # Pyflakes
     "I",      # isort
     "N",      # pep8-naming
@@ -73,6 +74,20 @@ select = [
 ignore = [
     "E501",   # Line too long (handled by formatter)
 ]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Header",
+    "fastapi.Body",
+    "fastapi.Path",
+    "fastapi.Cookie",
+    "fastapi.Form",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"apps/api/src/adapters/persistence/**" = ["SLF001"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src", "domain"]

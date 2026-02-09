@@ -763,7 +763,9 @@ async def delete_account(
             detail=f"Invalid account ID format: {e}",
         )
 
-    result = await service.delete_account(parsed_id, household_id=current_user.household_id)
+    result = await service.delete_account(
+        parsed_id, household_id=current_user.household_id
+    )
 
     if isinstance(result, AccountError):
         _handle_error(result)

@@ -145,8 +145,7 @@ def test_migrations_match_metadata(migration_engine):
     with migration_engine.connect() as connection:
         # Create migration context with type comparison enabled
         migration_context = MigrationContext.configure(
-            connection,
-            opts={"compare_type": True}
+            connection, opts={"compare_type": True}
         )
 
         # Compare database schema (from migrations) against metadata (from tables.py)

@@ -119,7 +119,9 @@ class TestCategoryAPI:
         assert SYSTEM_CATEGORY_UNCATEGORIZED in names
 
         # Verify Uncategorized is marked as system
-        uncategorized = next(c for c in data["categories"] if c["name"] == SYSTEM_CATEGORY_UNCATEGORIZED)
+        uncategorized = next(
+            c for c in data["categories"] if c["name"] == SYSTEM_CATEGORY_UNCATEGORIZED
+        )
         assert uncategorized["is_system"] is True
 
     def test_create_category(self, client, auth_headers):
@@ -285,9 +287,7 @@ class TestCategoryAPI:
         category_id = create_response.json()["id"]
 
         # Get it
-        response = client.get(
-            f"/api/v1/categories/{category_id}", headers=auth_headers
-        )
+        response = client.get(f"/api/v1/categories/{category_id}", headers=auth_headers)
 
         assert response.status_code == 200
         assert response.json()["id"] == category_id
@@ -355,9 +355,7 @@ class TestCategoryType:
         cat_id = create_response.json()["id"]
 
         # Get
-        get_response = client.get(
-            f"/api/v1/categories/{cat_id}", headers=auth_headers
-        )
+        get_response = client.get(f"/api/v1/categories/{cat_id}", headers=auth_headers)
         assert get_response.status_code == 200
         assert get_response.json()["category_type"] == "expense"
 
@@ -376,7 +374,9 @@ class TestCategoryType:
 
         # Find the income category
         categories = response.json()["categories"]
-        income_cat = next((c for c in categories if c["name"] == "Interest Income"), None)
+        income_cat = next(
+            (c for c in categories if c["name"] == "Interest Income"), None
+        )
         assert income_cat is not None
         assert income_cat["category_type"] == "income"
 
@@ -393,9 +393,7 @@ class TestCategoryType:
         assert create_response.json()["category_type"] == "income"
 
         # Get by ID
-        get_response = client.get(
-            f"/api/v1/categories/{cat_id}", headers=auth_headers
-        )
+        get_response = client.get(f"/api/v1/categories/{cat_id}", headers=auth_headers)
         assert get_response.status_code == 200
         assert get_response.json()["category_type"] == "income"
 

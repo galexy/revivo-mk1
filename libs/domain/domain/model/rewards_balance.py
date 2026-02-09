@@ -53,7 +53,9 @@ class RewardsBalance:
     def _check_same_unit(self, other: Self) -> None:
         """Raise ValueError if units don't match."""
         if self.unit != other.unit:
-            raise ValueError(f"Cannot perform operation between {self.unit} and {other.unit}")
+            raise ValueError(
+                f"Cannot perform operation between {self.unit} and {other.unit}"
+            )
 
     def __add__(self, other: Self) -> Self:
         """Add two RewardsBalance of same unit.

@@ -379,7 +379,9 @@ async def mark_transaction_cleared(
     txn_id = TransactionId.from_string(transaction_id)
     posted_date = request.posted_date if request else None
 
-    result = await service.mark_transaction_cleared(current_user.user_id, txn_id, posted_date)
+    result = await service.mark_transaction_cleared(
+        current_user.user_id, txn_id, posted_date
+    )
 
     if isinstance(result, TransactionError):
         raise HTTPException(

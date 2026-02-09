@@ -108,9 +108,7 @@ class TestRegistrationEnqueuesEmail:
         send_verification_email.defer_async = mock_defer_async
 
         try:
-            response = client_with_handlers.post(
-                "/auth/register", json=test_user_data
-            )
+            response = client_with_handlers.post("/auth/register", json=test_user_data)
 
             assert response.status_code == 202
             # Verify defer_async was called with correct keyword args

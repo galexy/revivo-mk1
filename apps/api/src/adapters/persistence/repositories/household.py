@@ -41,7 +41,9 @@ class HouseholdRepository:
         Returns:
             Household entity or None.
         """
-        return self._session.query(Household).filter(Household.id == household_id).first()
+        return (
+            self._session.query(Household).filter(Household.id == household_id).first()
+        )
 
     def update(self, household: Household) -> None:
         """Update an existing household.

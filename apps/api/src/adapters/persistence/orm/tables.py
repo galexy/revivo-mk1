@@ -162,49 +162,40 @@ accounts = Table(
         ForeignKey("households.id"),
         nullable=False,
     ),
-
     # Core fields - uses custom type decorators for enum conversion
     Column("name", String(255), nullable=False),
     Column("account_type", AccountTypeEnum(50), nullable=False),  # Discriminator
     Column("status", AccountStatusEnum(20), nullable=False, default="active"),
     Column("subtype", AccountSubtypeEnum(50), nullable=True),
-
     # Balance tracking
     Column("opening_balance_amount", Numeric(19, 4), nullable=False),
     Column("opening_balance_currency", String(3), nullable=False),
     Column("opening_date", DateTime(timezone=True), nullable=False),
-
     # Type-specific fields (nullable for types that don't use them)
     Column("credit_limit_amount", Numeric(19, 4), nullable=True),
     Column("credit_limit_currency", String(3), nullable=True),
     Column("apr", Numeric(5, 4), nullable=True),  # e.g., 0.1999 for 19.99%
     Column("term_months", Integer, nullable=True),
     Column("due_date", DateTime(timezone=True), nullable=True),
-
     # Rewards-specific
     Column("rewards_value", Numeric(19, 0), nullable=True),
     Column("rewards_unit", String(100), nullable=True),
-
     # Institution
     Column("institution_name", String(255), nullable=True),
     Column("institution_website", String(500), nullable=True),
     Column("institution_phone", String(50), nullable=True),
     Column("institution_notes", Text, nullable=True),
-
     # Encrypted account number (AES-256-GCM via FieldEncryption)
     Column("encrypted_account_number", Text, nullable=True),
-
     # Lifecycle
     Column("closing_date", DateTime(timezone=True), nullable=True),
     Column("notes", Text, nullable=True),
     Column("sort_order", Integer, nullable=False, default=0),
-
     # Audit - uses UserIdType for nullable user references
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
     Column("created_by", UserIdType(36), nullable=True),
     Column("updated_by", UserIdType(36), nullable=True),
-
     # Indexes
     Index("ix_accounts_user_id", "user_id"),
     Index("ix_accounts_household_id", "household_id"),
@@ -226,23 +217,18 @@ categories = Table(
         nullable=False,
     ),
     Column("name", String(255), nullable=False),
-
     # Hierarchy - parent_id is None for top-level categories
     Column("parent_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True),
-
     # Type - income or expense (defaults to expense)
     Column("category_type", String(10), nullable=False, server_default="expense"),
-
     # Metadata
     Column("is_system", Boolean, nullable=False, default=False),
     Column("is_hidden", Boolean, nullable=False, default=False),
     Column("sort_order", Integer, nullable=False, default=0),
     Column("icon", String(50), nullable=True),
-
     # Audit
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
-
     # Indexes
     Index("ix_categories_user_id", "user_id"),
     Index("ix_categories_household_id", "household_id"),
@@ -265,7 +251,6 @@ payees = Table(
     ),
     Column("name", String(255), nullable=False),
     Column("normalized_name", String(255), nullable=False),  # Lowercase for matching
-
     # Default category for auto-fill when selecting this payee
     Column(
         "default_category_id",
@@ -273,15 +258,12 @@ payees = Table(
         ForeignKey("categories.id"),
         nullable=True,
     ),
-
     # Usage tracking for autocomplete relevance
     Column("last_used_at", DateTime(timezone=True), nullable=True),
     Column("usage_count", Integer, nullable=False, default=0),
-
     # Audit
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
-
     # Indexes
     Index("ix_payees_user_id", "user_id"),
     Index("ix_payees_household_id", "household_id"),
@@ -302,27 +284,21 @@ transactions = Table(
         ForeignKey("households.id"),
         nullable=False,
     ),
-
     # Dates per CONTEXT: effective_date and posted_date (Date type, not DateTime)
     Column("effective_date", Date, nullable=False),
     Column("posted_date", Date, nullable=True),  # None = pending
-
     # Amount: net flow to account (positive = inflow, negative = outflow)
     Column("amount", Numeric(19, 4), nullable=False),
     Column("currency", String(3), nullable=False, default="USD"),
-
     # Status and source
     Column("status", TransactionStatusEnum(20), nullable=False, default="pending"),
     Column("source", TransactionSourceEnum(20), nullable=False, default="manual"),
-
     # Payee (managed entity reference + denormalized name for display)
     Column("payee_id", PayeeIdType(36), ForeignKey("payees.id"), nullable=True),
     Column("payee_name", String(255), nullable=True),
-
     # Description
     Column("memo", Text, nullable=True),
     Column("check_number", String(50), nullable=True),
-
     # Mirror transaction link for transfers
     Column(
         "source_transaction_id",
@@ -330,16 +306,15 @@ transactions = Table(
         ForeignKey("transactions.id"),
         nullable=True,
     ),
-    Column("source_split_id", SplitIdType(36), nullable=True),  # Links mirror to source split
+    Column(
+        "source_split_id", SplitIdType(36), nullable=True
+    ),  # Links mirror to source split
     Column("is_mirror", Boolean, nullable=False, default=False),
-
     # Audit
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
-
     # Full-text search vector (updated by application)
     Column("search_vector", TSVECTOR, nullable=True),
-
     # Indexes
     Index("ix_transactions_user_id", "user_id"),
     Index("ix_transactions_household_id", "household_id"),
@@ -366,26 +341,23 @@ split_lines = Table(
         ForeignKey("transactions.id", ondelete="CASCADE"),
         nullable=False,
     ),
-
     # Amount: signed (positive = income/inflow, negative = expense/outflow)
     Column("amount", Numeric(19, 4), nullable=False),
     Column("currency", String(3), nullable=False, default="USD"),
-
     # Either category OR transfer account (not both, enforced by application)
-    Column("category_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True),
+    Column(
+        "category_id", CategoryIdType(36), ForeignKey("categories.id"), nullable=True
+    ),
     Column(
         "transfer_account_id",
         AccountIdType(36),
         ForeignKey("accounts.id"),
         nullable=True,
     ),
-
     # Per-split memo
     Column("memo", String(500), nullable=True),
-
     # Order within transaction
     Column("sort_order", Integer, nullable=False, default=0),
-
     # Indexes
     Index("ix_split_lines_transaction_id", "transaction_id"),
     Index("ix_split_lines_category_id", "category_id"),
@@ -411,7 +383,6 @@ refresh_tokens = Table(
     Column("expires_at", DateTime(timezone=True), nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("revoked_at", DateTime(timezone=True), nullable=True),
-
     # Indexes
     Index("ix_refresh_tokens_user_id", "user_id"),
     Index("ix_refresh_tokens_token_hash", "token_hash", unique=True),
