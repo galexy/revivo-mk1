@@ -2,7 +2,7 @@
 
 ## Overview
 
-A 28-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then authentication, then frontend infrastructure, then UI features, then integrations (bank sync), then financial features (budgeting, reporting, investments), migration from legacy systems, and finally platform hardening with multi-user household support. Phases 1-22 deliver the core platform; Phases 23-28 are a future milestone for security hardening and multi-user features. Each phase delivers a coherent, verifiable capability.
+A 29-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then authentication, then CI/code quality, then frontend infrastructure, then UI features, then integrations (bank sync), then financial features (budgeting, reporting, investments), migration from legacy systems, and finally platform hardening with multi-user household support. Phases 1-23 deliver the core platform; Phases 24-29 are a future milestone for security hardening and multi-user features. Each phase delivers a coherent, verifiable capability.
 
 ## Phases
 
@@ -23,21 +23,22 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Domain Event Publishing** - Event bus infrastructure, async event handlers, event-driven architecture
 - [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
 - [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
-- [ ] **Phase 8: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
-- [ ] **Phase 9: Login UI** - Login page, session/token management, logout
-- [ ] **Phase 10: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
-- [ ] **Phase 11: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
-- [ ] **Phase 12: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
-- [ ] **Phase 13: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
-- [ ] **Phase 14: Split Transactions UI** - Create and update split transactions
-- [ ] **Phase 15: Transfers UI** - Account transfers, transfers in splits
-- [ ] **Phase 16: Pagination & Infinite Scroll** - API pagination, infinite scroll UI
-- [ ] **Phase 17: Scheduled Transactions** - Recurring transactions with auto-creation
-- [ ] **Phase 18: Bank Sync** - Plaid integration with transaction import and reconciliation
-- [ ] **Phase 19: Budgeting** - Envelope budgeting with category tracking
-- [ ] **Phase 20: Reporting** - Spending reports, net worth, and trend analysis
-- [ ] **Phase 21: Investment Tracking** - Securities, holdings, cost basis, and gains
-- [ ] **Phase 22: Migration & Polish** - Quicken import, observability dashboards, comprehensive testing
+- [ ] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
+- [ ] **Phase 9: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
+- [ ] **Phase 10: Login UI** - Login page, session/token management, logout
+- [ ] **Phase 11: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
+- [ ] **Phase 12: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
+- [ ] **Phase 13: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
+- [ ] **Phase 14: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
+- [ ] **Phase 15: Split Transactions UI** - Create and update split transactions
+- [ ] **Phase 16: Transfers UI** - Account transfers, transfers in splits
+- [ ] **Phase 17: Pagination & Infinite Scroll** - API pagination, infinite scroll UI
+- [ ] **Phase 18: Scheduled Transactions** - Recurring transactions with auto-creation
+- [ ] **Phase 19: Bank Sync** - Plaid integration with transaction import and reconciliation
+- [ ] **Phase 20: Budgeting** - Envelope budgeting with category tracking
+- [ ] **Phase 21: Reporting** - Spending reports, net worth, and trend analysis
+- [ ] **Phase 22: Investment Tracking** - Securities, holdings, cost basis, and gains
+- [ ] **Phase 23: Migration & Polish** - Quicken import, observability dashboards, comprehensive testing
 
 ---
 
@@ -45,12 +46,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 *These phases address deferred items from Phase 4 (Authentication Infrastructure) and complete the multi-user vision.*
 
-- [ ] **Phase 23: Password Reset** - Email-based password recovery flow
-- [ ] **Phase 24: Auth Security Hardening** - Rate limiting, account lockout, brute force protection
-- [ ] **Phase 25: Session Management** - View active sessions, logout all devices, token revocation
-- [ ] **Phase 26: OIDC & Social Login** - Google OAuth and other identity providers
-- [ ] **Phase 27: Multi-User Households** - Invite users to join existing households
-- [ ] **Phase 28: User Preferences & Profile** - Timezone, currency, date format, avatar, profile data
+- [ ] **Phase 24: Password Reset** - Email-based password recovery flow
+- [ ] **Phase 25: Auth Security Hardening** - Rate limiting, account lockout, brute force protection
+- [ ] **Phase 26: Session Management** - View active sessions, logout all devices, token revocation
+- [ ] **Phase 27: OIDC & Social Login** - Google OAuth and other identity providers
+- [ ] **Phase 28: Multi-User Households** - Invite users to join existing households
+- [ ] **Phase 29: User Preferences & Profile** - Timezone, currency, date format, avatar, profile data
 
 ## Phase Details
 
@@ -255,9 +256,25 @@ Plans:
 - [x] 07-03-PLAN.md — Extract domain layer to libs/domain/, rewrite imports
 - [x] 07-04-PLAN.md — Update CLAUDE.md, final verification and smoke test
 
-### Phase 8: Frontend Infrastructure
-**Goal**: Set up frontend tooling and testing infrastructure
+### Phase 8: CI & Code Quality
+**Goal**: Get CI pipeline green and establish code quality baseline -- fix linting errors, resolve pyright strict type errors, add code coverage to Nx targets
 **Depends on**: Phase 7
+**Requirements**: CI pipeline health, code quality
+**Success Criteria** (what must be TRUE):
+  1. GitHub Actions CI passes on all jobs (lint, typecheck, test)
+  2. All pyright strict errors resolved in api and domain projects
+  3. All ruff lint errors resolved in api and domain projects
+  4. Code coverage Nx targets configured and reporting
+  5. import-linter passes in CI
+**Plans**: TBD
+
+Plans:
+- [ ] 08-01: TBD
+- [ ] 08-02: TBD
+
+### Phase 9: Frontend Infrastructure
+**Goal**: Set up frontend tooling and testing infrastructure
+**Depends on**: Phase 8
 **Requirements**: ARCH-06, TEST-05
 **Success Criteria** (what must be TRUE):
   1. React app runs with Tailwind CSS v4
@@ -268,12 +285,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 09-01: TBD
+- [ ] 09-02: TBD
 
-### Phase 9: Login UI
+### Phase 10: Login UI
 **Goal**: User can log in and out via web interface
-**Depends on**: Phase 8
+**Depends on**: Phase 9
 **Requirements**: WEB-01, WEB-02, WEB-03, WEB-04
 **Success Criteria** (what must be TRUE):
   1. Login page with form (email/password or OAuth)
@@ -284,12 +301,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 10-01: TBD
+- [ ] 10-02: TBD
 
-### Phase 10: Frontend API & Routing
+### Phase 11: Frontend API & Routing
 **Goal**: Establish patterns for API communication and client-side routing
-**Depends on**: Phase 9
+**Depends on**: Phase 10
 **Requirements**: WEB-08, ARCH-07
 **Success Criteria** (what must be TRUE):
   1. TanStack Query configured for API state management
@@ -300,12 +317,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 11-01: TBD
+- [ ] 11-02: TBD
 
-### Phase 11: API Integration Validation
+### Phase 12: API Integration Validation
 **Goal**: Validate frontend-backend integration with minimal CRUD operations
-**Depends on**: Phase 10
+**Depends on**: Phase 11
 **Requirements**: WEB-06, WEB-07
 **Success Criteria** (what must be TRUE):
   1. User can create an account via UI
@@ -317,12 +334,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
+- [ ] 12-01: TBD
+- [ ] 12-02: TBD
 
-### Phase 12: Error Handling Patterns
+### Phase 13: Error Handling Patterns
 **Goal**: Define and implement consistent error handling across the UI
-**Depends on**: Phase 11
+**Depends on**: Phase 12
 **Requirements**: WEB-06, WEB-07
 **Success Criteria** (what must be TRUE):
   1. Transient errors (network) show retry UI
@@ -333,12 +350,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 13-01: TBD
+- [ ] 13-02: TBD
 
-### Phase 13: Transaction UI (Simple Accounts)
+### Phase 14: Transaction UI (Simple Accounts)
 **Goal**: Full transaction management for checking/savings accounts
-**Depends on**: Phase 12
+**Depends on**: Phase 13
 **Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-11
 **Success Criteria** (what must be TRUE):
   1. Transaction list view for checking/savings accounts
@@ -350,13 +367,13 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
-- [ ] 13-03: TBD
+- [ ] 14-01: TBD
+- [ ] 14-02: TBD
+- [ ] 14-03: TBD
 
-### Phase 14: Split Transactions UI
+### Phase 15: Split Transactions UI
 **Goal**: Support creating and editing split transactions
-**Depends on**: Phase 13
+**Depends on**: Phase 14
 **Requirements**: TRAN-05
 **Success Criteria** (what must be TRUE):
   1. User can split transaction across multiple categories
@@ -366,12 +383,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
+- [ ] 15-01: TBD
+- [ ] 15-02: TBD
 
-### Phase 15: Transfers UI
+### Phase 16: Transfers UI
 **Goal**: Support transfers between accounts in the UI
-**Depends on**: Phase 14
+**Depends on**: Phase 15
 **Requirements**: TRAN-06
 **Success Criteria** (what must be TRUE):
   1. User can create transfer between two accounts
@@ -381,12 +398,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 15-01: TBD
-- [ ] 15-02: TBD
+- [ ] 16-01: TBD
+- [ ] 16-02: TBD
 
-### Phase 16: Pagination & Infinite Scroll
+### Phase 17: Pagination & Infinite Scroll
 **Goal**: Handle large transaction lists efficiently
-**Depends on**: Phase 15
+**Depends on**: Phase 16
 **Requirements**: API-05, API-06
 **Success Criteria** (what must be TRUE):
   1. Transaction API supports cursor-based pagination
@@ -396,12 +413,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 16-01: TBD
-- [ ] 16-02: TBD
+- [ ] 17-01: TBD
+- [ ] 17-02: TBD
 
-### Phase 17: Scheduled Transactions
+### Phase 18: Scheduled Transactions
 **Goal**: Users can define recurring transactions that automatically create instances on schedule
-**Depends on**: Phase 16
+**Depends on**: Phase 17
 **Requirements**: SCHED-01, SCHED-02, SCHED-03, SCHED-04, SCHED-05, SCHED-06, SCHED-07
 **Success Criteria** (what must be TRUE):
   1. User can create recurring transaction with frequency (weekly, monthly, yearly, custom) and date range
@@ -412,12 +429,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 17-01: TBD
-- [ ] 17-02: TBD
+- [ ] 18-01: TBD
+- [ ] 18-02: TBD
 
-### Phase 18: Bank Sync
+### Phase 19: Bank Sync
 **Goal**: Users can connect bank accounts via Plaid and have transactions automatically imported and reconciled
-**Depends on**: Phase 17
+**Depends on**: Phase 18
 **Requirements**: PLAID-01, PLAID-02, PLAID-03, PLAID-04, PLAID-05, PLAID-06, PLAID-07, PLAID-08, PLAID-09, RECON-01, RECON-02, RECON-03, RECON-04, RECON-05
 **Success Criteria** (what must be TRUE):
   1. User can connect checking and credit card accounts via Plaid OAuth flow
@@ -428,13 +445,13 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 18-01: TBD
-- [ ] 18-02: TBD
-- [ ] 18-03: TBD
+- [ ] 19-01: TBD
+- [ ] 19-02: TBD
+- [ ] 19-03: TBD
 
-### Phase 19: Budgeting
+### Phase 20: Budgeting
 **Goal**: Users can create envelope budgets and track spending against category limits
-**Depends on**: Phase 18
+**Depends on**: Phase 19
 **Requirements**: BUDG-01, BUDG-02, BUDG-03, BUDG-04, BUDG-05, BUDG-06, BUDG-07, BUDG-08
 **Success Criteria** (what must be TRUE):
   1. User can create annual budget with monthly breakdown by category
@@ -445,12 +462,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 19-01: TBD
-- [ ] 19-02: TBD
+- [ ] 20-01: TBD
+- [ ] 20-02: TBD
 
-### Phase 20: Reporting
+### Phase 21: Reporting
 **Goal**: Users can view spending analysis, net worth, and trends across their financial data
-**Depends on**: Phase 19
+**Depends on**: Phase 20
 **Requirements**: RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06
 **Success Criteria** (what must be TRUE):
   1. User can view spending by category for any time period (month, quarter, year)
@@ -461,12 +478,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 20-01: TBD
-- [ ] 20-02: TBD
+- [ ] 21-01: TBD
+- [ ] 21-02: TBD
 
-### Phase 21: Investment Tracking
+### Phase 22: Investment Tracking
 **Goal**: Users can track investment holdings with cost basis and gain/loss calculations
-**Depends on**: Phase 20
+**Depends on**: Phase 21
 **Requirements**: INV-01, INV-02, INV-03, INV-04, INV-05, INV-06, INV-07, INV-08
 **Success Criteria** (what must be TRUE):
   1. User can record buy, sell, dividend, and stock split transactions for securities
@@ -477,12 +494,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 21-01: TBD
-- [ ] 21-02: TBD
+- [ ] 22-01: TBD
+- [ ] 22-02: TBD
 
-### Phase 22: Migration & Polish
+### Phase 23: Migration & Polish
 **Goal**: Users can migrate from Quicken and system has production-ready observability and test coverage
-**Depends on**: Phase 21
+**Depends on**: Phase 22
 **Requirements**: MIG-01, MIG-02, MIG-03, MIG-04, MIG-05, MIG-06, MIG-07, OBS-01, OBS-02, OBS-03, OBS-04, OBS-05, OBS-06, OBS-07, TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07
 **Success Criteria** (what must be TRUE):
   1. User can import complete Quicken transaction history including transfers, attachments, and brokerage transactions
@@ -493,19 +510,19 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
-- [ ] 22-03: TBD
+- [ ] 23-01: TBD
+- [ ] 23-02: TBD
+- [ ] 23-03: TBD
 
 ---
 
 ## Future Milestone: Platform Hardening & Multi-User
 
-*Phases 23-28 address deferred items from Phase 4 and complete the multi-user household vision. These phases can be executed after the core platform is functional.*
+*Phases 24-29 address deferred items from Phase 4 and complete the multi-user household vision. These phases can be executed after the core platform is functional.*
 
-### Phase 23: Password Reset
+### Phase 24: Password Reset
 **Goal**: Users can recover account access via email-based password reset
-**Depends on**: Phase 22 (or can be pulled earlier if email infrastructure exists from Phase 6)
+**Depends on**: Phase 23 (or can be pulled earlier if email infrastructure exists from Phase 6)
 **Requirements**: AUTH-RESET-01, AUTH-RESET-02
 **Success Criteria** (what must be TRUE):
   1. User can request password reset via email
@@ -516,12 +533,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 23-01: TBD
-- [ ] 23-02: TBD
+- [ ] 24-01: TBD
+- [ ] 24-02: TBD
 
-### Phase 24: Auth Security Hardening
+### Phase 25: Auth Security Hardening
 **Goal**: Protect authentication endpoints from brute force and credential stuffing attacks
-**Depends on**: Phase 23
+**Depends on**: Phase 24
 **Requirements**: SEC-01, SEC-02, SEC-03
 **Success Criteria** (what must be TRUE):
   1. Login endpoint rate limited per IP and per email
@@ -532,12 +549,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 24-01: TBD
-- [ ] 24-02: TBD
+- [ ] 25-01: TBD
+- [ ] 25-02: TBD
 
-### Phase 25: Session Management
+### Phase 26: Session Management
 **Goal**: Users can view and control their active sessions across devices
-**Depends on**: Phase 24
+**Depends on**: Phase 25
 **Requirements**: AUTH-SESSION-01, AUTH-SESSION-02, AUTH-SESSION-03
 **Success Criteria** (what must be TRUE):
   1. User can view list of active sessions (device, location, last active)
@@ -548,12 +565,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 25-01: TBD
-- [ ] 25-02: TBD
+- [ ] 26-01: TBD
+- [ ] 26-02: TBD
 
-### Phase 26: OIDC & Social Login
+### Phase 27: OIDC & Social Login
 **Goal**: Users can authenticate via external identity providers (Google, etc.)
-**Depends on**: Phase 25
+**Depends on**: Phase 26
 **Requirements**: AUTH-OIDC-01, AUTH-OIDC-02, AUTH-OIDC-03
 **Success Criteria** (what must be TRUE):
   1. User can sign up and log in via Google OAuth
@@ -564,12 +581,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 26-01: TBD
-- [ ] 26-02: TBD
+- [ ] 27-01: TBD
+- [ ] 27-02: TBD
 
-### Phase 27: Multi-User Households
+### Phase 28: Multi-User Households
 **Goal**: Multiple users can share access to a household's financial data
-**Depends on**: Phase 26
+**Depends on**: Phase 27
 **Requirements**: HOUSEHOLD-01, HOUSEHOLD-02, HOUSEHOLD-03
 **Success Criteria** (what must be TRUE):
   1. User can invite others to join their household via email
@@ -580,12 +597,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 27-01: TBD
-- [ ] 27-02: TBD
+- [ ] 28-01: TBD
+- [ ] 28-02: TBD
 
-### Phase 28: User Preferences & Profile
+### Phase 29: User Preferences & Profile
 **Goal**: Users can customize their experience and manage profile information
-**Depends on**: Phase 27
+**Depends on**: Phase 28
 **Requirements**: USER-PREF-01, USER-PREF-02, USER-PROFILE-01
 **Success Criteria** (what must be TRUE):
   1. User can set timezone (affects date display)
@@ -596,13 +613,13 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 28-01: TBD
-- [ ] 28-02: TBD
+- [ ] 29-01: TBD
+- [ ] 29-02: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 5 -> 6 -> 7 -> ... -> 22 -> 23 -> ... -> 28
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 5 -> 6 -> 7 -> 8 -> ... -> 23 -> 24 -> ... -> 29
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -617,25 +634,26 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
-| 8. Frontend Infrastructure | 0/2 | Not started | - |
-| 9. Login UI | 0/2 | Not started | - |
-| 10. Frontend API & Routing | 0/2 | Not started | - |
-| 11. API Integration Validation | 0/2 | Not started | - |
-| 12. Error Handling Patterns | 0/2 | Not started | - |
-| 13. Transaction UI (Simple) | 0/3 | Not started | - |
-| 14. Split Transactions UI | 0/2 | Not started | - |
-| 15. Transfers UI | 0/2 | Not started | - |
-| 16. Pagination & Infinite Scroll | 0/2 | Not started | - |
-| 17. Scheduled Transactions | 0/2 | Not started | - |
-| 18. Bank Sync | 0/3 | Not started | - |
-| 19. Budgeting | 0/2 | Not started | - |
-| 20. Reporting | 0/2 | Not started | - |
-| 21. Investment Tracking | 0/2 | Not started | - |
-| 22. Migration & Polish | 0/3 | Not started | - |
+| 8. CI & Code Quality | 0/2 | Not started | - |
+| 9. Frontend Infrastructure | 0/2 | Not started | - |
+| 10. Login UI | 0/2 | Not started | - |
+| 11. Frontend API & Routing | 0/2 | Not started | - |
+| 12. API Integration Validation | 0/2 | Not started | - |
+| 13. Error Handling Patterns | 0/2 | Not started | - |
+| 14. Transaction UI (Simple) | 0/3 | Not started | - |
+| 15. Split Transactions UI | 0/2 | Not started | - |
+| 16. Transfers UI | 0/2 | Not started | - |
+| 17. Pagination & Infinite Scroll | 0/2 | Not started | - |
+| 18. Scheduled Transactions | 0/2 | Not started | - |
+| 19. Bank Sync | 0/3 | Not started | - |
+| 20. Budgeting | 0/2 | Not started | - |
+| 21. Reporting | 0/2 | Not started | - |
+| 22. Investment Tracking | 0/2 | Not started | - |
+| 23. Migration & Polish | 0/3 | Not started | - |
 | **Future Milestone** | | | |
-| 23. Password Reset | 0/2 | Not started | - |
-| 24. Auth Security Hardening | 0/2 | Not started | - |
-| 25. Session Management | 0/2 | Not started | - |
-| 26. OIDC & Social Login | 0/2 | Not started | - |
-| 27. Multi-User Households | 0/2 | Not started | - |
-| 28. User Preferences & Profile | 0/2 | Not started | - |
+| 24. Password Reset | 0/2 | Not started | - |
+| 25. Auth Security Hardening | 0/2 | Not started | - |
+| 26. Session Management | 0/2 | Not started | - |
+| 27. OIDC & Social Login | 0/2 | Not started | - |
+| 28. Multi-User Households | 0/2 | Not started | - |
+| 29. User Preferences & Profile | 0/2 | Not started | - |
