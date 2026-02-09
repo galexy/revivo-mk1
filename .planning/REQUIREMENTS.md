@@ -331,7 +331,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OBS-05 | Phase 20 | Pending |
 | OBS-06 | Phase 20 | Pending |
 | OBS-07 | Phase 20 | Pending |
-| TEST-01 | Phase 20 | Pending |
+| TEST-01 | Phase 11, 20 | Complete (Phase 11) |
 | TEST-02 | Phase 20 | Pending |
 | TEST-03 | Phase 20 | Pending |
 | TEST-04 | Phase 20 | Pending |
