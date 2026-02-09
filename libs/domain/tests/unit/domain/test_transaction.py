@@ -733,7 +733,8 @@ class TestTransactionUpdate:
                 amount=Money(Decimal("-80.00"), "USD"), category_id=category_id
             ),
             SplitLine.create(
-                amount=Money(Decimal("-40.00"), "USD"), category_id=CategoryId.generate()
+                amount=Money(Decimal("-40.00"), "USD"),
+                category_id=CategoryId.generate(),
             ),
         ]
 
