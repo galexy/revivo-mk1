@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 8 (CI & Code Quality) - In progress
+**Current focus:** Phase 8 (CI & Code Quality) - Complete
 
 ## Current Position
 
 Phase: 8 of 22 (CI & Code Quality)
-Plan: 3 of 4 complete
-Status: In progress
-Last activity: 2026-02-09 - Completed 08-03-PLAN.md (Fix API Ruff Lint Errors)
+Plan: 4 of 4 complete
+Status: Phase complete
+Last activity: 2026-02-09 - Completed 08-04-PLAN.md (CI Pipeline Configuration)
 
-Progress: [██████░░░░] ~60%
+Progress: [██████░░░░] ~62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 52
-- Average duration: 5.1 min
-- Total execution time: 5.94 hours
+- Total plans completed: 53
+- Average duration: 5.0 min
+- Total execution time: 6.01 hours
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: [██████░░░░] ~60%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
-| 08-ci-code-quality | 3 | 51 min | 17.0 min |
+| 08-ci-code-quality | 4 | 55 min | 13.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-03 (10 min), 07-04 (4 min), 08-01 (10 min), 08-02 (25 min), 08-03 (16 min)
-- Trend: 08-03 eliminated 173 ruff lint errors across 40 files.
+- Last 5 plans: 07-04 (4 min), 08-01 (10 min), 08-02 (25 min), 08-03 (16 min), 08-04 (4 min)
+- Trend: Phase 8 complete. CI pipeline with nx affected, caching, and all quality gates.
 
 *Updated after each plan completion*
 
@@ -231,6 +231,13 @@ Recent decisions affecting current work:
 - TYPE_CHECKING block for runtime-unused imports when __future__ annotations enabled
 - datetime.now(UTC).date() as standard pattern for timezone-aware date creation
 - Absolute imports only in src/ (no relative parent imports)
+- Coverage targets separate from test targets (npx nx coverage vs npx nx test)
+- Terminal-only coverage output (--cov-report=term-missing), no HTML artifacts
+- Branch coverage enabled (--cov-branch) for finance app signal
+- CI uses nx affected (not run-many) with nrwl/nx-set-shas@v4 for SHA resolution
+- Two CI jobs: quality (lint/typecheck/format/import-linter) and test (with postgres)
+- npm ci for deterministic CI builds (not npm install)
+- fetch-depth: 0 for nx affected git history
 
 ### Pending Todos
 
@@ -250,9 +257,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed 08-03-PLAN.md (Fix API Ruff Lint Errors)
+Stopped at: Completed 08-04-PLAN.md (CI Pipeline Configuration) - Phase 8 complete
 Resume file: None
-Next action: Execute 08-04-PLAN.md (CI pipeline configuration)
+Next action: Begin next phase in roadmap
 
 ## Roadmap Evolution
 
@@ -499,4 +506,31 @@ Key stats:
 - Git history preserved across all file moves
 - Service operational, alembic migrations clean, zero drift
 
-Ready for Phase 8: Frontend Infrastructure
+Ready for Phase 8: CI & Code Quality
+
+## Phase 8 Milestone
+
+**Phase 8: CI & Code Quality - COMPLETE**
+
+All success criteria met:
+1. Pyright strict mode with zero errors across api and domain projects
+2. Ruff lint with zero errors across api and domain projects
+3. Ruff format check passes (all files formatted)
+4. import-linter passes (2/2 architecture contracts kept)
+5. CI pipeline with nx affected, dependency caching, and all blocking quality gates
+6. Coverage targets for api (81%) and domain (48%) projects
+
+Plans completed (4 of 4):
+- 08-01: Tooling and Domain Cleanup (pyrightconfig.json, py.typed, ruff config, domain 0 errors)
+- 08-02: Fix API Pyright Errors (2067 -> 0 strict errors across 42 files)
+- 08-03: Fix API Ruff Lint Errors (173 -> 0 lint errors across 40 files)
+- 08-04: CI Pipeline Configuration (nx affected, caching, coverage targets, all blocking gates)
+
+Key stats:
+- 444 total tests passing (252 API + 192 domain)
+- Zero pyright strict errors, zero ruff lint errors
+- CI: 2 parallel jobs (quality + test), nx affected for efficiency
+- Coverage baseline: API 81%, Domain 48%
+- 10 formatting fixes in 08-04 for clean format check gate
+
+Ready for next phase in roadmap
