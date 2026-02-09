@@ -266,11 +266,13 @@ Plans:
   3. All ruff lint errors resolved in api and domain projects
   4. Code coverage Nx targets configured and reporting
   5. import-linter passes in CI
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Tooling config (pyrightconfig.json, py.typed, ruff config, format) + domain fixes
+- [ ] 08-02-PLAN.md — API pyright strict error fixes (repositories, mappers, routes, tests)
+- [ ] 08-03-PLAN.md — API ruff lint error fixes (DTZ, imports, unused args, exception chaining)
+- [ ] 08-04-PLAN.md — Coverage Nx targets + CI restructure (nx affected, caching, blocking checks)
 
 ### Phase 9: Frontend Infrastructure
 **Goal**: Set up frontend tooling and testing infrastructure
@@ -634,7 +636,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
-| 8. CI & Code Quality | 0/2 | Not started | - |
+| 8. CI & Code Quality | 0/4 | Not started | - |
 | 9. Frontend Infrastructure | 0/2 | Not started | - |
 | 10. Login UI | 0/2 | Not started | - |
 | 11. Frontend API & Routing | 0/2 | Not started | - |
