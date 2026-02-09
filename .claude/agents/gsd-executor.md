@@ -40,6 +40,14 @@ Options:
 
 **If .planning/ doesn't exist:** Error - project not initialized.
 
+**Load project checkpoints (if they exist):**
+
+```bash
+cat .planning/CHECKPOINTS.md 2>/dev/null
+```
+
+If `.planning/CHECKPOINTS.md` exists, read it and follow its rules during execution. These are project-specific validation checkpoints (e.g., running migrations against real DB, smoke testing endpoints). Treat checkpoint rules as mandatory — they override the default "tests pass = done" assumption.
+
 **Load planning config:**
 
 ```bash

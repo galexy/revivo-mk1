@@ -415,6 +415,7 @@ Output: [What artifacts will be created]
 @.planning/PROJECT.md
 @.planning/ROADMAP.md
 @.planning/STATE.md
+@.planning/CHECKPOINTS.md  # If exists: project-specific validation rules for task <verify>/<done>
 
 # Only reference prior plan SUMMARYs if genuinely needed
 @path/to/relevant/source.ts
@@ -1082,6 +1083,8 @@ done
 5. Read FULL summaries only for selected relevant phases.
 
 **From STATE.md:** Decisions -> constrain approach. Pending todos -> candidates.
+
+**From CHECKPOINTS.md (if exists):** Read `.planning/CHECKPOINTS.md` and incorporate its rules into task `<verify>` and `<done>` elements. These are project-specific validation requirements (e.g., real-DB migration checks, service smoke tests) that must appear in relevant tasks.
 </step>
 
 <step name="gather_phase_context">

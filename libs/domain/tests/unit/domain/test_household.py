@@ -1,0 +1,85 @@
+"""Tests for Household domain model."""
+
+import pytest
+
+
+class TestHouseholdId:
+    """Tests for HouseholdId TypeID."""
+
+    def test_generate_creates_valid_id(self) -> None:
+        """Generated HouseholdId has 'hh_' prefix."""
+        from domain.model.entity_id import HouseholdId
+
+        hh_id = HouseholdId.generate()
+
+        assert str(hh_id).startswith("hh_")
+        assert len(str(hh_id)) > 10  # TypeID format
+
+    def test_from_string_parses_valid_id(self) -> None:
+        """HouseholdId can be parsed from valid string."""
+        from domain.model.entity_id import HouseholdId
+
+        original = HouseholdId.generate()
+        parsed = HouseholdId.from_string(str(original))
+
+        assert str(parsed) == str(original)
+
+    def test_from_string_rejects_wrong_prefix(self) -> None:
+        """HouseholdId rejects non-hh prefixes."""
+        from domain.model.entity_id import HouseholdId
+
+        with pytest.raises(ValueError, match="hh"):
+            HouseholdId.from_string("user_01h455vb4pex5vsknk084sn02q")
+
+    def test_prefix_property_returns_hh(self) -> None:
+        """HouseholdId.prefix returns 'hh'."""
+        from domain.model.entity_id import HouseholdId
+
+        hh_id = HouseholdId.generate()
+
+        assert hh_id.prefix == "hh"
+
+
+class TestHousehold:
+    """Tests for Household aggregate root."""
+
+    def test_create_generates_id(self) -> None:
+        """Household.create() generates a new HouseholdId."""
+        from domain.model.household import Household
+
+        household = Household.create(name="Smith Family")
+
+        assert household.id is not None
+        assert str(household.id).startswith("hh_")
+
+    def test_create_stores_name(self) -> None:
+        """Household.create() stores name."""
+        from domain.model.household import Household
+
+        household = Household.create(name="Test Household")
+
+        assert household.name == "Test Household"
+
+    def test_create_sets_timestamps(self) -> None:
+        """Household.create() sets created_at and updated_at."""
+        from domain.model.household import Household
+
+        household = Household.create(name="Test")
+
+        assert household.created_at is not None
+        assert household.updated_at is not None
+        assert household.created_at == household.updated_at
+
+    def test_update_name_changes_name_and_updated_at(self) -> None:
+        """update_name() changes name and updates timestamp."""
+        from domain.model.household import Household
+        import time
+
+        household = Household.create(name="Old Name")
+        old_updated = household.updated_at
+
+        time.sleep(0.01)  # Ensure timestamp changes
+        household.update_name("New Name")
+
+        assert household.name == "New Name"
+        assert household.updated_at > old_updated

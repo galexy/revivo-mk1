@@ -1,0 +1,34 @@
+{
+  "name": "domain",
+  "projectType": "library",
+  "sourceRoot": "libs/domain/domain",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-domain pytest tests/ -v --tb=short",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-domain ruff check domain/ tests/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-domain pyright domain/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
+    }
+  }
+}

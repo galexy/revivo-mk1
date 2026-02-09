@@ -22,7 +22,8 @@
         "ckolkman.vscode-postgres",
         "ms-python.debugpy",
         "tamasfe.even-better-toml",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "nrwl.angular-console"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
@@ -54,13 +55,13 @@
     }
   },
 
-  "forwardPorts": [8000, 5432],
+  "forwardPorts": [8000, 5432, 8025],
 
   "remoteUser": "developer",
 
   "mounts": [
-    "source=personal-finance-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=personal-finance-claude-config-${devcontainerId},target=/home/developer/.claude,type=volume"
+    "source=personal-finance-bashhistory,target=/commandhistory,type=volume",
+    "source=${localWorkspaceFolder}/.claude-local,target=/home/developer/.claude,type=bind"
   ],
 
   "containerEnv": {
@@ -73,7 +74,7 @@
     "LOG_LEVEL": "DEBUG"
   },
 
-  "postCreateCommand": "uv sync",
+  "postCreateCommand": "uv sync && npm ci",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
   "waitFor": "postStartCommand",
 

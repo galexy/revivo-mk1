@@ -2,7 +2,7 @@
 
 ## Overview
 
-A 10-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then interfaces, then integrations (bank sync), then financial features (budgeting, reporting, investments), and finally migration from legacy systems. Each phase delivers a coherent, verifiable capability.
+A 29-phase journey to build a modern personal finance platform that replaces Quicken with proper domain modeling, data sovereignty, and multi-interface access. The roadmap follows dependency order: domain primitives first, then core entities (accounts, transactions), then authentication, then CI/code quality, then frontend infrastructure, then UI features, then integrations (bank sync), then financial features (budgeting, reporting, investments), migration from legacy systems, and finally platform hardening with multi-user household support. Phases 1-23 deliver the core platform; Phases 24-29 are a future milestone for security hardening and multi-user features. Each phase delivers a coherent, verifiable capability.
 
 ## Phases
 
@@ -16,14 +16,42 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Account Domain** - Account aggregate with all account types and balance tracking
 - [x] **Phase 3: Transaction Domain** - Transaction model with categories, splits, and transfers
 - [x] **Phase 3.1: Split Identity & Validation Fixes** - Add split IDs, fix validation, category types (INSERTED)
-- [ ] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
-- [ ] **Phase 4: Web Interface & API** - FastAPI REST endpoints and React frontend shell
-- [ ] **Phase 5: Scheduled Transactions** - Recurring transactions with auto-creation
-- [ ] **Phase 6: Bank Sync** - Plaid integration with transaction import and reconciliation
-- [ ] **Phase 7: Budgeting** - Envelope budgeting with category tracking
-- [ ] **Phase 8: Reporting** - Spending reports, net worth, and trend analysis
-- [ ] **Phase 9: Investment Tracking** - Securities, holdings, cost basis, and gains
-- [ ] **Phase 10: Migration & Polish** - Quicken import, observability dashboards, comprehensive testing
+- [x] **Phase 3.2: Add Missing PATCH Test Cases** - Comprehensive PATCH edge case tests (INSERTED)
+- [x] **Phase 4: Authentication Infrastructure** - User domain model, JWT issuance, protected routes
+- [x] **Phase 4.1: Test Schema Parity** - Align SQLAlchemy metadata with Alembic migrations so tests use production-equivalent schema (INSERTED)
+- [x] **Phase 4.2: Current User Metadata Endpoint** - Add /auth/me endpoint returning authenticated user profile (INSERTED)
+- [x] **Phase 5: Domain Event Publishing** - Event bus infrastructure, async event handlers, event-driven architecture
+- [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
+- [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
+- [ ] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
+- [ ] **Phase 9: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
+- [ ] **Phase 10: Login UI** - Login page, session/token management, logout
+- [ ] **Phase 11: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
+- [ ] **Phase 12: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
+- [ ] **Phase 13: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
+- [ ] **Phase 14: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
+- [ ] **Phase 15: Split Transactions UI** - Create and update split transactions
+- [ ] **Phase 16: Transfers UI** - Account transfers, transfers in splits
+- [ ] **Phase 17: Pagination & Infinite Scroll** - API pagination, infinite scroll UI
+- [ ] **Phase 18: Scheduled Transactions** - Recurring transactions with auto-creation
+- [ ] **Phase 19: Bank Sync** - Plaid integration with transaction import and reconciliation
+- [ ] **Phase 20: Budgeting** - Envelope budgeting with category tracking
+- [ ] **Phase 21: Reporting** - Spending reports, net worth, and trend analysis
+- [ ] **Phase 22: Investment Tracking** - Securities, holdings, cost basis, and gains
+- [ ] **Phase 23: Migration & Polish** - Quicken import, observability dashboards, comprehensive testing
+
+---
+
+### Future Milestone: Platform Hardening & Multi-User
+
+*These phases address deferred items from Phase 4 (Authentication Infrastructure) and complete the multi-user vision.*
+
+- [ ] **Phase 24: Password Reset** - Email-based password recovery flow
+- [ ] **Phase 25: Auth Security Hardening** - Rate limiting, account lockout, brute force protection
+- [ ] **Phase 26: Session Management** - View active sessions, logout all devices, token revocation
+- [ ] **Phase 27: OIDC & Social Login** - Google OAuth and other identity providers
+- [ ] **Phase 28: Multi-User Households** - Invite users to join existing households
+- [ ] **Phase 29: User Preferences & Profile** - Timezone, currency, date format, avatar, profile data
 
 ## Phase Details
 
@@ -118,30 +146,279 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03.2-01-PLAN.md — PATCH modification sub-cases (M1-M6)
-- [ ] 03.2-02-PLAN.md — Split addition and removal scenarios
-- [ ] 03.2-03-PLAN.md — PATCH-specific validation errors
+- [x] 03.2-01-PLAN.md — PATCH modification sub-cases (M1-M6)
+- [x] 03.2-02-PLAN.md — Split addition and removal scenarios
+- [x] 03.2-03-PLAN.md — PATCH-specific validation errors
 
-### Phase 4: Web Interface & API
-**Goal**: Users can access the application through web browser and external tools can access via REST API
-**Depends on**: Phase 3
-**Requirements**: WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06, WEB-07, WEB-08, API-01, API-02, API-03, API-04, API-05, API-06, API-07
+### Phase 4: Authentication Infrastructure
+**Goal**: Secure API with user authentication - JWT-based auth with protected routes
+**Depends on**: Phase 3.2
+**Requirements**: API-01, WEB-02, WEB-03
 **Success Criteria** (what must be TRUE):
-  1. User can log in with email/password and session persists across browser refresh
-  2. User can log out from any page
-  3. UI displays loading states during API calls and error messages for failures
-  4. API documentation is available at /docs with all endpoints documented
-  5. External tool can authenticate and call API endpoints to list accounts and transactions
+  1. User domain model exists with persistence (User entity, migration, repository)
+  2. User can obtain JWT token via login endpoint
+  3. Protected API routes reject requests without valid JWT (401)
+  4. Protected API routes accept requests with valid JWT and identify user
+  5. Existing E2E tests updated to work with authentication
+**Plans**: 8 plans
+
+Plans:
+- [x] 04-01-PLAN.md — User and Household domain entities with HouseholdId
+- [x] 04-02-PLAN.md — Security infrastructure (PyJWT, pwdlib/Argon2, itsdangerous)
+- [x] 04-03-PLAN.md — Database migration for auth tables and household scoping
+- [x] 04-04-PLAN.md — ORM mappers and repositories (User, Household, RefreshToken)
+- [x] 04-05-PLAN.md — AuthService application service (TDD)
+- [x] 04-06-PLAN.md — Auth API routes, schemas, dependencies, and endpoint tests (TDD)
+- [x] 04-07-PLAN.md — Route protection and household scoping (TDD)
+- [x] 04-08-PLAN.md — Update existing E2E tests for auth and household isolation
+
+### Phase 4.1: Test Schema Parity (INSERTED)
+**Goal**: Eliminate schema drift between SQLAlchemy table metadata and Alembic migrations so integration tests run against a production-equivalent schema
+**Depends on**: Phase 4
+**Requirements**: TEST integrity
+**Success Criteria** (what must be TRUE):
+  1. Integration tests create tables using Alembic migrations (not metadata.create_all)
+  2. All FK constraints, indexes, and column properties in migrations are reflected in SQLAlchemy metadata (or vice versa)
+  3. No test can pass against a schema that differs from production
+  4. All existing tests still pass
+**Plans**: 2 plans
+
+Plans:
+- [x] 04.1-01-PLAN.md — Fix Alembic config and replace hand-written migrations with autogenerated
+- [x] 04.1-02-PLAN.md — Drift detection test and autogenerate-first knowledge encoding
+
+### Phase 4.2: Current User Metadata Endpoint (INSERTED)
+**Goal**: Add a /auth/me endpoint that returns the authenticated user's profile metadata (user_id, email, display_name, household_id, email_verified status)
+**Depends on**: Phase 4
+**Requirements**: WEB-02 (user identity)
+**Success Criteria** (what must be TRUE):
+  1. GET /auth/me with valid JWT returns user profile (user_id, email, display_name, household_id, email_verified)
+  2. GET /auth/me without JWT returns 401
+  3. Response does not leak sensitive fields (password_hash, internal IDs)
+**Plans**: 1 plan
+
+Plans:
+- [x] 04.2-01-PLAN.md — Add /auth/me endpoint with UserProfileResponse schema and integration tests
+
+### Phase 5: Domain Event Publishing
+**Goal**: Establish domain event publishing infrastructure that enables async event handlers and event-driven architecture patterns
+**Depends on**: Phase 4.2
+**Requirements**: ARCH event-driven patterns
+**Success Criteria** (what must be TRUE):
+  1. Event bus infrastructure exists for publishing domain events
+  2. Event handlers can subscribe to specific event types
+  3. Events can be published synchronously (in-process) or queued for async handling
+  4. Event publishing integrates with existing domain events (UserRegistered, etc.)
+  5. Test infrastructure supports event handler testing
+**Plans**: 3 plans
+
+Plans:
+- [x] 05-01-PLAN.md — Event bus infrastructure and dependencies (Procrastinate, jobs database)
+- [x] 05-02-PLAN.md — Job queue wiring, UoW event publishing, handler registration
+- [x] 05-03-PLAN.md — Operational scripts and runbook for job queue management
+
+### Phase 6: Transactional Email Infrastructure
+**Goal**: Build email sending domain with SMTP adapter, add Mailpit to dev environment for email testing, send verification email on registration
+**Depends on**: Phase 5
+**Requirements**: AUTH email delivery
+**Success Criteria** (what must be TRUE):
+  1. Email domain exists with port (EmailService protocol) and SMTP adapter implementation
+  2. Mailpit runs in Docker Compose dev environment and captures all outgoing emails
+  3. UserRegistered event handler triggers verification email containing the signed token link
+  4. Integration tests mock the email adapter (no real SMTP calls) and verify email send was invoked with correct arguments
+  5. Password reset and other future transactional emails can reuse the same infrastructure
+  6. Dev workflow: register user -> open Mailpit UI -> click verification link -> user verified
+**Plans**: 5 plans
+
+Plans:
+- [x] 06-01-PLAN.md — EmailService protocol and SMTP adapter with Jinja2 templates
+- [x] 06-02-PLAN.md — Mailpit Docker Compose and SMTP configuration
+- [x] 06-03-PLAN.md — Event handler and job queue email integration
+- [x] 06-04-PLAN.md — Integration tests and end-to-end verification
+- [x] 06-05-PLAN.md — Async event bus, UoW, services, and routes conversion
+
+### Phase 7: Nx Monorepo Restructure
+**Goal**: Convert project to Nx monorepo structure to support multiple apps and shared libraries
+**Depends on**: Phase 6
+**Requirements**: Monorepo structure (apps/api, apps/web scaffold, libs/domain, libs/ui scaffold)
+**Success Criteria** (what must be TRUE):
+  1. Project uses Nx monorepo structure
+  2. Backend exists as app at `apps/backend/` (or `apps/api/`)
+  3. Frontend scaffold exists as app at `apps/frontend/` (or `apps/web/`)
+  4. Libraries directory structure ready at `libs/`
+  5. All existing backend tests pass after restructure
+  6. Nx commands work for building and testing apps
+**Plans**: 4 plans
+
+Plans:
+- [x] 07-01-PLAN.md — Initialize Nx workspace, scaffold apps/web/ and libs/ui/
+- [x] 07-02-PLAN.md — Move backend to apps/api/ with config updates
+- [x] 07-03-PLAN.md — Extract domain layer to libs/domain/, rewrite imports
+- [x] 07-04-PLAN.md — Update CLAUDE.md, final verification and smoke test
+
+### Phase 8: CI & Code Quality
+**Goal**: Get CI pipeline green and establish code quality baseline -- fix linting errors, resolve pyright strict type errors, add code coverage to Nx targets
+**Depends on**: Phase 7
+**Requirements**: CI pipeline health, code quality
+**Success Criteria** (what must be TRUE):
+  1. GitHub Actions CI passes on all jobs (lint, typecheck, test)
+  2. All pyright strict errors resolved in api and domain projects
+  3. All ruff lint errors resolved in api and domain projects
+  4. Code coverage Nx targets configured and reporting
+  5. import-linter passes in CI
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 08-01: TBD
+- [ ] 08-02: TBD
 
-### Phase 5: Scheduled Transactions
+### Phase 9: Frontend Infrastructure
+**Goal**: Set up frontend tooling and testing infrastructure
+**Depends on**: Phase 8
+**Requirements**: ARCH-06, TEST-05
+**Success Criteria** (what must be TRUE):
+  1. React app runs with Tailwind CSS v4
+  2. shadcn/ui component library integrated and working
+  3. Playwright configured for E2E UI testing
+  4. Claude browsing skill available for launching site and testing UI changes
+  5. Basic smoke test passes (app renders without errors)
+**Plans**: TBD
+
+Plans:
+- [ ] 09-01: TBD
+- [ ] 09-02: TBD
+
+### Phase 10: Login UI
+**Goal**: User can log in and out via web interface
+**Depends on**: Phase 9
+**Requirements**: WEB-01, WEB-02, WEB-03, WEB-04
+**Success Criteria** (what must be TRUE):
+  1. Login page with form (email/password or OAuth)
+  2. Successful login stores JWT token and redirects to app
+  3. Session persists across browser refresh
+  4. User can log out from any page
+  5. Unauthenticated users redirected to login
+**Plans**: TBD
+
+Plans:
+- [ ] 10-01: TBD
+- [ ] 10-02: TBD
+
+### Phase 11: Frontend API & Routing
+**Goal**: Establish patterns for API communication and client-side routing
+**Depends on**: Phase 10
+**Requirements**: WEB-08, ARCH-07
+**Success Criteria** (what must be TRUE):
+  1. TanStack Query configured for API state management
+  2. TanStack Router configured for client-side routing
+  3. Type-safe API client generated from OpenAPI spec
+  4. Authentication token automatically included in API requests
+  5. API error responses handled consistently
+**Plans**: TBD
+
+Plans:
+- [ ] 11-01: TBD
+- [ ] 11-02: TBD
+
+### Phase 12: API Integration Validation
+**Goal**: Validate frontend-backend integration with minimal CRUD operations
+**Depends on**: Phase 11
+**Requirements**: WEB-06, WEB-07
+**Success Criteria** (what must be TRUE):
+  1. User can create an account via UI
+  2. User can update an account via UI
+  3. User can create a transaction with single split via UI
+  4. User can update a transaction via UI
+  5. E2E tests cover these flows
+  6. Claude browsing skill used to automate UAT
+**Plans**: TBD
+
+Plans:
+- [ ] 12-01: TBD
+- [ ] 12-02: TBD
+
+### Phase 13: Error Handling Patterns
+**Goal**: Define and implement consistent error handling across the UI
+**Depends on**: Phase 12
+**Requirements**: WEB-06, WEB-07
+**Success Criteria** (what must be TRUE):
+  1. Transient errors (network) show retry UI
+  2. System errors show appropriate error message
+  3. User errors (validation) show inline feedback
+  4. Error handling patterns documented in frontend CLAUDE.md
+  5. Reusable error UI components created
+**Plans**: TBD
+
+Plans:
+- [ ] 13-01: TBD
+- [ ] 13-02: TBD
+
+### Phase 14: Transaction UI (Simple Accounts)
+**Goal**: Full transaction management for checking/savings accounts
+**Depends on**: Phase 13
+**Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-11
+**Success Criteria** (what must be TRUE):
+  1. Transaction list view for checking/savings accounts
+  2. Inline editing of transaction fields
+  3. Auto-create payees when typing new payee name
+  4. Auto-create categories when typing new category name
+  5. Delete transaction with confirmation
+  6. No split transaction editing (single category only)
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD
+- [ ] 14-02: TBD
+- [ ] 14-03: TBD
+
+### Phase 15: Split Transactions UI
+**Goal**: Support creating and editing split transactions
+**Depends on**: Phase 14
+**Requirements**: TRAN-05
+**Success Criteria** (what must be TRUE):
+  1. User can split transaction across multiple categories
+  2. Split amounts must sum to transaction total
+  3. User can add/remove split lines
+  4. User can edit individual split amounts and categories
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: TBD
+- [ ] 15-02: TBD
+
+### Phase 16: Transfers UI
+**Goal**: Support transfers between accounts in the UI
+**Depends on**: Phase 15
+**Requirements**: TRAN-06
+**Success Criteria** (what must be TRUE):
+  1. User can create transfer between two accounts
+  2. Transfer shows in both account transaction lists
+  3. User can create split with transfer component
+  4. Editing transfer updates both sides
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD
+- [ ] 16-02: TBD
+
+### Phase 17: Pagination & Infinite Scroll
+**Goal**: Handle large transaction lists efficiently
+**Depends on**: Phase 16
+**Requirements**: API-05, API-06
+**Success Criteria** (what must be TRUE):
+  1. Transaction API supports cursor-based pagination
+  2. UI implements infinite scroll for transaction list
+  3. Scroll position preserved on navigation
+  4. Performance acceptable with 10,000+ transactions
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: TBD
+- [ ] 17-02: TBD
+
+### Phase 18: Scheduled Transactions
 **Goal**: Users can define recurring transactions that automatically create instances on schedule
-**Depends on**: Phase 4
+**Depends on**: Phase 17
 **Requirements**: SCHED-01, SCHED-02, SCHED-03, SCHED-04, SCHED-05, SCHED-06, SCHED-07
 **Success Criteria** (what must be TRUE):
   1. User can create recurring transaction with frequency (weekly, monthly, yearly, custom) and date range
@@ -152,12 +429,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 18-01: TBD
+- [ ] 18-02: TBD
 
-### Phase 6: Bank Sync
+### Phase 19: Bank Sync
 **Goal**: Users can connect bank accounts via Plaid and have transactions automatically imported and reconciled
-**Depends on**: Phase 5
+**Depends on**: Phase 18
 **Requirements**: PLAID-01, PLAID-02, PLAID-03, PLAID-04, PLAID-05, PLAID-06, PLAID-07, PLAID-08, PLAID-09, RECON-01, RECON-02, RECON-03, RECON-04, RECON-05
 **Success Criteria** (what must be TRUE):
   1. User can connect checking and credit card accounts via Plaid OAuth flow
@@ -168,13 +445,13 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
-- [ ] 06-03: TBD
+- [ ] 19-01: TBD
+- [ ] 19-02: TBD
+- [ ] 19-03: TBD
 
-### Phase 7: Budgeting
+### Phase 20: Budgeting
 **Goal**: Users can create envelope budgets and track spending against category limits
-**Depends on**: Phase 6
+**Depends on**: Phase 19
 **Requirements**: BUDG-01, BUDG-02, BUDG-03, BUDG-04, BUDG-05, BUDG-06, BUDG-07, BUDG-08
 **Success Criteria** (what must be TRUE):
   1. User can create annual budget with monthly breakdown by category
@@ -185,12 +462,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 20-01: TBD
+- [ ] 20-02: TBD
 
-### Phase 8: Reporting
+### Phase 21: Reporting
 **Goal**: Users can view spending analysis, net worth, and trends across their financial data
-**Depends on**: Phase 7
+**Depends on**: Phase 20
 **Requirements**: RPT-01, RPT-02, RPT-03, RPT-04, RPT-05, RPT-06
 **Success Criteria** (what must be TRUE):
   1. User can view spending by category for any time period (month, quarter, year)
@@ -201,12 +478,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 21-01: TBD
+- [ ] 21-02: TBD
 
-### Phase 9: Investment Tracking
+### Phase 22: Investment Tracking
 **Goal**: Users can track investment holdings with cost basis and gain/loss calculations
-**Depends on**: Phase 8
+**Depends on**: Phase 21
 **Requirements**: INV-01, INV-02, INV-03, INV-04, INV-05, INV-06, INV-07, INV-08
 **Success Criteria** (what must be TRUE):
   1. User can record buy, sell, dividend, and stock split transactions for securities
@@ -217,12 +494,12 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 22-01: TBD
+- [ ] 22-02: TBD
 
-### Phase 10: Migration & Polish
+### Phase 23: Migration & Polish
 **Goal**: Users can migrate from Quicken and system has production-ready observability and test coverage
-**Depends on**: Phase 9
+**Depends on**: Phase 22
 **Requirements**: MIG-01, MIG-02, MIG-03, MIG-04, MIG-05, MIG-06, MIG-07, OBS-01, OBS-02, OBS-03, OBS-04, OBS-05, OBS-06, OBS-07, TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06, TEST-07
 **Success Criteria** (what must be TRUE):
   1. User can import complete Quicken transaction history including transfers, attachments, and brokerage transactions
@@ -233,14 +510,116 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
-- [ ] 10-03: TBD
+- [ ] 23-01: TBD
+- [ ] 23-02: TBD
+- [ ] 23-03: TBD
+
+---
+
+## Future Milestone: Platform Hardening & Multi-User
+
+*Phases 24-29 address deferred items from Phase 4 and complete the multi-user household vision. These phases can be executed after the core platform is functional.*
+
+### Phase 24: Password Reset
+**Goal**: Users can recover account access via email-based password reset
+**Depends on**: Phase 23 (or can be pulled earlier if email infrastructure exists from Phase 6)
+**Requirements**: AUTH-RESET-01, AUTH-RESET-02
+**Success Criteria** (what must be TRUE):
+  1. User can request password reset via email
+  2. Reset link expires after 24 hours
+  3. User can set new password via reset link
+  4. Old sessions invalidated after password change
+  5. Rate limiting on reset requests prevents abuse
+**Plans**: TBD
+
+Plans:
+- [ ] 24-01: TBD
+- [ ] 24-02: TBD
+
+### Phase 25: Auth Security Hardening
+**Goal**: Protect authentication endpoints from brute force and credential stuffing attacks
+**Depends on**: Phase 24
+**Requirements**: SEC-01, SEC-02, SEC-03
+**Success Criteria** (what must be TRUE):
+  1. Login endpoint rate limited per IP and per email
+  2. Account locks temporarily after N failed attempts
+  3. Lockout duration increases with repeated failures
+  4. Admin can unlock accounts manually
+  5. Failed login attempts logged for security monitoring
+**Plans**: TBD
+
+Plans:
+- [ ] 25-01: TBD
+- [ ] 25-02: TBD
+
+### Phase 26: Session Management
+**Goal**: Users can view and control their active sessions across devices
+**Depends on**: Phase 25
+**Requirements**: AUTH-SESSION-01, AUTH-SESSION-02, AUTH-SESSION-03
+**Success Criteria** (what must be TRUE):
+  1. User can view list of active sessions (device, location, last active)
+  2. User can logout individual sessions
+  3. User can logout all other sessions ("logout everywhere")
+  4. Session terminated immediately on logout (refresh token revoked)
+  5. Sessions auto-expire after inactivity period
+**Plans**: TBD
+
+Plans:
+- [ ] 26-01: TBD
+- [ ] 26-02: TBD
+
+### Phase 27: OIDC & Social Login
+**Goal**: Users can authenticate via external identity providers (Google, etc.)
+**Depends on**: Phase 26
+**Requirements**: AUTH-OIDC-01, AUTH-OIDC-02, AUTH-OIDC-03
+**Success Criteria** (what must be TRUE):
+  1. User can sign up and log in via Google OAuth
+  2. OAuth accounts linked to existing email accounts automatically
+  3. User can link/unlink OAuth providers from settings
+  4. Users with only OAuth can add password later
+  5. OAuth tokens stored securely and refreshed as needed
+**Plans**: TBD
+
+Plans:
+- [ ] 27-01: TBD
+- [ ] 27-02: TBD
+
+### Phase 28: Multi-User Households
+**Goal**: Multiple users can share access to a household's financial data
+**Depends on**: Phase 27
+**Requirements**: HOUSEHOLD-01, HOUSEHOLD-02, HOUSEHOLD-03
+**Success Criteria** (what must be TRUE):
+  1. User can invite others to join their household via email
+  2. Invited user receives email with join link
+  3. Invited user can accept/decline invitation
+  4. All household members see same accounts and transactions
+  5. Household owner can remove members
+**Plans**: TBD
+
+Plans:
+- [ ] 28-01: TBD
+- [ ] 28-02: TBD
+
+### Phase 29: User Preferences & Profile
+**Goal**: Users can customize their experience and manage profile information
+**Depends on**: Phase 28
+**Requirements**: USER-PREF-01, USER-PREF-02, USER-PROFILE-01
+**Success Criteria** (what must be TRUE):
+  1. User can set timezone (affects date display)
+  2. User can set preferred currency (affects amount display)
+  3. User can set date format preference
+  4. User can upload profile avatar
+  5. User can update display name and contact info
+**Plans**: TBD
+
+Plans:
+- [ ] 29-01: TBD
+- [ ] 29-02: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 5 -> 6 -> 7 -> 8 -> ... -> 23 -> 24 -> ... -> 29
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -248,11 +627,33 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 2. Account Domain | 6/6 | Complete | 2026-01-30 |
 | 3. Transaction Domain | 7/7 | Complete | 2026-02-02 |
 | 3.1 Split Identity & Validation | 4/4 | Complete | 2026-02-02 |
-| 3.2 Add Missing PATCH Tests | 0/3 | Not started | - |
-| 4. Web Interface & API | 0/3 | Not started | - |
-| 5. Scheduled Transactions | 0/2 | Not started | - |
-| 6. Bank Sync | 0/3 | Not started | - |
-| 7. Budgeting | 0/2 | Not started | - |
-| 8. Reporting | 0/2 | Not started | - |
-| 9. Investment Tracking | 0/2 | Not started | - |
-| 10. Migration & Polish | 0/3 | Not started | - |
+| 3.2 Add Missing PATCH Tests | 3/3 | Complete | 2026-02-03 |
+| 4. Authentication Infrastructure | 8/8 | Complete | 2026-02-05 |
+| 4.1 Test Schema Parity | 2/2 | Complete | 2026-02-06 |
+| 4.2 Current User Metadata Endpoint | 1/1 | Complete | 2026-02-06 |
+| 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
+| 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
+| 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
+| 8. CI & Code Quality | 0/2 | Not started | - |
+| 9. Frontend Infrastructure | 0/2 | Not started | - |
+| 10. Login UI | 0/2 | Not started | - |
+| 11. Frontend API & Routing | 0/2 | Not started | - |
+| 12. API Integration Validation | 0/2 | Not started | - |
+| 13. Error Handling Patterns | 0/2 | Not started | - |
+| 14. Transaction UI (Simple) | 0/3 | Not started | - |
+| 15. Split Transactions UI | 0/2 | Not started | - |
+| 16. Transfers UI | 0/2 | Not started | - |
+| 17. Pagination & Infinite Scroll | 0/2 | Not started | - |
+| 18. Scheduled Transactions | 0/2 | Not started | - |
+| 19. Bank Sync | 0/3 | Not started | - |
+| 20. Budgeting | 0/2 | Not started | - |
+| 21. Reporting | 0/2 | Not started | - |
+| 22. Investment Tracking | 0/2 | Not started | - |
+| 23. Migration & Polish | 0/3 | Not started | - |
+| **Future Milestone** | | | |
+| 24. Password Reset | 0/2 | Not started | - |
+| 25. Auth Security Hardening | 0/2 | Not started | - |
+| 26. Session Management | 0/2 | Not started | - |
+| 27. OIDC & Social Login | 0/2 | Not started | - |
+| 28. Multi-User Households | 0/2 | Not started | - |
+| 29. User Preferences & Profile | 0/2 | Not started | - |

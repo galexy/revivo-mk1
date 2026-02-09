@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 3.2 Complete - Ready for Phase 4
+**Current focus:** Phase 7 (Nx Monorepo Restructure) - Complete
 
 ## Current Position
 
-Phase: 3.2 of 10 (Add Missing PATCH Test Cases) - COMPLETE
-Plan: 3 of 3 complete
+Phase: 7 of 22 (Nx Monorepo Restructure)
+Plan: 4 of 4 complete
 Status: Phase complete
-Last activity: 2026-02-03 - Completed 03.2-03-PLAN.md (Validation Error tests)
+Last activity: 2026-02-07 - Completed 07-04-PLAN.md (CLAUDE.md Update & Final Verification)
 
-Progress: [███████░░░] ~65%
+Progress: [██████░░░░] ~56%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
-- Average duration: 5.3 min
-- Total execution time: 2.6 hours
+- Total plans completed: 49
+- Average duration: 5.0 min
+- Total execution time: 5.08 hours
 
 **By Phase:**
 
@@ -32,10 +32,17 @@ Progress: [███████░░░] ~65%
 | 03-transaction-domain | 7 | 35 min | 5.0 min |
 | 03.1-split-identity-validation-fixes | 4 | 21 min | 5.3 min |
 | 03.2-add-missing-patch-test-cases | 3 | 7 min | 2.3 min |
+| 04-authentication-infrastructure | 8 | 46 min | 5.8 min |
+| 04.1-test-schema-parity | 2 | 8 min | 4.0 min |
+| 04.2-current-user-metadata-endpoint | 1 | 7 min | 7.0 min |
+| 05-domain-event-publishing | 3 | 14 min | 4.7 min |
+| 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
+
+| 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-04 (4 min), 03.2-01 (1 min), 03.2-02 (2 min), 03.2-03 (4 min)
-- Trend: Phase 3.2 complete
+- Last 5 plans: 06-05 (12 min), 07-01 (2 min), 07-02 (34 min), 07-03 (10 min), 07-04 (4 min)
+- Trend: 07-04 was fast (docs + verification only). Phase 7 averaged 12.5 min/plan due to 07-02 complexity.
 
 *Updated after each plan completion*
 
@@ -114,6 +121,100 @@ Recent decisions affecting current work:
 - TransactionResponse includes source_split_id field for mirror linkage
 - PATCH rejects splits with neither category_id nor transfer_account_id (API validation, domain allows)
 - PATCH validates provided split IDs exist on transaction before update
+- User events are standalone frozen dataclasses (not inheriting DomainEvent base)
+- User.collect_events() pattern (copy-then-clear) for event collection
+- Email normalization in domain layer (lowercase + strip in User.create())
+- verify_email() is idempotent (no-op on already-verified user)
+- HouseholdId uses "hh_" prefix in TypeID pattern
+- PyJWT over python-jose (abandoned, CVE-2025-61152)
+- pwdlib with Argon2 over passlib (deprecated, breaks Python 3.13+)
+- itsdangerous for email verification tokens (no DB lookup, signed+timestamped)
+- Explicit algorithm list in jwt.decode() to prevent algorithm confusion attacks
+- JWT_SECRET from os.environ with fallback default for development
+- Required claims (exp, sub, household_id) enforced in JWT decode
+- Default household ID is well-known constant hh_00000000000000000000000000 (valid TypeID)
+- Circular FK bootstrap: create households.owner_id nullable, populate, then add NOT NULL
+- All user-owned data tables (accounts, transactions, categories, payees) have household_id FK
+- HouseholdIdType TypeDecorator for ORM mapping of HouseholdId
+- Household bootstrap: create with placeholder owner_id, update after user creation
+- login() returns same INVALID_CREDENTIALS for bad email and bad password (prevent enumeration)
+- EMAIL_NOT_VERIFIED is separate error code (user can take action)
+- verify_email() validates token stateless first, then DB lookup (no unnecessary queries)
+- Separate port files per entity (user_repository.py, household_repository.py) following existing project pattern
+- RefreshTokenRepository uses SQLAlchemy Core (not ORM) for infrastructure records
+- RefreshTokenRepository typed as Any in UoW port (domain should not import adapter types)
+- User._events excluded from ORM mapping, re-initialized in repository after load
+- Cookie secure flag environment-aware (production=True, dev/test=False) for TestClient compatibility
+- Auth routes at /auth prefix (no /api/v1) since auth is cross-cutting infrastructure
+- UnitOfWork commit skips non-DomainEvent protocol events (UserRegistered is standalone dataclass)
+- Registration always returns 202 with generic user_id on duplicate email (enumeration protection)
+- OAuth2 login via OAuth2PasswordRequestForm, refresh via HttpOnly cookie at /auth/refresh path
+- CurrentUser frozen dataclass with user_id + household_id injected from JWT
+- All domain model factory methods accept optional household_id with fallback to well-known default
+- Cross-household access returns 404 (not 403) to prevent resource probing
+- Routes extract both user_id and household_id from CurrentUser JWT claims
+- Removed placeholder get_current_user_id; all routes use real JWT auth
+- Auth fixture chain per test file (not shared conftest) for test module independence
+- household_id must be threaded through all service layers to domain entity creation (category, transaction, payee)
+- CLAUDE.md for project-wide rules (auto-loaded by Claude Code, always visible)
+- Chokepoint testing: verify migrations against real DB, smoke test endpoints against running service, never rely solely on integration tests
+- Alembic autogenerate: import tables.py in env.py to register Table objects with metadata
+- user_module_prefix="types." for clean TypeDecorator rendering in migrations
+- compare_type=True for thorough drift detection during autogenerate
+- All migrations autogenerated from tables.py metadata (single source of truth)
+- Drift detection test guards schema parity between metadata.create_all and alembic upgrade head
+- compare_type=True in MigrationContext for thorough type drift detection
+- Three-level autogenerate-first documentation: CLAUDE.md, skill file, CHECKPOINTS.md
+- UserProfileResponse includes created_at for "member since" display
+- is_owner derived from user.role == "owner" (not stored on household)
+- CurrentUserDep type alias for JWT-authenticated endpoints
+- Nested Pydantic response schemas with from_domain classmethod
+- Event bus uses dict[type, list[Callable]] for handler registry (Cosmic Python pattern)
+- Handlers called synchronously; async work delegated to job queue
+- Exception in handler re-raised for fail-fast in development
+- Separate postgres-jobs database on port 5433 for job queue isolation
+- UoW publishes events AFTER commit succeeds (RESEARCH.md Pitfall 1)
+- JOB_QUEUE_ENABLED env var for graceful degradation when job db unavailable
+- Procrastinate job queue with PsycopgConnector for async jobs
+- Event handlers registered in lifespan via register_all_handlers()
+- Job queue worker runs in same process as API via lifespan
+- Direct SQL queries via psql for job queue operations (maximum visibility)
+- scripts/jobs/ directory for operational scripts
+- docs/runbooks/ directory for operational documentation
+- MJML via npm devDependency (not Python package), invoked via npx
+- Mailpit always-on Docker Compose service (not optional profile)
+- App starts even if SMTP unavailable (mailpit condition: service_started)
+- No SMTP_USER/SMTP_PASSWORD for Mailpit (accepts any auth in dev)
+- Makefile for non-Python build tooling (build-emails target)
+- Jinja2 for email template rendering (runtime variable substitution in compiled HTML)
+- FileSystemLoader with StrictUndefined for template safety (catches missing variables)
+- EmailService Protocol in domain/ports with SmtpEmailAdapter in adapters/email
+- Default SMTP_PORT 1025 for Mailpit dev server, use_tls=False
+- Lazy is_available() with cached result for SMTP connectivity checks
+- EmailDeliveryError wraps both SMTPException and OSError
+- Email PII masking: first 3 chars + *** for log output
+- Handler catches defer exceptions for graceful degradation (email is side effect, not critical path)
+- 48-hour token expiry to match email template promise
+- EmailDeliveryError added to job retry_exceptions for transient SMTP failures
+- Lazy import of send_verification_email inside handler to avoid module-level job queue initialization
+- Async event bus with mixed sync/async handler support via inspect.iscoroutinefunction
+- UoW context manager stays sync, only commit() is async
+- Read-only service methods and routes stay sync for thread pool execution
+- asyncio.run() in sync tests for async function calls (no pytest-asyncio dependency)
+- Manual Nx setup (no `nx init`) for clean integration with existing Python+Node hybrid project
+- Nx project.json discovery (not npm workspaces) for monorepo project registration
+- Empty Nx project targets -- Phase 8 adds React/Tailwind build configuration
+- Backend moved to apps/api/ via git mv (preserves history), editable install via hatch packages=['apps/api/src']
+- Root pyproject.toml kept as regular project (not uv workspace) to avoid typeid-python Rust build in offline env
+- Nx targets use .venv/bin/ paths and {workspaceRoot} cwd for Python tool execution
+- alembic.ini: prepend_sys_path includes both . and apps/api for import resolution
+- Domain layer extracted to libs/domain/domain/ as standalone shared library (imports use domain.* not src.domain.*)
+- Editable install: hatch packages=['apps/api/src', 'libs/domain/domain'] for both src and domain importability
+- uv pip install -e . --no-deps to avoid typeid-python Rust rebuild (use --no-deps flag always)
+- pytest --import-mode=importlib for monorepo with multiple test directories
+- import-linter root_packages=['src', 'domain'] for cross-package architecture enforcement
+- CLAUDE.md documents monorepo structure, import conventions, Nx commands, future phase notes
+- ROADMAP.md Phase 7 requirements: descriptive label (not ARCH-06/ARCH-07 which belong to Phase 8/10)
 
 ### Pending Todos
 
@@ -121,14 +222,21 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+None.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Add chokepoint testing guardrails (CLAUDE.md + GSD agent updates) | 2026-02-05 | ff9f765 | [001-add-chokepoint-testing-guardrails](./quick/001-add-chokepoint-testing-guardrails/) |
+| 002 | Split phase 4.3 into event publishing and email phases | 2026-02-06 | ee20011 | [002-split-phase-4-3-into-event-and-email-phases](./quick/002-split-phase-4-3-into-event-and-email-phases/) |
 
 ## Session Continuity
 
-Last session: 2026-02-03
-Stopped at: Completed 03.2-03-PLAN.md (Validation Error tests)
+Last session: 2026-02-07
+Stopped at: Completed 07-04-PLAN.md (Phase 7 complete)
 Resume file: None
-Next action: Begin Phase 4: Web Interface & API
+Next action: Begin Phase 8 (Frontend Infrastructure)
 
 ## Roadmap Evolution
 
@@ -137,6 +245,8 @@ Next action: Begin Phase 4: Web Interface & API
   - Plan 01: PATCH Split Modifications (M1-M6) - COMPLETE
   - Plan 02: Split Addition/Removal - COMPLETE
   - Plan 03: Validation Errors - COMPLETE
+- Phase 4.2 inserted after Phase 4.1: Current User Metadata Endpoint - Add /auth/me endpoint returning authenticated user profile (INSERTED)
+- Phase 4.3 split into Phase 5 (Domain Event Publishing) and Phase 6 (Transactional Email Infrastructure), all subsequent phases renumbered +2
 
 ## Phase 1 Milestone
 
@@ -221,4 +331,156 @@ Plans completed (3 of 3):
 Total new tests: 21 (55 total transaction API tests)
 Bugs fixed: 2 (uncategorized splits validation, non-existent split ID validation)
 
-Ready for Phase 4: Web Interface & API
+Ready for Phase 4: Authentication Infrastructure
+
+## Phase 4 Milestone
+
+**Phase 4: Authentication Infrastructure - COMPLETE**
+
+All success criteria met:
+1. User can register with email/password and verify email via signed token
+2. User can login and receive JWT access token + HttpOnly refresh cookie
+3. All API endpoints require valid JWT authentication
+4. Users can only access data within their own household (cross-household returns 404)
+5. All 111 API integration tests pass with real JWT auth flow (24 account + 55 transaction + 17 category + 15 auth)
+
+Plans completed (8 of 8):
+- 04-01: User Domain Model (User entity, events, password hashing with Argon2)
+- 04-02: JWT Token Infrastructure (PyJWT access tokens, itsdangerous verification tokens)
+- 04-03: Household & User Persistence (migration 006, ORM mappers, repositories)
+- 04-04: Auth Service (register, login, verify_email, refresh with token rotation)
+- 04-05: Auth API Endpoints (register, token, verify, refresh routes)
+- 04-06: Auth Integration Tests (15 tests covering full auth flow)
+- 04-07: Route Protection & Household Scoping (JWT middleware, CurrentUser injection, household_id FK on all tables)
+- 04-08: Update Integration Tests for Auth (96 tests migrated to real auth, 2 household isolation tests, household_id bug fix)
+
+Key stats:
+- 407 total tests passing (152 integration + 255 unit)
+- 8 plans executed across 4 dependency waves
+- 1 critical bug fixed (household_id not threaded through category/transaction services)
+- Verification: 5/5 success criteria confirmed
+
+Ready for Phase 7: Nx Monorepo Restructure
+
+## Phase 4.1 Milestone
+
+**Phase 4.1: Test Schema Parity - COMPLETE**
+
+All success criteria met:
+1. Single autogenerated migration file exists in alembic/versions/
+2. No hand-written migration files remain
+3. alembic check confirms zero drift between tables.py metadata and migration chain
+4. All 407 existing tests pass
+5. Service starts and responds to API requests
+
+Plans completed (2 of 2):
+- 04.1-01: Fix Alembic Config and Replace Migrations
+- 04.1-02: Drift Detection Test and Workflow Documentation
+
+Key stats:
+- 408 total tests passing (407 existing + 1 drift detection)
+- 7 hand-written migrations replaced with 1 autogenerated migration
+- Schema parity between integration tests and production established
+- Drift detection test guards against future schema drift
+- Autogenerate-first workflow documented at 3 levels (CLAUDE.md, skill file, CHECKPOINTS.md)
+
+Ready for Phase 4.2: Current User Metadata Endpoint
+
+## Phase 4.2 Milestone
+
+**Phase 4.2: Current User Metadata Endpoint - COMPLETE**
+
+All success criteria met:
+1. GET /auth/me with valid JWT returns user profile (user_id, email, display_name, email_verified, created_at)
+2. GET /auth/me response includes nested household object with id, name, is_owner
+3. GET /auth/me without JWT returns 401 Unauthorized
+4. Response does not leak sensitive fields (password_hash not in response)
+
+Plans completed (1 of 1):
+- 04.2-01: GET /auth/me endpoint with UserProfileResponse schema and integration tests
+
+Key stats:
+- 414 total tests passing (408 existing + 6 new)
+- Service smoke tested per CHECKPOINTS.md
+- is_owner flag ready for Phase 25 (Multi-User Households)
+
+Ready for Phase 5: Domain Event Publishing
+
+## Phase 5 Milestone
+
+**Phase 5: Domain Event Publishing - COMPLETE**
+
+All success criteria met:
+1. Domain events published after aggregate changes commit
+2. Event handlers can enqueue async jobs for side effects
+3. Job queue worker processes jobs with retry on failure
+4. Operators can manage job queue via CLI scripts and runbook
+
+Plans completed (3 of 3):
+- 05-01: Event Bus Infrastructure (in-memory bus with dict registry, Cosmic Python pattern)
+- 05-02: Job Queue Integration (Procrastinate with separate postgres-jobs database)
+- 05-03: Operations Tooling (7 scripts, 300-line runbook)
+
+Key stats:
+- 432 total tests passing (all existing tests)
+- Separate jobs database on port 5433 for isolation
+- JOB_QUEUE_ENABLED env var for graceful degradation
+- Comprehensive runbook with monitoring queries and emergency procedures
+
+Ready for Phase 6: Transactional Email Infrastructure
+
+## Phase 6 Milestone
+
+**Phase 6: Transactional Email Infrastructure - COMPLETE**
+
+All success criteria met:
+1. MJML email templates compiled to HTML with Jinja2 rendering
+2. SmtpEmailAdapter with Mailpit dev server for local email testing
+3. Event handler enqueues verification email job via Procrastinate
+4. Full async await chain: route -> service -> commit -> publish_all -> handler -> defer_async
+5. Integration tests and E2E verification of complete email flow
+6. 444 total tests passing, service smoke tested
+
+Plans completed (5 of 5):
+- 06-01: MJML Email Templates and Rendering (verification email template, Jinja2 rendering)
+- 06-02: Email Service Protocol and SMTP Adapter (SmtpEmailAdapter, Mailpit config)
+- 06-03: Event Handler and Job Queue Email Integration (send_verification_email job, handler wiring)
+- 06-04: Integration Tests and E2E Verification (MockEmailAdapter, 11 tests, E2E Mailpit flow)
+- 06-05: Async Event Bus, UoW, Services, Routes (full async conversion, eliminate create_task workaround)
+
+Key stats:
+- 444 total tests passing (444 existing, tests updated for async)
+- Full async publish chain eliminates fire-and-forget create_task workaround
+- 30 service write methods converted to async across 4 service files
+- 17 files modified in 06-05 (largest plan in phase)
+- Proper error handling: defer_async failures caught by handler try/except
+
+Ready for Phase 7: Nx Monorepo Restructure
+
+## Phase 7 Milestone
+
+**Phase 7: Nx Monorepo Restructure - COMPLETE**
+
+All success criteria met:
+1. Project uses Nx monorepo structure (Nx 22.4.5, 4 projects)
+2. Backend at apps/api/ with serve, test, lint Nx targets
+3. Frontend scaffold at apps/web/ (empty, ready for Phase 8)
+4. Libraries at libs/domain/ (shared domain) and libs/ui/ (future shadcn/ui)
+5. All 444 existing tests pass after restructure (252 API + 192 domain)
+6. Nx commands work for all projects (test, lint, serve)
+
+Plans completed (4 of 4):
+- 07-01: Nx Workspace Init (nx.json, apps/web, libs/ui scaffolds)
+- 07-02: Backend as Nx Project (git mv to apps/api/, Nx project.json, config updates)
+- 07-03: Domain Layer Extraction (libs/domain/domain/, import rewrite, Nx project registration)
+- 07-04: CLAUDE.md Update & Final Verification (docs, E2E smoke test)
+
+Key stats:
+- 444 total tests passing (252 API + 192 domain)
+- Nx 22.4.5, 4 projects: api, domain, web, ui
+- Hatch packages for Python editable install (not uv workspaces)
+- import-linter: 2 contracts kept (domain isolation + hexagonal layers)
+- Git history preserved across all file moves
+- Service operational, alembic migrations clean, zero drift
+
+Ready for Phase 8: Frontend Infrastructure
