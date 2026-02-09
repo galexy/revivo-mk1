@@ -35,6 +35,18 @@
         "{projectRoot}/**/*.py"
       ],
       "outputs": []
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-api pyright src/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": [
+        "{projectRoot}/**/*.py",
+        "{workspaceRoot}/libs/domain/**/*.py"
+      ],
+      "outputs": []
     }
   }
 }
