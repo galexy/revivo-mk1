@@ -22,8 +22,8 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import and_, delete, select, update
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.orm.tables import refresh_tokens
 from domain.model.entity_id import UserId
+from src.adapters.persistence.orm.tables import refresh_tokens
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 

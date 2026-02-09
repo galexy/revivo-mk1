@@ -18,6 +18,11 @@ from typing import Annotated, NoReturn
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typeid.errors import SuffixValidationException
 
+from domain.model.account_types import AccountStatus, AccountType
+from domain.model.entity_id import AccountId
+from domain.model.institution import InstitutionDetails
+from domain.model.money import Money
+from domain.model.rewards_balance import RewardsBalance
 from src.adapters.api.dependencies import (
     CurrentUser,
     get_current_user,
@@ -25,11 +30,6 @@ from src.adapters.api.dependencies import (
 )
 from src.adapters.persistence.unit_of_work import SqlAlchemyUnitOfWork
 from src.application.services.account_service import AccountError, AccountService
-from domain.model.account_types import AccountStatus, AccountType
-from domain.model.entity_id import AccountId
-from domain.model.institution import InstitutionDetails
-from domain.model.money import Money
-from domain.model.rewards_balance import RewardsBalance
 
 from ..schemas.account import (
     AccountListResponse,

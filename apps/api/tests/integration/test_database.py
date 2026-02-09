@@ -7,13 +7,13 @@ import pytest
 from sqlalchemy import insert, select, text
 from sqlalchemy.exc import IntegrityError
 
+from domain.model.entity_id import HouseholdId, UserId
 from src.adapters.persistence.orm.tables import (
     encrypted_secrets,
     households,
     outbox,
     users,
 )
-from domain.model.entity_id import HouseholdId, UserId
 
 
 @pytest.fixture

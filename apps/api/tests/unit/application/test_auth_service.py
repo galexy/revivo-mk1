@@ -224,10 +224,10 @@ class TestAuthServiceVerifyEmail:
 
     def test_valid_token_marks_email_verified(self) -> None:
         """verify_email() marks user verified for valid token."""
-        from src.adapters.security.tokens import generate_verification_token
-        from src.application.services.auth_service import AuthService
         from domain.model.entity_id import HouseholdId
         from domain.model.user import User
+        from src.adapters.security.tokens import generate_verification_token
+        from src.application.services.auth_service import AuthService
 
         token = generate_verification_token("user@example.com")
         hh_id = HouseholdId.generate()

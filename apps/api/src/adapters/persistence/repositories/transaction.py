@@ -16,7 +16,6 @@ from typing import Any
 from sqlalchemy import ColumnElement, and_, func, select
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.orm.tables import split_lines, transactions
 from domain.model.entity_id import (
     AccountId,
     CategoryId,
@@ -30,6 +29,7 @@ from domain.model.money import Money
 from domain.model.split_line import SplitLine
 from domain.model.transaction import Transaction
 from domain.model.transaction_types import TransactionSource, TransactionStatus
+from src.adapters.persistence.orm.tables import split_lines, transactions
 
 
 class SqlAlchemyTransactionRepository:

@@ -17,7 +17,6 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock
 
 import pytest
 
-from src.application.services.account_service import AccountError, AccountService
 from domain.events.account_events import (
     AccountClosed,
     AccountCreated,
@@ -31,7 +30,7 @@ from domain.model.entity_id import AccountId, UserId
 from domain.model.institution import InstitutionDetails
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
-
+from src.application.services.account_service import AccountError, AccountService
 
 # --- Fixtures ---
 

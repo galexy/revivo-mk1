@@ -20,6 +20,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId
+from domain.model.money import Money
+from domain.model.split_line import SplitLine
+from domain.model.transaction import Transaction
 from src.adapters.api.dependencies import (
     CurrentUser,
     get_current_user,
@@ -38,10 +42,6 @@ from src.application.services.transaction_service import (
     TransactionError,
     TransactionService,
 )
-from domain.model.entity_id import AccountId, CategoryId, SplitId, TransactionId
-from domain.model.money import Money
-from domain.model.split_line import SplitLine
-from domain.model.transaction import Transaction
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 

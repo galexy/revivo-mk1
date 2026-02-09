@@ -24,7 +24,7 @@ Auth flow: register -> verify email -> login -> use JWT bearer token.
 import os
 import uuid
 from collections.abc import Generator
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -164,7 +164,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-50.00", "currency": "USD"},
                 "splits": [
                     {
@@ -206,7 +206,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -251,7 +251,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -296,7 +296,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -322,7 +322,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -350,7 +350,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-25.00", "currency": "USD"},
                 "splits": [
                     {
@@ -384,7 +384,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-10.00", "currency": "USD"},
                 "splits": [
                     {
@@ -415,7 +415,7 @@ class TestTransactionAPI:
         test_category: JsonDict,
     ) -> None:
         """GET /transactions?date_from=&date_to= should filter by date."""
-        today = date.today()
+        today = datetime.now(UTC).date()
 
         # Create transaction for today
         client.post(
@@ -455,12 +455,12 @@ class TestTransactionAPI:
     ) -> None:
         """GET /transactions?search= should full-text search."""
         # Create transaction with specific payee
-        unique_payee = f"UniqueSearchPayee{date.today().isoformat().replace('-', '')}"
+        unique_payee = f"UniqueSearchPayee{datetime.now(UTC).date().isoformat().replace('-', '')}"
         client.post(
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-99.00", "currency": "USD"},
                 "splits": [
                     {
@@ -499,7 +499,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-15.00", "currency": "USD"},
                 "splits": [
                     {
@@ -534,7 +534,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-20.00", "currency": "USD"},
                 "splits": [
                     {
@@ -571,7 +571,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-30.00", "currency": "USD"},
                 "splits": [
                     {
@@ -613,7 +613,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-200.00", "currency": "USD"},
                 "splits": [
                     {
@@ -663,7 +663,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-150.00", "currency": "USD"},
                 "splits": [
                     {
@@ -698,13 +698,13 @@ class TestTransactionAPI:
         test_category: JsonDict,
     ) -> None:
         """Creating transaction with new payee should auto-create it."""
-        unique_payee = f"NewPayee_{date.today().isoformat()}"
+        unique_payee = f"NewPayee_{datetime.now(UTC).date().isoformat()}"
 
         response = client.post(
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-45.00", "currency": "USD"},
                 "splits": [
                     {
@@ -746,7 +746,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-60.00", "currency": "USD"},
                 "splits": [
                     {
@@ -782,7 +782,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "2500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -832,7 +832,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-480.00", "currency": "USD"},
                 "splits": [
                     {
@@ -877,7 +877,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -907,7 +907,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "85.00", "currency": "USD"},
                 "splits": [
                     {
@@ -934,7 +934,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-50.00", "currency": "USD"},
                 "splits": [],
             },
@@ -955,7 +955,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-25.00", "currency": "USD"},
                 "splits": [
                     {
@@ -992,7 +992,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-300.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1036,7 +1036,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1088,7 +1088,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-45.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1123,7 +1123,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1163,7 +1163,7 @@ class TestTransactionAPI:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-1000.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1514,7 +1514,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1571,7 +1571,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1644,7 +1644,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-75.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1708,7 +1708,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1789,7 +1789,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-200.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1869,7 +1869,7 @@ class TestPatchSplitModifications:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-300.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1940,7 +1940,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -1997,7 +1997,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2068,7 +2068,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2149,7 +2149,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2221,7 +2221,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-500.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2306,7 +2306,7 @@ class TestPatchSplitAddRemove:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2419,7 +2419,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2468,7 +2468,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2514,7 +2514,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2571,7 +2571,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2619,7 +2619,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {
@@ -2667,7 +2667,7 @@ class TestPatchValidationErrors:
             "/api/v1/transactions",
             json={
                 "account_id": test_account["id"],
-                "effective_date": date.today().isoformat(),
+                "effective_date": datetime.now(UTC).date().isoformat(),
                 "amount": {"amount": "-100.00", "currency": "USD"},
                 "splits": [
                     {

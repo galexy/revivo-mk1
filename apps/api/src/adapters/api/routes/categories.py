@@ -16,6 +16,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from domain.model.category import Category, CategoryType
+from domain.model.entity_id import CategoryId
 from src.adapters.api.dependencies import (
     CurrentUser,
     get_category_service,
@@ -29,8 +31,6 @@ from src.adapters.api.schemas.category import (
     UpdateCategoryRequest,
 )
 from src.application.services.category_service import CategoryError, CategoryService
-from domain.model.category import Category, CategoryType
-from domain.model.entity_id import CategoryId
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 

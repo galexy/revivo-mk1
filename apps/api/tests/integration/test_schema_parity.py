@@ -26,8 +26,8 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from sqlalchemy import create_engine, text
 
-from src.adapters.persistence.orm.base import metadata
 import src.adapters.persistence.orm.tables  # noqa: F401 -- registers tables with metadata
+from src.adapters.persistence.orm.base import metadata
 
 
 def get_test_database_url() -> str:
@@ -95,38 +95,37 @@ def format_diff(diff: tuple) -> str:
 
     if diff_type == "add_table":
         return f"Table missing from migrations: {diff[1].name}"
-    elif diff_type == "remove_table":
+    if diff_type == "remove_table":
         return f"Table in migrations but not in metadata: {diff[1].name}"
-    elif diff_type == "add_column":
+    if diff_type == "add_column":
         table_name = diff[2] if isinstance(diff[2], str) else diff[2].name
         column = diff[3]
         return f"Column missing from migrations: {table_name}.{column.name}"
-    elif diff_type == "remove_column":
+    if diff_type == "remove_column":
         table_name = diff[2] if isinstance(diff[2], str) else diff[2].name
         column = diff[3]
         return f"Column in migrations but not in metadata: {table_name}.{column.name}"
-    elif diff_type == "modify_type":
+    if diff_type == "modify_type":
         table_name = diff[2]
         column_name = diff[3]
         return f"Type mismatch for {table_name}.{column_name}: migrations have {diff[6]} but metadata has {diff[5]}"
-    elif diff_type == "modify_nullable":
+    if diff_type == "modify_nullable":
         table_name = diff[2]
         column_name = diff[3]
         return f"Nullable mismatch for {table_name}.{column_name}: migrations have nullable={diff[6]} but metadata has nullable={diff[5]}"
-    elif diff_type == "add_constraint":
+    if diff_type == "add_constraint":
         return f"Constraint missing from migrations: {diff[1].name}"
-    elif diff_type == "remove_constraint":
+    if diff_type == "remove_constraint":
         return f"Constraint in migrations but not in metadata: {diff[1].name}"
-    elif diff_type == "add_index":
+    if diff_type == "add_index":
         return f"Index missing from migrations: {diff[1].name}"
-    elif diff_type == "remove_index":
+    if diff_type == "remove_index":
         return f"Index in migrations but not in metadata: {diff[1].name}"
-    elif diff_type == "add_fk":
+    if diff_type == "add_fk":
         return f"FK constraint missing from migrations: {diff[1].name}"
-    elif diff_type == "remove_fk":
+    if diff_type == "remove_fk":
         return f"FK constraint in migrations but not in metadata: {diff[1].name}"
-    else:
-        return f"Schema difference: {diff}"
+    return f"Schema difference: {diff}"
 
 
 def test_migrations_match_metadata(migration_engine):

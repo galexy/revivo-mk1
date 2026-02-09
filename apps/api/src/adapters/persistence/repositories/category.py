@@ -11,13 +11,13 @@ expected and correct.
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.adapters.persistence.orm.tables import split_lines
 from domain.model.category import (
     SYSTEM_CATEGORY_UNCATEGORIZED,
     Category,
     CategoryType,
 )
 from domain.model.entity_id import CategoryId, HouseholdId, UserId
+from src.adapters.persistence.orm.tables import split_lines
 
 
 class SqlAlchemyCategoryRepository:

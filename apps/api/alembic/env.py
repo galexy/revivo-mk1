@@ -12,10 +12,11 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+import src.adapters.persistence.orm.tables  # noqa: F401  # Registers Table objects with metadata
+
 # Import metadata for autogenerate support
 # This enables `alembic revision --autogenerate` to detect changes
 from src.adapters.persistence.orm.base import metadata
-import src.adapters.persistence.orm.tables  # noqa: F401  # Registers Table objects with metadata
 
 # Alembic Config object for access to .ini values
 config = context.config

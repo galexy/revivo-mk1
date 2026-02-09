@@ -4,8 +4,8 @@ Handlers are registered at application startup. Each handler
 receives domain events and may enqueue jobs for async processing.
 """
 
-from src.application.event_bus import register
 from domain.events.user_events import EmailVerified, UserRegistered
+from src.application.event_bus import register
 
 from .user_handlers import on_email_verified, on_user_registered
 

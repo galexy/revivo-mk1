@@ -87,7 +87,10 @@ extend-immutable-calls = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"apps/api/src/adapters/persistence/**" = ["SLF001"]
+"apps/api/src/adapters/persistence/**" = ["SLF001", "ARG001", "ARG002"]
+"apps/api/src/adapters/api/routes/**" = ["ARG001", "ARG002"]
+"apps/api/src/adapters/api/app.py" = ["ARG001"]
+"apps/api/tests/**" = ["ARG001", "ARG002", "SLF001"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src", "domain"]

@@ -16,7 +16,7 @@ import uuid
 from decimal import Decimal
 
 import pytest
-from hypothesis import settings, Verbosity
+from hypothesis import settings
 
 from domain.model.money import Money
 
@@ -64,7 +64,6 @@ def registered_user(client, test_user_data: dict) -> dict:
 
     Requires a `client` fixture (TestClient) in scope.
     """
-    from fastapi.testclient import TestClient
 
     from src.adapters.security.tokens import generate_verification_token
 

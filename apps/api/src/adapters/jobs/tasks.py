@@ -8,9 +8,9 @@ import os
 
 from procrastinate import RetryStrategy
 
+from domain.ports.email_service import EmailDeliveryError
 from src.adapters.jobs.app import job_queue
 from src.adapters.logging import get_logger
-from domain.ports.email_service import EmailDeliveryError
 
 logger = get_logger(__name__)
 

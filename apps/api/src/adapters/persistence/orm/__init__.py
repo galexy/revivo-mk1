@@ -8,4 +8,4 @@ This package contains:
 
 from .base import mapper_registry, metadata
 
-__all__ = ["metadata", "mapper_registry"]
+__all__ = ["mapper_registry", "metadata"]
