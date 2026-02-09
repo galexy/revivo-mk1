@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 08-ci-code-quality
 source: 08-01-SUMMARY.md, 08-02-SUMMARY.md, 08-03-SUMMARY.md, 08-04-SUMMARY.md
 started: 2026-02-09T08:00:00Z
@@ -76,30 +76,56 @@ skipped: 0
   reason: "User reported: i see one warning"
   severity: minor
   test: 2
-  artifacts: []
-  missing: []
+  root_cause: "test_schema_parity.py line 29 has side-effect import of tables module suppressed with noqa: F401 but pyright uses separate reportUnusedImport diagnostic. executionEnvironments sets it to warning (not false) for tests/"
+  artifacts:
+    - path: "apps/api/tests/integration/test_schema_parity.py"
+      issue: "Side-effect import needs pyright: ignore[reportUnusedImport] alongside noqa: F401"
+  missing:
+    - "Add # pyright: ignore[reportUnusedImport] to line 29"
   debug_session: ""
 - truth: "Ruff format check should be an Nx target, not a bare uv command"
   status: failed
   reason: "User reported: shouldn't that be an nx command?"
   severity: minor
   test: 5
-  artifacts: []
-  missing: []
+  root_cause: "Phase 8 added format checking to CI via raw 'uv run ruff format --check .' but never created per-project Nx format targets in project.json"
+  artifacts:
+    - path: "apps/api/project.json"
+      issue: "Missing format target"
+    - path: "libs/domain/project.json"
+      issue: "Missing format target"
+    - path: ".github/workflows/ci.yml"
+      issue: "Line 61 uses raw uv command instead of nx affected -t format"
+  missing:
+    - "Add format target to apps/api/project.json and libs/domain/project.json"
+    - "Update CI to use npx nx affected -t format"
   debug_session: ""
 - truth: "import-linter should be an Nx target, not a bare uv command"
   status: failed
   reason: "User reported: same thing, shouldn't that be an nx command too?"
   severity: minor
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "import-linter checks workspace-wide architecture boundaries (cross-project), so it doesn't naturally map to a single Nx project. However, it could be a workspace-level target or at minimum documented as intentionally workspace-scoped."
+  artifacts:
+    - path: ".github/workflows/ci.yml"
+      issue: "Line 64 uses raw uv command for lint-imports"
+  missing:
+    - "Either add lint-imports as workspace-level Nx target or document why it stays as raw command"
   debug_session: ""
 - truth: "Domain coverage should be higher than 48%"
   status: failed
   reason: "User reported: pass, but 48% for domain is very low"
   severity: minor
   test: 9
-  artifacts: []
-  missing: []
+  root_cause: "542 of 1059 statements missed. 95% of misses come from 16 files at 0% coverage: (1) Transaction/Category/Payee models have no domain-level unit tests (268 stmts) -- they rely on API integration tests only; (2) All port Protocol interfaces are 0% (166 stmts) -- pure interfaces with no logic; (3) Transaction events untested (55 stmts). If ports excluded and model tests added, coverage would reach ~85-90%."
+  artifacts:
+    - path: "libs/domain/domain/model/transaction.py"
+      issue: "144 statements, 0% coverage, no domain unit tests"
+    - path: "libs/domain/domain/model/category.py"
+      issue: "88 statements, 0% coverage, no domain unit tests"
+    - path: "libs/domain/domain/model/payee.py"
+      issue: "36 statements, 0% coverage, no domain unit tests"
+  missing:
+    - "Add test_transaction.py, test_category.py, test_payee.py to domain unit tests"
+    - "Consider excluding domain/ports/ from coverage measurement (Protocol interfaces)"
   debug_session: ""
