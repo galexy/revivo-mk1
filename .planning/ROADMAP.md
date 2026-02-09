@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Domain Event Publishing** - Event bus infrastructure, async event handlers, event-driven architecture
 - [x] **Phase 6: Transactional Email Infrastructure** - Email domain, SMTP adapter, Mailpit dev env, verification email on registration
 - [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
-- [ ] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
+- [x] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
 - [ ] **Phase 9: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
 - [ ] **Phase 10: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 11: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
@@ -269,10 +269,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Tooling config (pyrightconfig.json, py.typed, ruff config, format) + domain fixes
-- [ ] 08-02-PLAN.md — API pyright strict error fixes (repositories, mappers, routes, tests)
-- [ ] 08-03-PLAN.md — API ruff lint error fixes (DTZ, imports, unused args, exception chaining)
-- [ ] 08-04-PLAN.md — Coverage Nx targets + CI restructure (nx affected, caching, blocking checks)
+- [x] 08-01-PLAN.md — Tooling config (pyrightconfig.json, py.typed, ruff config, format) + domain fixes
+- [x] 08-02-PLAN.md — API pyright strict error fixes (repositories, mappers, routes, tests)
+- [x] 08-03-PLAN.md — API ruff lint error fixes (DTZ, imports, unused args, exception chaining)
+- [x] 08-04-PLAN.md — Coverage Nx targets + CI restructure (nx affected, caching, blocking checks)
 
 ### Phase 9: Frontend Infrastructure
 **Goal**: Set up frontend tooling and testing infrastructure
@@ -636,7 +636,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 5. Domain Event Publishing | 3/3 | Complete | 2026-02-06 |
 | 6. Transactional Email Infrastructure | 5/5 | Complete | 2026-02-07 |
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
-| 8. CI & Code Quality | 0/4 | Not started | - |
+| 8. CI & Code Quality | 4/4 | Complete | 2026-02-09 |
 | 9. Frontend Infrastructure | 0/2 | Not started | - |
 | 10. Login UI | 0/2 | Not started | - |
 | 11. Frontend API & Routing | 0/2 | Not started | - |

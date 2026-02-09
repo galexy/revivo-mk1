@@ -259,7 +259,7 @@ None.
 Last session: 2026-02-09
 Stopped at: Completed 08-04-PLAN.md (CI Pipeline Configuration) - Phase 8 complete
 Resume file: None
-Next action: Begin next phase in roadmap
+Next action: Begin Phase 9 (Frontend Infrastructure)
 
 ## Roadmap Evolution
 
@@ -507,6 +507,31 @@ Key stats:
 - Service operational, alembic migrations clean, zero drift
 
 Ready for Phase 8: CI & Code Quality
+
+## Phase 8 Milestone
+
+**Phase 8: CI & Code Quality - COMPLETE**
+
+All success criteria met:
+1. GitHub Actions CI configured with all quality gates blocking (lint, typecheck, test, format, import-linter)
+2. All pyright strict errors resolved — domain: 52→0, api: 2067→0
+3. All ruff lint errors resolved — domain: 33→0, api: 173→0
+4. Code coverage Nx targets configured (api: 81%, domain: 48%)
+5. import-linter passes (2/2 contracts kept)
+
+Plans completed (4 of 4):
+- 08-01: Tooling config + domain fixes (pyrightconfig.json, py.typed, ruff config, format)
+- 08-02: API pyright strict errors (2067→0 with justified type: ignore annotations)
+- 08-03: API ruff lint errors (173→0, absolute imports, timezone-aware datetime)
+- 08-04: Coverage targets + CI restructure (nx affected, uv+npm caching, blocking gates)
+
+Key stats:
+- 444 total tests passing (252 API + 192 domain)
+- All quality gates pass locally: lint, typecheck, test, format, import-linter
+- CI uses nx affected with nrwl/nx-set-shas@v4 for PR-scoped execution
+- Verification: 5/5 success criteria confirmed
+
+Ready for Phase 9: Frontend Infrastructure
 
 ## Phase 8 Milestone
 
