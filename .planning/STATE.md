@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 8 of 22 (CI & Code Quality)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-02-09 - Completed 08-01-PLAN.md (Tooling & Domain Cleanup)
+Last activity: 2026-02-09 - Completed 08-02-PLAN.md (Fix API Pyright Errors)
 
-Progress: [██████░░░░] ~57%
+Progress: [██████░░░░] ~59%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 50
-- Average duration: 5.0 min
-- Total execution time: 5.25 hours
+- Total plans completed: 51
+- Average duration: 5.1 min
+- Total execution time: 5.67 hours
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: [██████░░░░] ~57%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
-| 08-ci-code-quality | 1 | 10 min | 10.0 min |
+| 08-ci-code-quality | 2 | 35 min | 17.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (2 min), 07-02 (34 min), 07-03 (10 min), 07-04 (4 min), 08-01 (10 min)
-- Trend: 08-01 involved 52 pyright + 33 lint fixes across 21 domain files.
+- Last 5 plans: 07-02 (34 min), 07-03 (10 min), 07-04 (4 min), 08-01 (10 min), 08-02 (25 min)
+- Trend: 08-02 reduced 2067 pyright errors to 0 across 21 API files.
 
 *Updated after each plan completion*
 
@@ -222,6 +222,10 @@ Recent decisions affecting current work:
 - Typed default_factory: lambda: list[T]() for pyright strict (bare list infers list[Unknown])
 - Rename DomainException to DomainError (N818 naming convention)
 - Per-project pyrightconfig.json includes tests (catches type errors in test code too)
+- File-level pyright pragmas for SQLAlchemy-heavy modules (tables.py, types.py) where patterns are too pervasive for per-line ignores
+- pyrightconfig.json executionEnvironments to relax mock-related rules (reportUnknownMemberType etc.) in tests/ directory
+- Explicit re-export pattern (X as X) in __init__.py for pyright strict re-export detection
+- NoReturn annotation on error handlers that always raise (enables type narrowing in callers)
 
 ### Pending Todos
 
@@ -241,9 +245,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed 08-01-PLAN.md (Tooling & Domain Cleanup)
+Stopped at: Completed 08-02-PLAN.md (Fix API Pyright Errors)
 Resume file: None
-Next action: Execute 08-02-PLAN.md (Fix API pyright errors)
+Next action: Execute 08-03-PLAN.md (Fix API ruff lint errors)
 
 ## Roadmap Evolution
 
