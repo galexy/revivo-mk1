@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 9 (Type Safety & Test Cleanup) - Complete
+**Current focus:** Phase 10 (Value Object ORM Mapping) - Complete
 
 ## Current Position
 
@@ -586,3 +586,25 @@ Key stats:
 - All quality gates pass: typecheck, test, lint, format
 
 Ready for Phase 10: Value Object ORM Mapping
+
+## Phase 10 Milestone
+
+**Phase 10: Value Object ORM Mapping - COMPLETE**
+
+All success criteria met:
+1. SQLAlchemy composite() maps Money, InstitutionDetails, RewardsBalance to flat DB columns
+2. _decompose_value_objects before_flush handler is removed
+3. Manual value object reconstruction in AccountRepository is removed
+4. 16 type: ignore[attr-defined] comments eliminated from mappers.py
+5. All 437 existing tests pass
+
+Plans completed (1 of 1):
+- 10-01: SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
+
+Key stats:
+- 437 total tests passing (252 API + 185 domain)
+- 153 lines of manual mapping code eliminated
+- Factory functions handle nullable composites (return None when all columns NULL)
+- Verification: 5/5 must-haves confirmed
+
+Ready for Phase 11: Domain Test Coverage

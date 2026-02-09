@@ -304,7 +304,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md — SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
+- [x] 10-01-PLAN.md — SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
 
 ### Phase 11: Domain Test Coverage
 **Goal**: Add domain unit tests for models that currently have zero domain-level coverage
@@ -684,7 +684,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 7. Nx Monorepo Restructure | 4/4 | Complete | 2026-02-07 |
 | 8. CI & Code Quality | 5/5 | Complete | 2026-02-09 |
 | 9. Type Safety & Test Cleanup | 1/1 | Complete | 2026-02-09 |
-| 10. Value Object ORM Mapping | 0/1 | Not started | - |
+| 10. Value Object ORM Mapping | 1/1 | Complete | 2026-02-09 |
 | 11. Domain Test Coverage | 0/1 | Not started | - |
 | 12. Frontend Infrastructure | 0/2 | Not started | - |
 | 13. Login UI | 0/2 | Not started | - |
