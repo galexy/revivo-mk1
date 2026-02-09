@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 8 of 32 (CI & Code Quality)
-Plan: 4 of 5 (08-05 remaining)
-Status: In progress (gap closure)
-Last activity: 2026-02-09 - Restructured roadmap: 3 new phases (9-11), renumbered 9→12 through 29→32
+Plan: 5 of 5 (COMPLETE)
+Status: Phase complete
+Last activity: 2026-02-09 - Completed 08-05-PLAN.md (Nx/CI Integration Gap Closure)
 
 Progress: [██████░░░░] ~62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 53
-- Average duration: 5.0 min
-- Total execution time: 6.01 hours
+- Total plans completed: 54
+- Average duration: 4.9 min
+- Total execution time: 6.03 hours
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: [██████░░░░] ~62%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
-| 08-ci-code-quality | 4 | 55 min | 13.8 min |
+| 08-ci-code-quality | 5 | 56 min | 11.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-04 (4 min), 08-01 (10 min), 08-02 (25 min), 08-03 (16 min), 08-04 (4 min)
-- Trend: Phase 8 complete. CI pipeline with nx affected, caching, and all quality gates.
+- Last 5 plans: 08-01 (10 min), 08-02 (25 min), 08-03 (16 min), 08-04 (4 min), 08-05 (1 min)
+- Trend: Phase 8 complete. All quality gates run through Nx consistently.
 
 *Updated after each plan completion*
 
@@ -238,6 +238,9 @@ Recent decisions affecting current work:
 - Two CI jobs: quality (lint/typecheck/format/import-linter) and test (with postgres)
 - npm ci for deterministic CI builds (not npm install)
 - fetch-depth: 0 for nx affected git history
+- Per-project format Nx targets (ruff format --check) for nx affected execution
+- import-linter documented as workspace-scoped (validates cross-project boundaries)
+- targetDefaults cache includes test, lint, typecheck, and format for Nx caching
 
 ### Pending Todos
 
@@ -257,9 +260,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-09
-Stopped at: Completed 08-04-PLAN.md (CI Pipeline Configuration) - Phase 8 complete
+Stopped at: Completed 08-05-PLAN.md (Nx/CI Integration Gap Closure) - Phase 8 complete (5/5 plans)
 Resume file: None
-Next action: Execute Phase 8 plan 08-05, then Phase 9 (Type Safety & Test Cleanup), Phase 10 (Value Object ORM Mapping), Phase 11 (Domain Test Coverage)
+Next action: Phase 9 (Type Safety & Test Cleanup), Phase 10 (Value Object ORM Mapping), Phase 11 (Domain Test Coverage)
 
 ## Roadmap Evolution
 
