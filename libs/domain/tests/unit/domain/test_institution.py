@@ -43,12 +43,12 @@ class TestInstitutionDetailsConstruction:
 
     def test_rejects_empty_name(self):
         """Should reject empty name string."""
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             InstitutionDetails(name="")
 
     def test_rejects_whitespace_only_name(self):
         """Should reject whitespace-only name string."""
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             InstitutionDetails(name="   ")
 
     def test_accepts_name_with_special_characters(self):

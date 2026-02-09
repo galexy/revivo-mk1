@@ -14,13 +14,11 @@ Key principles:
 - Uses Protocol for interface definition (structural subtyping)
 """
 
-from typing import Generic, Protocol, TypeVar
-
-from domain.exceptions import EntityNotFoundError
+from typing import Protocol, TypeVar
 
 # Type variables for generic repository
 T = TypeVar("T")  # Entity/Aggregate type
-ID = TypeVar("ID")  # Entity ID type
+ID = TypeVar("ID", contravariant=True)  # Entity ID type
 
 
 class Repository(Protocol[T, ID]):

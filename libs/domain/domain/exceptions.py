@@ -5,7 +5,7 @@ These exceptions represent problems in the domain logic, not infrastructure
 failures.
 
 Exception hierarchy:
-- DomainException: Base for all domain errors
+- DomainError: Base for all domain errors
   - EntityNotFoundError: Entity lookup failed
   - ValidationError: Domain validation failed
   - BusinessRuleViolationError: Business rule was violated
@@ -19,7 +19,7 @@ Usage guidelines:
 from typing import Any
 
 
-class DomainException(Exception):
+class DomainError(Exception):
     """Base exception for all domain errors.
 
     All domain-specific exceptions should inherit from this class.
@@ -48,7 +48,7 @@ class DomainException(Exception):
         return self.message
 
 
-class EntityNotFoundError(DomainException):
+class EntityNotFoundError(DomainError):
     """Raised when an entity lookup fails.
 
     Use this when an expected entity doesn't exist in the repository.
@@ -74,7 +74,7 @@ class EntityNotFoundError(DomainException):
         super().__init__(message, context)
 
 
-class ValidationError(DomainException):
+class ValidationError(DomainError):
     """Raised when domain validation fails.
 
     Use this for validation of domain invariants that can't be
@@ -101,7 +101,7 @@ class ValidationError(DomainException):
         super().__init__(message, context)
 
 
-class BusinessRuleViolationError(DomainException):
+class BusinessRuleViolationError(DomainError):
     """Raised when a business rule is violated.
 
     Use this for violations of business rules that go beyond simple

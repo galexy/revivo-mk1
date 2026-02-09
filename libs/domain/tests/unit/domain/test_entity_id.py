@@ -69,7 +69,7 @@ class TestAccountId:
         """Cannot modify ID after creation."""
         aid = AccountId.generate()
         with pytest.raises(AttributeError):
-            aid.value = "acct_modified"
+            aid.value = "acct_modified"  # type: ignore[reportAttributeAccessIssue]
 
 
 class TestTransactionId:
@@ -205,7 +205,7 @@ class TestSplitId:
         """Cannot modify ID after creation."""
         sid = SplitId.generate()
         with pytest.raises(AttributeError):
-            sid.value = "split_modified"
+            sid.value = "split_modified"  # type: ignore[reportAttributeAccessIssue]
 
 
 class TestEntityIdUniqueness:

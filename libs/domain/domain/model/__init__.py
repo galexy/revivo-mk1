@@ -13,29 +13,25 @@ from domain.model.entity_id import (
 )
 from domain.model.household import Household
 from domain.model.institution import InstitutionDetails
-from domain.model.user import User
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
+from domain.model.user import User
 
 __all__ = [
-    # Value objects
-    "Money",
-    "RewardsBalance",
-    "InstitutionDetails",
-    # Entity IDs
-    "EntityId",
+    "Account",
     "AccountId",
-    "HouseholdId",
-    "TransactionId",
-    "UserId",
-    "CategoryId",
-    "BudgetId",
-    # Account types
-    "AccountType",
     "AccountStatus",
     "AccountSubtype",
-    # Entities
-    "Account",
+    "AccountType",
+    "BudgetId",
+    "CategoryId",
+    "EntityId",
     "Household",
+    "HouseholdId",
+    "InstitutionDetails",
+    "Money",
+    "RewardsBalance",
+    "TransactionId",
     "User",
+    "UserId",
 ]

@@ -12,9 +12,10 @@ Key design decisions:
 - Always initialize Decimal from string to avoid float precision issues
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Self
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,14 +55,14 @@ class Money:
         # Normalize currency to uppercase
         object.__setattr__(self, "currency", self.currency.upper())
 
-    def _check_same_currency(self, other: Self) -> None:
+    def _check_same_currency(self, other: Money) -> None:
         """Raise ValueError if currencies don't match."""
         if self.currency != other.currency:
             raise ValueError(
                 f"Cannot perform operation between {self.currency} and {other.currency}"
             )
 
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: Money) -> Money:
         """Add two Money of same currency.
 
         Args:
@@ -76,7 +77,7 @@ class Money:
         self._check_same_currency(other)
         return Money(self.amount + other.amount, self.currency)
 
-    def __sub__(self, other: Self) -> Self:
+    def __sub__(self, other: Money) -> Money:
         """Subtract other from self (same currency).
 
         Args:
@@ -91,7 +92,7 @@ class Money:
         self._check_same_currency(other)
         return Money(self.amount - other.amount, self.currency)
 
-    def __mul__(self, factor: Decimal | int) -> Self:
+    def __mul__(self, factor: Decimal | int) -> Money:
         """Multiply by a factor (for percentage calculations, etc.).
 
         Args:
@@ -102,11 +103,11 @@ class Money:
         """
         return Money(self.amount * Decimal(str(factor)), self.currency)
 
-    def __rmul__(self, factor: Decimal | int) -> Self:
+    def __rmul__(self, factor: Decimal | int) -> Money:
         """Support factor * money syntax."""
         return self.__mul__(factor)
 
-    def __neg__(self) -> Self:
+    def __neg__(self) -> Money:
         """Negate the amount.
 
         Returns:
@@ -114,7 +115,7 @@ class Money:
         """
         return Money(-self.amount, self.currency)
 
-    def __lt__(self, other: Self) -> bool:
+    def __lt__(self, other: Money) -> bool:
         """Compare if self is less than other (same currency only).
 
         Raises:
@@ -123,7 +124,7 @@ class Money:
         self._check_same_currency(other)
         return self.amount < other.amount
 
-    def __le__(self, other: Self) -> bool:
+    def __le__(self, other: Money) -> bool:
         """Compare if self is less than or equal to other (same currency only).
 
         Raises:
@@ -132,7 +133,7 @@ class Money:
         self._check_same_currency(other)
         return self.amount <= other.amount
 
-    def __gt__(self, other: Self) -> bool:
+    def __gt__(self, other: Money) -> bool:
         """Compare if self is greater than other (same currency only).
 
         Raises:
@@ -141,7 +142,7 @@ class Money:
         self._check_same_currency(other)
         return self.amount > other.amount
 
-    def __ge__(self, other: Self) -> bool:
+    def __ge__(self, other: Money) -> bool:
         """Compare if self is greater than or equal to other (same currency only).
 
         Raises:
@@ -162,7 +163,7 @@ class Money:
         """Check if amount is zero."""
         return self.amount == 0
 
-    def abs(self) -> Self:
+    def abs(self) -> Money:
         """Return absolute value.
 
         Returns:

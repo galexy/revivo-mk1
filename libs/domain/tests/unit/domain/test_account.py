@@ -26,7 +26,6 @@ from domain.model.institution import InstitutionDetails
 from domain.model.money import Money
 from domain.model.rewards_balance import RewardsBalance
 
-
 # --- Fixtures ---
 
 
@@ -356,10 +355,10 @@ class TestAccountPropertyUpdates:
             opening_balance=usd_balance,
         )
 
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             account.update_name("")
 
-        with pytest.raises(ValueError, match="(?i)name cannot be empty"):
+        with pytest.raises(ValueError, match=r"(?i)name cannot be empty"):
             account.update_name("   ")
 
     def test_update_notes(self, user_id: UserId, usd_balance: Money):
@@ -470,6 +469,7 @@ class TestAccountWithInstitution:
         )
 
         assert account.institution == sample_institution
+        assert account.institution is not None
         assert account.institution.name == "Test Bank"
 
     def test_create_with_account_number(self, user_id: UserId, usd_balance: Money):

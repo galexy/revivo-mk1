@@ -168,15 +168,15 @@ class TestEnumInteroperability:
     def test_enum_comparison_with_strings(self):
         """Enums should compare equal to their string values."""
         assert AccountType.CHECKING == "checking"
-        assert "checking" == AccountType.CHECKING
+        assert AccountType.CHECKING == "checking"
         assert AccountStatus.ACTIVE == "active"
         assert AccountSubtype.MORTGAGE == "mortgage"
 
     def test_invalid_enum_value_raises_error(self):
         """Creating enum from invalid value should raise ValueError."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="invalid_type"):
             AccountType("invalid_type")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="pending"):
             AccountStatus("pending")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="unknown"):
             AccountSubtype("unknown")
