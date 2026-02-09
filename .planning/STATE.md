@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 7 (Nx Monorepo Restructure) - Complete
+**Current focus:** Phase 8 (CI & Code Quality) - In progress
 
 ## Current Position
 
-Phase: 7 of 22 (Nx Monorepo Restructure)
-Plan: 4 of 4 complete
-Status: Phase complete
-Last activity: 2026-02-07 - Completed 07-04-PLAN.md (CLAUDE.md Update & Final Verification)
+Phase: 8 of 22 (CI & Code Quality)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-02-09 - Completed 08-01-PLAN.md (Tooling & Domain Cleanup)
 
-Progress: [██████░░░░] ~56%
+Progress: [██████░░░░] ~57%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 49
+- Total plans completed: 50
 - Average duration: 5.0 min
-- Total execution time: 5.08 hours
+- Total execution time: 5.25 hours
 
 **By Phase:**
 
@@ -39,10 +39,11 @@ Progress: [██████░░░░] ~56%
 | 06-transactional-email-infrastructure | 5 | 22 min | 4.4 min |
 
 | 07-nx-monorepo-restructure | 4 | 50 min | 12.5 min |
+| 08-ci-code-quality | 1 | 10 min | 10.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-05 (12 min), 07-01 (2 min), 07-02 (34 min), 07-03 (10 min), 07-04 (4 min)
-- Trend: 07-04 was fast (docs + verification only). Phase 7 averaged 12.5 min/plan due to 07-02 complexity.
+- Last 5 plans: 07-01 (2 min), 07-02 (34 min), 07-03 (10 min), 07-04 (4 min), 08-01 (10 min)
+- Trend: 08-01 involved 52 pyright + 33 lint fixes across 21 domain files.
 
 *Updated after each plan completion*
 
@@ -215,6 +216,12 @@ Recent decisions affecting current work:
 - import-linter root_packages=['src', 'domain'] for cross-package architecture enforcement
 - CLAUDE.md documents monorepo structure, import conventions, Nx commands, future phase notes
 - ROADMAP.md Phase 7 requirements: descriptive label (not ARCH-06/ARCH-07 which belong to Phase 8/10)
+- Per-project pyrightconfig.json in Nx monorepo (each project has own strict config, pyright auto-discovers)
+- from __future__ import annotations + concrete return types for frozen dataclass arithmetic (Self requires cls())
+- File-level pyright pragma for untyped third-party libraries (entity_id.py for typeid)
+- Typed default_factory: lambda: list[T]() for pyright strict (bare list infers list[Unknown])
+- Rename DomainException to DomainError (N818 naming convention)
+- Per-project pyrightconfig.json includes tests (catches type errors in test code too)
 
 ### Pending Todos
 
@@ -233,10 +240,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-07
-Stopped at: Completed 07-04-PLAN.md (Phase 7 complete)
+Last session: 2026-02-09
+Stopped at: Completed 08-01-PLAN.md (Tooling & Domain Cleanup)
 Resume file: None
-Next action: Begin Phase 8 (Frontend Infrastructure)
+Next action: Execute 08-02-PLAN.md (Fix API pyright errors)
 
 ## Roadmap Evolution
 
