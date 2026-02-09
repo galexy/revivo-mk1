@@ -64,7 +64,7 @@ result: pass
 
 total: 10
 passed: 6
-issues: 4
+issues: 5
 pending: 0
 skipped: 0
 skipped: 0
@@ -111,6 +111,22 @@ skipped: 0
       issue: "Line 64 uses raw uv command for lint-imports"
   missing:
     - "Either add lint-imports as workspace-level Nx target or document why it stays as raw command"
+  debug_session: ""
+- truth: "type: ignore comments should not paper over fixable type issues"
+  status: failed
+  reason: "User reported: categories.py lines 119-120 have type: ignore because get_category_tree returns loosely typed dict instead of TypedDict"
+  severity: minor
+  test: 2
+  root_cause: "get_category_tree returns dict[str, list[Category] | dict[str, list[Category]]] — a union-valued dict where every key has the same union type. Accessing tree['root'] and tree['children'] requires type: ignore[assignment] to narrow. The proper fix is a CategoryTree TypedDict with distinct types per key."
+  artifacts:
+    - path: "apps/api/src/application/services/category_service.py"
+      issue: "Return type should be CategoryTree TypedDict, not dict[str, union]"
+    - path: "apps/api/src/adapters/api/routes/categories.py"
+      issue: "Lines 119-120 have unnecessary type: ignore[assignment] due to weak return type"
+  missing:
+    - "Create CategoryTree TypedDict with root: list[Category] and children: dict[str, list[Category]]"
+    - "Update get_category_tree return type to CategoryTree"
+    - "Remove type: ignore[assignment] from categories.py lines 119-120"
   debug_session: ""
 - truth: "Domain coverage should be higher than 48%"
   status: failed
