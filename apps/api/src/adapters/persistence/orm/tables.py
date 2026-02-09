@@ -13,6 +13,10 @@ Tables created:
 
 Custom type decorators handle domain type conversion for EntityIds and Enums.
 """
+# pyright: reportArgumentType=false, reportUnknownArgumentType=false
+# NOTE: reportArgumentType/reportUnknownArgumentType is suppressed because SQLAlchemy Table() constructor
+# accepts Column, Index, and ForeignKey objects as positional args, but pyright
+# cannot fully resolve the complex overloaded signatures.
 
 from datetime import UTC, datetime
 

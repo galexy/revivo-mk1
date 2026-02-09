@@ -3,7 +3,15 @@
 These type decorators handle conversion between domain value objects
 and their database representations, enabling transparent persistence
 of domain types like EntityIds and Enums.
+
 """
+# pyright: reportMissingTypeArgument=false
+# pyright: reportUnnecessaryIsInstance=false
+# NOTE: reportMissingTypeArgument is suppressed because SQLAlchemy's TypeDecorator
+# generic parameter is complex and not needed for correct runtime behavior.
+# reportUnnecessaryIsInstance is suppressed because StrEnum subclasses are always
+# str at the type level, but the isinstance checks are needed for runtime safety
+# when values come from the database as plain strings.
 
 from sqlalchemy import String
 from sqlalchemy.engine.interfaces import Dialect

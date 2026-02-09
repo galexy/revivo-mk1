@@ -1,6 +1,11 @@
 """SQLAlchemy implementation of PayeeRepository.
 
 Handles persistence of Payee entity with autocomplete support.
+
+NOTE: SQLAlchemy imperative mapping makes domain class attributes behave as
+Column descriptors at runtime, but pyright sees them as their declared Python
+types. The type: ignore comments on .where() and .order_by() clauses are
+expected and correct.
 """
 
 from sqlalchemy import select
@@ -57,8 +62,13 @@ class SqlAlchemyPayeeRepository:
         """
         stmt = (
             select(Payee)
-            .where(Payee.user_id == str(user_id))
-            .order_by(Payee.usage_count.desc(), Payee.name)
+            .where(
+                Payee.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+            )
+            .order_by(
+                Payee.usage_count.desc(),  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+                Payee.name,  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
         )
         result = self._session.execute(stmt)
         payees = list(result.scalars().all())
@@ -81,8 +91,12 @@ class SqlAlchemyPayeeRepository:
         normalized = name.strip().lower()
         stmt = (
             select(Payee)
-            .where(Payee.user_id == str(user_id))
-            .where(Payee.normalized_name == normalized)
+            .where(
+                Payee.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
+            .where(
+                Payee.normalized_name == normalized  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
         )
         payee = self._session.scalar(stmt)
         if payee is not None:
@@ -110,9 +124,16 @@ class SqlAlchemyPayeeRepository:
         normalized_query = query.strip().lower()
         stmt = (
             select(Payee)
-            .where(Payee.user_id == str(user_id))
-            .where(Payee.normalized_name.startswith(normalized_query))
-            .order_by(Payee.usage_count.desc(), Payee.name)
+            .where(
+                Payee.user_id == str(user_id)  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
+            .where(
+                Payee.normalized_name.startswith(normalized_query)  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .startswith() available at runtime
+            )
+            .order_by(
+                Payee.usage_count.desc(),  # type: ignore[union-attr]  # SQLAlchemy imperative mapping: .desc() available at runtime
+                Payee.name,  # type: ignore[arg-type]  # SQLAlchemy imperative mapping
+            )
             .limit(limit)
         )
         result = self._session.execute(stmt)
@@ -175,17 +196,17 @@ class SqlAlchemyPayeeRepository:
             payee: Payee entity loaded from database.
         """
         # Reconstruct PayeeId from string
-        if isinstance(payee.id, str):
-            object.__setattr__(payee, "id", PayeeId.from_string(payee.id))
+        if isinstance(payee.id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(payee, "id", PayeeId.from_string(payee.id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct UserId from string
-        if isinstance(payee.user_id, str):
-            object.__setattr__(payee, "user_id", UserId.from_string(payee.user_id))
+        if isinstance(payee.user_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            object.__setattr__(payee, "user_id", UserId.from_string(payee.user_id))  # type: ignore[arg-type]  # str at runtime from DB
 
         # Reconstruct HouseholdId from string
-        if hasattr(payee, "household_id") and isinstance(payee.household_id, str):
+        if hasattr(payee, "household_id") and isinstance(payee.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                payee, "household_id", HouseholdId.from_string(payee.household_id)
+                payee, "household_id", HouseholdId.from_string(payee.household_id)  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct default_category_id CategoryId from string

@@ -43,7 +43,9 @@ class UserRepository:
         Returns:
             User entity or None.
         """
-        user = self._session.query(User).filter(User.id == user_id).first()
+        user = self._session.query(User).filter(
+            User.id == user_id  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+        ).first()
         if user is not None:
             self._ensure_events_list(user)
         return user
@@ -59,7 +61,9 @@ class UserRepository:
         Returns:
             User entity or None.
         """
-        user = self._session.query(User).filter(User.email == email.lower()).first()
+        user = self._session.query(User).filter(
+            User.email == email.lower()  # type: ignore[arg-type]  # SQLAlchemy imperative mapping: domain attr becomes Column at runtime
+        ).first()
         if user is not None:
             self._ensure_events_list(user)
         return user

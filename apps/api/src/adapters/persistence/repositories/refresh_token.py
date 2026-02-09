@@ -225,7 +225,7 @@ class RefreshTokenRepository:
             )
             .values(revoked_at=now)
         )
-        return result.rowcount
+        return result.rowcount  # type: ignore[return-value]  # SQLAlchemy CursorResult.rowcount is int at runtime, incomplete type stubs
 
     def revoke_family(self, family: str) -> int:
         """Revoke all tokens in a family (reuse detection response).
@@ -254,7 +254,7 @@ class RefreshTokenRepository:
             )
             .values(revoked_at=now)
         )
-        return result.rowcount
+        return result.rowcount  # type: ignore[return-value]  # SQLAlchemy CursorResult.rowcount is int at runtime, incomplete type stubs
 
     def cleanup_expired(self, older_than_days: int = 30) -> int:
         """Delete expired tokens older than the specified number of days.
@@ -277,4 +277,4 @@ class RefreshTokenRepository:
         result = self._session.execute(
             delete(refresh_tokens).where(refresh_tokens.c.expires_at < cutoff)
         )
-        return result.rowcount
+        return result.rowcount  # type: ignore[return-value]  # SQLAlchemy CursorResult.rowcount is int at runtime, incomplete type stubs
