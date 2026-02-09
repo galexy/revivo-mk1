@@ -64,9 +64,8 @@ result: pass
 
 total: 10
 passed: 6
-issues: 5
+issues: 6
 pending: 0
-skipped: 0
 skipped: 0
 
 ## Gaps
@@ -127,6 +126,32 @@ skipped: 0
     - "Create CategoryTree TypedDict with root: list[Category] and children: dict[str, list[Category]]"
     - "Update get_category_tree return type to CategoryTree"
     - "Remove type: ignore[assignment] from categories.py lines 119-120"
+  debug_session: ""
+- truth: "type: ignore[attr-defined] in mappers.py should use SQLAlchemy composite() instead of manual decomposition"
+  status: failed
+  reason: "User reported: mappers.py _decompose_value_objects has 20+ type: ignore[attr-defined] for SQLAlchemy-injected flat column attributes. Should use SQLAlchemy composite() to map value objects (Money, InstitutionDetails, RewardsBalance) directly to multiple columns."
+  severity: minor
+  test: 2
+  root_cause: "Account imperative mapping excludes value objects (opening_balance, credit_limit, institution, rewards_balance) and uses a before_flush event handler to manually decompose them to flat columns. SQLAlchemy composite() is designed for exactly this — mapping a Python object to multiple DB columns — and would eliminate the event handler, manual reconstruction in repository, and all type: ignore comments."
+  artifacts:
+    - path: "apps/api/src/adapters/persistence/orm/mappers.py"
+      issue: "_decompose_value_objects handler (lines 39-91) has 20+ type: ignore[attr-defined] for manually setting flat columns on Account"
+    - path: "apps/api/src/adapters/persistence/repositories/account.py"
+      issue: "Manual reconstruction of Money/InstitutionDetails/RewardsBalance from flat columns after load"
+  missing:
+    - "Add __composite_values__() to Money: return (self.amount, self.currency)"
+    - "Add __composite_values__() to InstitutionDetails: return (self.name, self.website, self.phone, self.notes)"
+    - "Add __composite_values__() to RewardsBalance: return (self.value, self.unit)"
+    - "Replace exclude_properties with composite() in map_imperatively properties dict"
+    - "Remove _decompose_value_objects before_flush handler entirely"
+    - "Remove manual value object reconstruction from AccountRepository"
+  references:
+    - "https://docs.sqlalchemy.org/en/21/orm/composites.html — composite() docs, includes imperative mapping example with properties dict"
+    - "https://github.com/sqlalchemy/sqlalchemy/issues/10380 — declaring composite as Optional (nullable handling: when all columns NULL, composite returns None)"
+    - "https://github.com/sqlalchemy/sqlalchemy/discussions/9869 — composite with exclude_properties and name conflicts"
+    - "composite() requires: (1) constructor accepts flat column values as positional args, (2) __composite_values__() returns flat tuple"
+    - "Nullable composites: when all component columns are NULL, SQLAlchemy returns None for the composite attribute — works naturally with credit_limit: Money | None"
+    - "Frozen dataclass value objects are fine as composite types — composite only needs to SET the attribute on the parent (Account is not frozen), not mutate the value object itself"
   debug_session: ""
 - truth: "Domain coverage should be higher than 48%"
   status: failed
