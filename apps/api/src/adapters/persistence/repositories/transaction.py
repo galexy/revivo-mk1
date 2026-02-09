@@ -161,7 +161,9 @@ class SqlAlchemyTransactionRepository:
         # Reconstruct HouseholdId from string
         if hasattr(txn, "household_id") and isinstance(txn.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                txn, "household_id", HouseholdId.from_string(txn.household_id)  # type: ignore[arg-type]  # str at runtime from DB
+                txn,
+                "household_id",
+                HouseholdId.from_string(txn.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct AccountId from string
@@ -174,7 +176,8 @@ class SqlAlchemyTransactionRepository:
 
         # Reconstruct source_transaction_id from string
         if txn.source_transaction_id is not None and isinstance(
-            txn.source_transaction_id, str  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
+            txn.source_transaction_id,
+            str,  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
         ):
             object.__setattr__(
                 txn,
@@ -185,7 +188,9 @@ class SqlAlchemyTransactionRepository:
         # Reconstruct source_split_id from string
         if txn.source_split_id is not None and isinstance(txn.source_split_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                txn, "source_split_id", SplitId.from_string(txn.source_split_id)  # type: ignore[arg-type]  # str at runtime from DB
+                txn,
+                "source_split_id",
+                SplitId.from_string(txn.source_split_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct enums from string values

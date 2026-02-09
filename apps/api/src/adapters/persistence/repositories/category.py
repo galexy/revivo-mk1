@@ -202,19 +202,25 @@ class SqlAlchemyCategoryRepository:
         # Reconstruct UserId from string
         if isinstance(category.user_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "user_id", UserId.from_string(category.user_id)  # type: ignore[arg-type]  # str at runtime from DB
+                category,
+                "user_id",
+                UserId.from_string(category.user_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct HouseholdId from string
         if hasattr(category, "household_id") and isinstance(category.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "household_id", HouseholdId.from_string(category.household_id)  # type: ignore[arg-type]  # str at runtime from DB
+                category,
+                "household_id",
+                HouseholdId.from_string(category.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct parent_id CategoryId from string
         if category.parent_id is not None and isinstance(category.parent_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                category, "parent_id", CategoryId.from_string(category.parent_id)  # type: ignore[arg-type]  # str at runtime from DB
+                category,
+                "parent_id",
+                CategoryId.from_string(category.parent_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct CategoryType enum from string

@@ -206,7 +206,9 @@ class SqlAlchemyPayeeRepository:
         # Reconstruct HouseholdId from string
         if hasattr(payee, "household_id") and isinstance(payee.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                payee, "household_id", HouseholdId.from_string(payee.household_id)  # type: ignore[arg-type]  # str at runtime from DB
+                payee,
+                "household_id",
+                HouseholdId.from_string(payee.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct default_category_id CategoryId from string

@@ -210,7 +210,9 @@ class SqlAlchemyAccountRepository:
         # Reconstruct HouseholdId from string
         if hasattr(account, "household_id") and isinstance(account.household_id, str):  # type: ignore[arg-type]  # SQLAlchemy loads str from DB
             object.__setattr__(
-                account, "household_id", HouseholdId.from_string(account.household_id)  # type: ignore[arg-type]  # str at runtime from DB
+                account,
+                "household_id",
+                HouseholdId.from_string(account.household_id),  # type: ignore[arg-type]  # str at runtime from DB
             )
 
         # Reconstruct enums from string values

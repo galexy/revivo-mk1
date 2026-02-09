@@ -455,7 +455,9 @@ class TestTransactionAPI:
     ) -> None:
         """GET /transactions?search= should full-text search."""
         # Create transaction with specific payee
-        unique_payee = f"UniqueSearchPayee{datetime.now(UTC).date().isoformat().replace('-', '')}"
+        unique_payee = (
+            f"UniqueSearchPayee{datetime.now(UTC).date().isoformat().replace('-', '')}"
+        )
         client.post(
             "/api/v1/transactions",
             json={

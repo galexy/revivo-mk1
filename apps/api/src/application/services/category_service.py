@@ -97,7 +97,9 @@ class CategoryService:
         with self._uow:
             return self._uow.categories.get_by_user(user_id)
 
-    def get_category_tree(self, user_id: UserId) -> dict[str, list[Category] | dict[str, list[Category]]]:
+    def get_category_tree(
+        self, user_id: UserId
+    ) -> dict[str, list[Category] | dict[str, list[Category]]]:
         """Get categories organized as a tree structure.
 
         Returns dict with 'root' categories and 'children' mapping.
