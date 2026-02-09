@@ -2,31 +2,38 @@
   "name": "api",
   "projectType": "application",
   "sourceRoot": "apps/api/src",
-  "implicitDependencies": ["domain"],
+  "implicitDependencies": [
+    "domain"
+  ],
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uv run --no-sync fastapi dev apps/api/src/adapters/api/app.py --host 0.0.0.0",
-        "cwd": "{workspaceRoot}"
+        "command": "uv run --package personal-finance-api fastapi dev src/adapters/api/app.py --host 0.0.0.0",
+        "cwd": "{projectRoot}"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uv run --no-sync pytest apps/api/tests/ -v --tb=short",
-        "cwd": "{workspaceRoot}"
+        "command": "uv run --package personal-finance-api pytest tests/ -v --tb=short",
+        "cwd": "{projectRoot}"
       },
-      "inputs": ["{projectRoot}/**/*.py", "{workspaceRoot}/libs/domain/**/*.py"],
+      "inputs": [
+        "{projectRoot}/**/*.py",
+        "{workspaceRoot}/libs/domain/**/*.py"
+      ],
       "outputs": []
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "uv run --no-sync ruff check apps/api/src/ apps/api/tests/",
-        "cwd": "{workspaceRoot}"
+        "command": "uv run --package personal-finance-api ruff check src/ tests/",
+        "cwd": "{projectRoot}"
       },
-      "inputs": ["{projectRoot}/**/*.py"],
+      "inputs": [
+        "{projectRoot}/**/*.py"
+      ],
       "outputs": []
     }
   }
