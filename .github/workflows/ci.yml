@@ -57,10 +57,12 @@ jobs:
       - name: Type check (affected)
         run: npx nx affected -t typecheck --base=$NX_BASE --head=$NX_HEAD
 
-      - name: Format check
-        run: uv run ruff format --check .
+      - name: Format check (affected)
+        run: npx nx affected -t format --base=$NX_BASE --head=$NX_HEAD
 
       - name: Import architecture check
+        # import-linter is workspace-scoped (validates cross-project boundaries)
+        # Not an Nx target because it checks relationships between projects
         run: uv run lint-imports
 
   test:
