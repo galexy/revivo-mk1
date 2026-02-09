@@ -5,5 +5,20 @@
   "venvPath": "../..",
   "venv": ".venv",
   "reportMissingTypeStubs": true,
-  "pythonPlatform": "Linux"
+  "pythonPlatform": "Linux",
+  "executionEnvironments": [
+    {
+      "root": "tests",
+      "reportUnknownMemberType": false,
+      "reportUnknownParameterType": false,
+      "reportUnknownArgumentType": false,
+      "reportUnknownVariableType": false,
+      "reportMissingParameterType": false,
+      "reportMissingTypeArgument": false,
+      "reportUnnecessaryComparison": false,
+      "reportUnnecessaryIsInstance": false,
+      "reportUnusedImport": "warning",
+      "reportMissingTypeStubs": false
+    }
+  ]
 }

@@ -101,7 +101,7 @@ async def create_transaction(
     account_id = AccountId.from_string(request.account_id)
     amount = Money(request.amount.amount, request.amount.currency)
 
-    splits = []
+    splits: list[SplitLine] = []
     for split_req in request.splits:
         try:
             split = SplitLine.create(
@@ -272,7 +272,7 @@ async def update_transaction(
         # Convert splits to domain objects, preserving IDs if provided
         # Also validate provided split IDs exist on this transaction
         existing_split_ids = {str(s.id) for s in existing_txn.splits}
-        new_splits = []
+        new_splits: list[SplitLine] = []
         for split_req in request.splits:
             try:
                 # If split ID provided, parse it first (validates format) then check existence

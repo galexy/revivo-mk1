@@ -120,7 +120,7 @@ class TransactionService:
         source_transaction: Transaction,
     ) -> list[Transaction]:
         """Create mirror transactions for transfer splits."""
-        mirrors = []
+        mirrors: list[Transaction] = []
 
         for split in source_transaction.splits:
             if split.is_transfer and split.transfer_account_id:

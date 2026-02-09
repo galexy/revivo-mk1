@@ -114,13 +114,15 @@ async def get_category_tree(
     await service.ensure_system_categories(
         user_id, household_id=current_user.household_id
     )
-    tree = service.get_category_tree(user_id)
+    tree: dict[str, list[Category] | dict[str, list[Category]]] = service.get_category_tree(user_id)
+    root_categories: list[Category] = tree["root"]  # type: ignore[assignment]  # dict value is list[Category]
+    children_map: dict[str, list[Category]] = tree["children"]  # type: ignore[assignment]  # dict value is dict[str, list[Category]]
 
     return CategoryTreeResponse(
-        root=[_category_to_response(c) for c in tree["root"]],
+        root=[_category_to_response(c) for c in root_categories],
         children={
             parent_id: [_category_to_response(c) for c in children]
-            for parent_id, children in tree["children"].items()
+            for parent_id, children in children_map.items()
         },
     )
 

@@ -67,8 +67,8 @@ async def publish(event: Any) -> None:
     Args:
         event: The domain event to publish
     """
-    event_type = type(event)
-    handlers = _handlers.get(event_type, [])
+    event_type: type = type(event)  # type: ignore[reportUnknownMemberType]  # type(Any) returns type[Any], fine for handler registry lookup
+    handlers: list[Callable[..., Any]] = _handlers.get(event_type, [])
 
     for handler in handlers:
         try:

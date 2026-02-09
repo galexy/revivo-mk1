@@ -13,7 +13,7 @@ All endpoints use dependency injection for AccountService and current user.
 Routes are protected by JWT authentication via get_current_user dependency.
 """
 
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typeid.errors import SuffixValidationException
@@ -72,7 +72,7 @@ CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 # --- Helper Functions ---
 
 
-def _handle_error(error: AccountError) -> None:
+def _handle_error(error: AccountError) -> NoReturn:
     """Convert AccountError to HTTPException.
 
     Args:
@@ -92,7 +92,7 @@ def _handle_error(error: AccountError) -> None:
     raise HTTPException(status_code=http_status, detail=error.message)
 
 
-def _institution_from_schema(
+def _institution_from_schema(  # pyright: ignore[reportUnusedFunction]  # helper kept for future use
     schema: "CreateCheckingAccountRequest",
 ) -> InstitutionDetails | None:
     """Convert institution schema to domain object.

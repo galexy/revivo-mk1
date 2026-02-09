@@ -6,7 +6,7 @@ Handles category CRUD, hierarchy management, and system category initialization.
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from domain.model.category import Category, CategoryType, SYSTEM_CATEGORY_UNCATEGORIZED
+from domain.model.category import Category, CategoryType
 from domain.model.entity_id import CategoryId, HouseholdId, UserId
 
 if TYPE_CHECKING:
@@ -97,7 +97,7 @@ class CategoryService:
         with self._uow:
             return self._uow.categories.get_by_user(user_id)
 
-    def get_category_tree(self, user_id: UserId) -> dict:
+    def get_category_tree(self, user_id: UserId) -> dict[str, list[Category] | dict[str, list[Category]]]:
         """Get categories organized as a tree structure.
 
         Returns dict with 'root' categories and 'children' mapping.
@@ -106,7 +106,7 @@ class CategoryService:
             all_categories = self._uow.categories.get_by_user(user_id)
 
             # Organize into tree
-            root_categories = []
+            root_categories: list[Category] = []
             children_by_parent: dict[str, list[Category]] = {}
 
             for cat in all_categories:
