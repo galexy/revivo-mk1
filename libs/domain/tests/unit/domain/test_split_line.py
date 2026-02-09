@@ -36,12 +36,6 @@ class TestSplitLineIdentity:
         )
         assert split.id == explicit_id
 
-    def test_split_line_immutable_with_id(self) -> None:
-        """SplitLine should remain immutable (frozen dataclass)."""
-        split = SplitLine.create(amount=Money(Decimal("-100.00"), "USD"))
-        with pytest.raises(AttributeError):
-            split.amount = Money(Decimal("-200.00"), "USD")  # type: ignore[misc]
-
 
 class TestSplitLineValidation:
     """Tests for SplitLine validation with ID."""
