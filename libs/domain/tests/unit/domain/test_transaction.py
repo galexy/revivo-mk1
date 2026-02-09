@@ -234,7 +234,7 @@ class TestTransactionCreate:
             )
         ]  # Only half the amount
 
-        with pytest.raises(ValueError, match="Splits sum .* must equal"):
+        with pytest.raises(ValueError, match=r"Splits sum .* must equal"):
             Transaction.create(
                 user_id=user_id,
                 account_id=account_id,
@@ -604,7 +604,6 @@ class TestTransactionUpdate:
         usd_amount: Money,
         effective_date: date,
         single_split: list[SplitLine],
-        payee_id: PayeeId,
     ):
         """update_payee() changes payee_id and payee_name."""
         txn = Transaction.create(
