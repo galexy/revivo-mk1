@@ -26,7 +26,7 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from sqlalchemy import create_engine, text
 
-import src.adapters.persistence.orm.tables  # noqa: F401 -- registers tables with metadata
+import src.adapters.persistence.orm.tables  # noqa: F401  # pyright: ignore[reportUnusedImport] -- registers tables with metadata
 from src.adapters.persistence.orm.base import metadata
 
 

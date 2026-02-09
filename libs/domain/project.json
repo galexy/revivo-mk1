@@ -38,6 +38,15 @@
       },
       "inputs": ["{projectRoot}/**/*.py"],
       "outputs": []
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-domain ruff format --check domain/ tests/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
     }
   }
 }

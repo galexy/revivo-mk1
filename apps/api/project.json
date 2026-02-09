@@ -59,6 +59,15 @@
         "{workspaceRoot}/libs/domain/**/*.py"
       ],
       "outputs": []
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "uv run --package personal-finance-api ruff format --check src/ tests/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/**/*.py"],
+      "outputs": []
     }
   }
 }
