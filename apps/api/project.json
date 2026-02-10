@@ -60,6 +60,23 @@
       ],
       "outputs": []
     },
+    "build-emails": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "mkdir -p src/adapters/email/templates",
+          "npx mjml src/adapters/email/templates/verification.mjml -o src/adapters/email/templates/verification.html"
+        ],
+        "cwd": "{projectRoot}",
+        "parallel": false
+      },
+      "inputs": [
+        "{projectRoot}/src/adapters/email/templates/*.mjml"
+      ],
+      "outputs": [
+        "{projectRoot}/src/adapters/email/templates/*.html"
+      ]
+    },
     "format": {
       "executor": "nx:run-commands",
       "options": {
