@@ -6,6 +6,10 @@ import {
 } from '@tanstack/react-router';
 import type { AuthContextType } from './features/auth/context/AuthContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import { DashboardPage } from './pages/DashboardPage';
 
 // Root route with auth context injection
 const rootRoute = createRootRouteWithContext<{ auth: AuthContextType }>()({
@@ -16,19 +20,25 @@ const rootRoute = createRootRouteWithContext<{ auth: AuthContextType }>()({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  component: () => <div>Login Page (placeholder)</div>, // Replaced in Plan 04
+  validateSearch: (search: Record<string, unknown>): { expired?: boolean } => ({
+    expired: search.expired === 'true' ? true : undefined,
+  }),
+  component: LoginPage,
 });
 
 const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
-  component: () => <div>Register Page (placeholder)</div>, // Replaced in Plan 04
+  component: RegisterPage,
 });
 
 const verifyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/verify',
-  component: () => <div>Verify Email (placeholder)</div>, // Replaced in Plan 05
+  validateSearch: (search: Record<string, unknown>): { token?: string } => ({
+    token: search.token as string | undefined,
+  }),
+  component: VerifyEmailPage,
 });
 
 // Protected layout route — auth guard via beforeLoad
@@ -38,7 +48,7 @@ const protectedLayoutRoute = createRoute({
   component: ProtectedRoute,
   beforeLoad: ({ context }) => {
     if (!context.auth.isLoading && !context.auth.isAuthenticated) {
-      throw redirect({ to: '/login' });
+      throw redirect({ to: '/login', search: {} });
     }
   },
 });
@@ -46,7 +56,7 @@ const protectedLayoutRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   path: '/dashboard',
-  component: () => <div>Dashboard (placeholder)</div>, // Replaced in Plan 05
+  component: DashboardPage,
 });
 
 // Root index route — redirect based on auth state
