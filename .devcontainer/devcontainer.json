@@ -57,7 +57,8 @@
   "forwardPorts": [
     8000,
     5432,
-    8025
+    8025,
+    9323
   ],
   "remoteUser": "developer",
   "mounts": [
