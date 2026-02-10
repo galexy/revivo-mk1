@@ -157,7 +157,7 @@ export function RegisterForm() {
 
         <div className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:underline">
+          <Link to="/login" search={{}} className="text-primary hover:underline">
             Log in
           </Link>
         </div>
