@@ -28,6 +28,7 @@ services:
       - app-network
     secrets:
       - encryption_key
+    init: true
 
   postgres:
     image: postgres:16
