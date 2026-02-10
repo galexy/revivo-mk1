@@ -6,12 +6,10 @@
   ],
   "service": "app",
   "workspaceFolder": "/workspace",
-
   "runArgs": [
     "--cap-add=NET_ADMIN",
     "--cap-add=NET_RAW"
   ],
-
   "customizations": {
     "vscode": {
       "extensions": [
@@ -37,7 +35,9 @@
           }
         },
         "ruff.lint.run": "onSave",
-        "editor.rulers": [88],
+        "editor.rulers": [
+          88
+        ],
         "editor.formatOnSave": true,
         "files.trimTrailingWhitespace": true,
         "files.insertFinalNewline": true,
@@ -54,16 +54,16 @@
       }
     }
   },
-
-  "forwardPorts": [8000, 5432, 8025],
-
+  "forwardPorts": [
+    8000,
+    5432,
+    8025
+  ],
   "remoteUser": "developer",
-
   "mounts": [
     "source=personal-finance-bashhistory,target=/commandhistory,type=volume",
     "source=${localWorkspaceFolder}/.claude-local,target=/home/developer/.claude,type=bind"
   ],
-
   "containerEnv": {
     "NODE_OPTIONS": "--max-old-space-size=4096",
     "CLAUDE_CONFIG_DIR": "/home/developer/.claude",
@@ -73,11 +73,9 @@
     "ENVIRONMENT": "development",
     "LOG_LEVEL": "DEBUG"
   },
-
-  "postCreateCommand": "uv sync && npm ci",
+  "postCreateCommand": "uv sync && npx pnpm install --frozen-lockfile",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
   "waitFor": "postStartCommand",
-
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   }
