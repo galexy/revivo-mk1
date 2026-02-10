@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 
 ## Current Position
 
-Phase: 11 of 32 (Domain Test Coverage)
-Plan: 1 of 1 (COMPLETE)
-Status: Phase complete
-Last activity: 2026-02-09 - Completed 11-01-PLAN.md (Transaction, Category, Payee unit tests)
+Phase: 12 of 32 (Frontend Infrastructure)
+Plan: 1 of 5 (awaiting checkpoint verification)
+Status: In progress - checkpoint reached
+Last activity: 2026-02-10 - Completed 12-01-PLAN.md (pnpm migration)
 
 Progress: [██████░░░░] ~67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57
-- Average duration: 4.9 min
-- Total execution time: 6.27 hours
+- Total plans completed: 58
+- Average duration: 4.7 min
+- Total execution time: 6.35 hours
 
 **By Phase:**
 
@@ -42,10 +42,11 @@ Progress: [██████░░░░] ~67%
 | 09-type-safety-test-cleanup | 1 | 3 min | 3.0 min |
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
+| 12-frontend-infrastructure | 1 | 2 min | 2.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-05 (1 min), 09-01 (3 min), 10-01 (6 min), 11-01 (5 min)
-- Trend: Phase 11 complete. Domain coverage 48%→80% with 89 new unit tests for Transaction, Category, Payee.
+- Last 5 plans: 09-01 (3 min), 10-01 (6 min), 11-01 (5 min), 12-01 (2 min)
+- Trend: Phase 12 started. Migrated to pnpm, awaiting CI verification checkpoint.
 
 *Updated after each plan completion*
 
@@ -246,6 +247,10 @@ Recent decisions affecting current work:
 - targetDefaults cache includes test, lint, typecheck, and format for Nx caching
 - TypedDict for structured dict returns with distinct key types (eliminates type: ignore[assignment])
 - Remove tests that verify language mechanics already enforced by static analysis (frozen dataclass field assignment)
+- pnpm as package manager for monorepo (replaces npm, better dependency resolution)
+- pnpm workspace config in pnpm-workspace.yaml (apps/*, libs/*)
+- shamefully-hoist=true in .npmrc for legacy package compatibility
+- pnpm/action-setup@v4 in GitHub Actions for reproducible CI builds
 
 ### Pending Todos
 
@@ -264,10 +269,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09
-Stopped at: Phase 11 complete (1/1 plans, domain coverage 48%→80%)
+Last session: 2026-02-10
+Stopped at: Phase 12 Plan 01 complete (pnpm migration) - awaiting checkpoint verification
 Resume file: None
-Next action: Phase 12 (Frontend Infrastructure)
+Next action: User to create PR and verify CI passes with pnpm before proceeding to 12-02
 
 ## Roadmap Evolution
 
