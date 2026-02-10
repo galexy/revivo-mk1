@@ -159,6 +159,98 @@ Import-linter is configured to enforce boundaries:
 - Adapters are independent of each other
 - Dependencies flow inward following hexagonal architecture
 
+## Making Changes with GSD (Claude Code)
+
+This project uses the [GSD workflow](https://github.com/coleam00/gsd) with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) for AI-assisted development. Work is organized into **phases** (a coherent feature or capability) broken down into **plans** (atomic units of work). All planning artifacts live in `.planning/`.
+
+### Workflow Overview
+
+1. **Check progress** — See where the project stands and what's next
+2. **Plan a phase** — Research the approach, create detailed execution plans
+3. **Execute a phase** — Run all plans with parallel agents, atomic commits, and verification
+4. **Verify the work** — Validate features through acceptance testing
+
+### Common Commands
+
+Run these as slash commands inside Claude Code:
+
+| Command | Purpose |
+|---|---|
+| `/gsd:progress` | Check project status, see current phase, and route to next action |
+| `/gsd:discuss-phase` | Flesh out the details and refine the requirements for a phase with the help of Claude  |
+| `/gsd:plan-phase` | Research and create detailed plans for the next phase |
+| `/gsd:execute-phase` | Execute all plans in a phase (parallel agents, atomic commits) |
+| `/gsd:verify-work` | Run conversational UAT to validate built features |
+| `/gsd:quick` | Execute a small task with GSD guarantees (atomic commits, state tracking) |
+| `/gsd:debug` | Systematic debugging with persistent state across context resets |
+
+### Planning and Roadmap Commands
+
+| Command | Purpose |
+|---|---|
+| `/gsd:new-milestone` | Start a new milestone cycle |
+| `/gsd:add-phase` | Add a phase to the end of the current milestone |
+| `/gsd:insert-phase` | Insert urgent work as a decimal phase (e.g., 12.1) between existing phases |
+| `/gsd:remove-phase` | Remove a future phase and renumber subsequent phases |
+| `/gsd:discuss-phase` | Gather context through adaptive questioning before planning |
+| `/gsd:list-phase-assumptions` | Surface Claude's assumptions about a phase before planning |
+
+### Session Management
+
+| Command | Purpose |
+|---|---|
+| `/gsd:pause-work` | Create context handoff when pausing work mid-phase |
+| `/gsd:resume-work` | Resume work from a previous session with full context restoration |
+| `/gsd:add-todo` | Capture an idea or task as a todo for later |
+| `/gsd:check-todos` | List pending todos and pick one to work on |
+
+### Milestone Lifecycle
+
+| Command | Purpose |
+|---|---|
+| `/gsd:audit-milestone` | Audit milestone completion against original intent |
+| `/gsd:plan-milestone-gaps` | Create phases to close gaps identified by the audit |
+| `/gsd:complete-milestone` | Archive a completed milestone and prepare for the next one |
+
+### Typical Workflow Example
+
+```
+# 1. Check where we are
+/gsd:progress
+
+# 2. Discuss the next phase
+/gsd:discuss-phase <phase>
+
+# 3. Plan the next phase (researches approach, creates PLAN.md files)
+/gsd:plan-phase <phase>
+-- READ EACH PLAN file and give feedback
+
+# 3. Execute the phase (spawns parallel agents per plan)
+/gsd:execute-phase <phase>
+-- READ EACH SUMMARY file and look for where agent took shortcuts
+
+# 5. Verify the work (conversational acceptance testing)
+/gsd:verify-work <phase>
+```
+
+### Planning Artifacts
+
+All GSD state is tracked in `.planning/`:
+
+```
+.planning/
+├── PROJECT.md          # Project requirements and constraints
+├── REQUIREMENTS.md     # Detailed requirements
+├── ROADMAP.md          # All phases with status
+├── STATE.md            # Current position, velocity metrics
+├── CHECKPOINTS.md      # Validation rules for development
+└── phases/
+    └── XX-phase-name/
+        ├── XX-NN-PLAN.md     # Execution plan for each unit of work
+        ├── XX-NN-SUMMARY.md  # What was done after execution
+        └── VERIFICATION.md   # Phase verification results
+```
+
 ## Documentation
 
 - [Project Overview](.planning/PROJECT.md) - Requirements and constraints
