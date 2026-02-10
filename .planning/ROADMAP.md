@@ -365,11 +365,15 @@ Plans:
   3. Session persists across browser refresh
   4. User can log out from any page
   5. Unauthenticated users redirected to login
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
+- [ ] 13-01-PLAN.md — Backend cookie fixes (samesite=lax, remember_me) + Axios client + auth types
+- [ ] 13-02-PLAN.md — shadcn/ui components (Form, Checkbox, DropdownMenu, Avatar)
+- [ ] 13-03-PLAN.md — AuthContext provider + useAuth hook + routing + ProtectedRoute
+- [ ] 13-04-PLAN.md — Login page + Registration page (forms, validation, password toggle)
+- [ ] 13-05-PLAN.md — Email verification page + UserMenu (logout) + Dashboard shell
+- [ ] 13-06-PLAN.md — Unit tests + end-to-end verification checkpoint
 
 ### Phase 14: Frontend API & Routing
 **Goal**: Establish patterns for API communication and client-side routing
@@ -707,7 +711,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 11. Domain Test Coverage | 1/1 | Complete | 2026-02-09 |
 | 12. Frontend Infrastructure | 6/6 | Complete | 2026-02-10 |
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
-| 13. Login UI | 0/2 | Not started | - |
+| 13. Login UI | 0/6 | Not started | - |
 | 14. Frontend API & Routing | 0/2 | Not started | - |
 | 15. API Integration Validation | 0/2 | Not started | - |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
