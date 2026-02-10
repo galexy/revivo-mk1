@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 12 of 32 (Frontend Infrastructure)
-Plan: 5 of 5
-Status: Phase complete
-Last activity: 2026-02-10 - Completed 12-05-PLAN.md (Vitest + Playwright + complete Nx targets)
+Plan: 6 of 6 (gap closure)
+Status: Phase complete with gap closure
+Last activity: 2026-02-10 - Completed 12-06-PLAN.md (shadcn/ui CLI components + Playwright system Chromium)
 
 Progress: [██████░░░░] ~69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 62
+- Total plans completed: 63
 - Average duration: 4.7 min
-- Total execution time: 6.63 hours
+- Total execution time: 6.71 hours
 
 **By Phase:**
 
@@ -42,11 +42,11 @@ Progress: [██████░░░░] ~69%
 | 09-type-safety-test-cleanup | 1 | 3 min | 3.0 min |
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
-| 12-frontend-infrastructure | 5 | 19 min | 3.8 min |
+| 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 12-02 (3 min), 12-03 (5 min), 12-04 (4 min), 12-05 (5 min)
-- Trend: Phase 12 complete. Frontend infrastructure ready with React 19, Vite 7, Tailwind CSS v4, shadcn/ui components, Vitest + Playwright testing.
+- Last 5 plans: 12-03 (5 min), 12-04 (4 min), 12-05 (5 min), 12-06 (5 min)
+- Trend: Phase 12 complete with gap closure. Official shadcn/ui CLI components replace manual versions. Playwright uses system Chromium (~180 MB saved).
 
 *Updated after each plan completion*
 
@@ -264,6 +264,11 @@ Recent decisions affecting current work:
 - pnpm workspace config in pnpm-workspace.yaml (apps/*, libs/*)
 - shamefully-hoist=true in .npmrc for legacy package compatibility
 - pnpm/action-setup@v4 in GitHub Actions for reproducible CI builds
+- shadcn CLI with pnpm wrapper script (/tmp/bin/pnpm calling npx pnpm) for component generation
+- radix-ui meta-package (not individual @radix-ui/* packages) as official CLI pattern
+- Playwright uses system Chromium at /usr/bin/chromium (no bundled browser download)
+- Container-safe browser args: --no-sandbox, --disable-gpu, --disable-dev-shm-usage
+- Minimal SVG favicon in public/ to prevent console 404 errors in e2e tests
 
 ### Pending Todos
 
@@ -283,7 +288,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Phase 12 complete, verified 22/22 must-haves
+Stopped at: Phase 12 gap closure complete (12-06), verified 6/6 must-haves
 Resume file: None
 Next action: Phase 12.1 (UI Acceptance Testing) or Phase 13 (Login UI)
 
@@ -638,20 +643,23 @@ All success criteria met:
 3. Playwright configured for E2E UI testing (chromium-only, local-only)
 4. Basic smoke test passes (app renders without errors, 2 Vitest + 2 Playwright tests)
 
-Plans completed (5 of 5):
+Plans completed (6 of 6):
 - 12-01: pnpm migration + CI update (packageManager field, onlyBuiltDependencies)
 - 12-02: React+Vite scaffold + FastAPI CORS (React 19, Vite 7, port 5173)
 - 12-03: Tailwind CSS v4 + ESLint + Prettier (dark mode, Fontsource fonts, flat config)
 - 12-04: libs/ui + shadcn/ui + app shell (internal package, sidebar layout)
 - 12-05: Vitest + Playwright + Nx targets (test, lint, typecheck, format, e2e)
+- 12-06: shadcn/ui CLI components + Playwright system Chromium (gap closure)
 
 Key stats:
-- 62 total plans completed across all phases
+- 63 total plans completed across all phases
 - All quality gates pass: npx nx test/lint/typecheck/format web
-- Verification: 22/22 must-haves confirmed
-- Frontend stack: React 19 + Vite 7 + Tailwind CSS v4 + shadcn/ui + Vitest + Playwright
+- Verification: 28/28 must-haves confirmed (22 from 12-05 + 6 from 12-06)
+- Frontend stack: React 19 + Vite 7 + Tailwind CSS v4 + official shadcn/ui + Vitest + Playwright
 - Package manager: pnpm with workspace configuration
 - Dark mode: class-based with localStorage persistence
 - Self-hosted fonts: Inter (UI) + JetBrains Mono (financial figures)
+- Components: Official CLI-generated (use `shadcn diff` to check for updates)
+- E2E: System Chromium at /usr/bin/chromium (~180 MB saved per container rebuild)
 
 Ready for Phase 12.1: UI Acceptance Testing Framework
