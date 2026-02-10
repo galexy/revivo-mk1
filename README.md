@@ -31,58 +31,96 @@ The devcontainer will automatically:
 # Install uv (Python package manager)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-uv sync
+# Install Node.js (for Nx monorepo tooling)
+# See https://nodejs.org/
+
+# Install all workspace dependencies (Python + Node)
+uv sync --all-packages
+pnpm install
 
 # Start services
 docker compose up -d
 
 # Run database migrations
-uv run alembic upgrade head
+cd apps/api && uv run --package personal-finance-api alembic upgrade head
 
 # Start the development server
-uv run uvicorn src.adapters.api.main:app --reload --host 0.0.0.0 --port 8000
+npx nx serve api
+```
+
+## Monorepo Structure
+
+This project uses [Nx](https://nx.dev) to manage a polyglot monorepo with [uv workspaces](https://docs.astral.sh/uv/concepts/workspaces/) for Python packages and [pnpm](https://pnpm.io) for Node packages.
+
+```
+/
+├── apps/
+│   ├── api/          # FastAPI backend (Python)
+│   └── web/          # React frontend (TypeScript)
+├── libs/
+│   ├── domain/       # Shared domain layer (Python)
+│   └── ui/           # Shared UI components (shadcn/ui)
+├── nx.json           # Nx workspace config
+└── pyproject.toml    # Root Python config (uv workspace)
+```
+
+### Nx Projects
+
+```bash
+npx nx show projects    # List all projects: api, domain, web, ui
+npx nx graph            # Visualize project dependency graph
 ```
 
 ## Development
 
+All tasks are run through Nx. Do not invoke the underlying tools (pytest, ruff, eslint, etc.) directly.
+
 ### Running Tests
 
 ```bash
-# Run all tests
-uv run pytest
+# Run tests for a specific project
+npx nx test api
+npx nx test domain
+npx nx test web
 
-# Run with coverage
-uv run pytest --cov=src --cov-report=html
-
-# Run specific test file
-uv run pytest tests/unit/domain/test_money.py
+# Run tests across all projects
+npx nx run-many -t test
 ```
 
 ### Code Quality
 
 ```bash
-# Run linter
-uv run ruff check .
+# Lint a specific project
+npx nx lint api
+npx nx lint domain
+npx nx lint web
 
-# Run formatter
-uv run ruff format .
+# Type check a specific project
+npx nx typecheck api
+npx nx typecheck domain
+npx nx typecheck web
 
-# Run type checker
-uv run mypy src/
+# Format check a specific project
+npx nx format api
+npx nx format domain
+npx nx format web
 
-# Check architecture boundaries
-uv run lint-imports
+# Run across all projects
+npx nx run-many -t lint typecheck
+npx nx run-many -t format
 ```
 
-### Pre-commit Hooks
+### Database Migrations
 
 ```bash
-# Install pre-commit hooks
-uv run pre-commit install
+# Run migrations
+cd apps/api && uv run --package personal-finance-api alembic upgrade head
 
-# Run hooks manually on all files
-uv run pre-commit run --all-files
+# Generate a new migration after changing tables.py
+cd apps/api && uv run --package personal-finance-api alembic revision --autogenerate -m "description"
+
+# Check for schema drift
+cd apps/api && uv run --package personal-finance-api alembic check
 ```
 
 ## Architecture
@@ -90,21 +128,20 @@ uv run pre-commit run --all-files
 This project follows **Hexagonal Architecture** (Ports and Adapters) with **Domain-Driven Design** principles:
 
 ```
-src/
-    domain/             # Pure domain logic (no infrastructure imports)
-        model/          # Entities, Aggregates, Value Objects
-        events/         # Domain events
-        ports/          # Abstract interfaces (repositories, services)
-        services/       # Domain services (cross-aggregate logic)
-        exceptions.py   # Domain exceptions
-
+apps/api/src/
     adapters/           # Infrastructure implementations
         persistence/    # Database adapters (SQLAlchemy)
         api/            # HTTP/REST adapters (FastAPI)
         security/       # Encryption, secrets
-
     application/        # Use cases / Application services
         services/       # Thin orchestration layer
+
+libs/domain/domain/
+    model/              # Entities, Aggregates, Value Objects
+    events/             # Domain events
+    ports/              # Abstract interfaces (repositories, services)
+    services/           # Domain services (cross-aggregate logic)
+    exceptions.py       # Domain exceptions
 ```
 
 ### Key Patterns
