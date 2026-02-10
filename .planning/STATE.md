@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 13 of 32 (Login UI)
-Plan: 3 of 6
+Plan: 5 of 6
 Status: In progress
-Last activity: 2026-02-10 - Completed 13-03-PLAN.md (AuthContext & TanStack Router)
+Last activity: 2026-02-10 - Completed 13-05-PLAN.md (Email Verification, User Menu & Dashboard Shell)
 
 Progress: [███████░░░] ~70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 65
-- Average duration: 4.6 min
-- Total execution time: 6.83 hours
+- Total plans completed: 67
+- Average duration: 4.5 min
+- Total execution time: 6.95 hours
 
 **By Phase:**
 
@@ -43,11 +43,11 @@ Progress: [███████░░░] ~70%
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
-| 13-login-ui | 3 | 12 min | 4.0 min |
+| 13-login-ui | 5 | 19 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 12-05 (5 min), 12-06 (5 min), 13-01 (5 min), 13-02 (5 min), 13-03 (2 min)
-- Trend: Phase 13 (Login UI) wave 2 complete. AuthContext + TanStack Router infrastructure. Ready for UI pages.
+- Last 5 plans: 13-01 (5 min), 13-02 (5 min), 13-03 (2 min), 13-04 (3 min), 13-05 (4 min)
+- Trend: Phase 13 (Login UI) wave 3 complete. Email verification, user menu with logout, dashboard shell ready.
 
 *Updated after each plan completion*
 
@@ -75,6 +75,16 @@ Recent decisions affecting current work:
 - AbortController cleanup in refresh useEffect prevents StrictMode double-mount race
 - Form-encoded URLSearchParams body for /auth/token (OAuth2PasswordRequestForm compatibility)
 - isLoading state starts true, prevents flash of login page during auth check
+- PasswordInput uses forwardRef for react-hook-form compatibility, tabIndex=-1 on toggle button
+- TanStack Router validateSearch requires explicit return type for optional params
+- Registration success shows verification notice, does NOT auto-login per user decision
+- Server errors displayed as destructive banner above submit button (not toast)
+- validateSearch with optional types ({ expired?: boolean }) makes search params optional for type-safe navigation
+- Email resend on expired token uses POST /auth/register (enumeration protection via always-202)
+- UserMenu generates initials from first + last word of display_name (max 2 chars)
+- Logout is immediate (no confirmation dialog) per UX specification
+- Session expired message shown via /login?expired=true from api.ts interceptor
+- DashboardPage owns sidebar + header layout (dark mode state managed there)
 - shadcn/ui new-york style for component aesthetics
 - .gitignore allows libs/ui/src/lib/ (shadcn convention) while blocking Python lib/
 - Vitest (not Jest) for component testing - native Vite integration
@@ -300,9 +310,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed 13-03-PLAN.md (AuthContext & TanStack Router)
+Stopped at: Completed 13-04-PLAN.md (Login & Registration Pages)
 Resume file: None
-Next action: Continue Phase 13 (Login UI) - Plan 13-04 (Login & Register Pages) or later
+Next action: Continue Phase 13 (Login UI) - Plan 13-05 or later
 
 ## Roadmap Evolution
 
