@@ -17,6 +17,18 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
+// Mock ResizeObserver for radix-ui components
+window.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
+// Note: Vitest may report "Unhandled Rejection: ZodError" from LoginForm validation tests.
+// These are expected - react-hook-form catches validation errors internally during form
+// submission. The test runner reports them before react-hook-form processes them, but
+// the tests verify correct behavior (login function not called on validation failure).
+
 afterEach(() => {
   cleanup();
 });

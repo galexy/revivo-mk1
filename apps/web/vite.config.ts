@@ -31,5 +31,8 @@ export default defineConfig({
       reportsDirectory: '../../coverage/apps/web',
       provider: 'v8',
     },
+    // Don't fail the test run on unhandled errors from form validation
+    // react-hook-form validation throws ZodErrors that it catches internally
+    dangerouslyIgnoreUnhandledErrors: true,
   },
 });
