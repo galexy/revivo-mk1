@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="">
   <head>
     <meta charset="UTF-8" />
@@ -6,7 +6,10 @@
     <title>Personal Finance</title>
     <script>
       // Prevent flash of wrong theme
-      if (localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (
+        localStorage.theme === 'dark' ||
+        (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
         document.documentElement.classList.add('dark');
       }
     </script>

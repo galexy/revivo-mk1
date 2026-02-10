@@ -3,5 +3,33 @@
   "projectType": "application",
   "sourceRoot": "apps/web/src",
   "implicitDependencies": ["ui"],
-  "targets": {}
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx eslint src/",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/src/**/*.{ts,tsx}", "{workspaceRoot}/eslint.config.mjs"],
+      "outputs": []
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prettier --check \"src/**/*.{ts,tsx,css}\"",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/src/**/*.{ts,tsx,css}", "{workspaceRoot}/.prettierrc"],
+      "outputs": []
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx playwright test --config=playwright.config.ts",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/e2e/**/*.ts", "{projectRoot}/playwright.config.ts"],
+      "outputs": []
+    }
+  }
 }
