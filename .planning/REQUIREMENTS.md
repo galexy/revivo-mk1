@@ -116,7 +116,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ARCH-03**: REST API uses FastAPI with automatic OpenAPI spec generation
 - [ ] **ARCH-04**: DTOs use Pydantic for validation and serialization
 - [ ] **ARCH-05**: PostgreSQL database with Alembic migrations
-- [ ] **ARCH-06**: Frontend uses React with TypeScript
+- [x] **ARCH-06**: Frontend uses React with TypeScript
 - [ ] **ARCH-07**: Frontend uses TanStack Query or similar for API state management
 - [ ] **ARCH-08**: Services are containerized with Dockerfile
 - [ ] **ARCH-09**: Development environment uses devcontainers
@@ -140,7 +140,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TEST-02**: Critical financial calculations have property-based tests (money arithmetic, balance calculations)
 - [ ] **TEST-03**: Use cases have integration tests with test database
 - [ ] **TEST-04**: API endpoints have integration tests
-- [ ] **TEST-05**: UI has end-to-end tests using Playwright (headless browser)
+- [x] **TEST-05**: UI has end-to-end tests using Playwright (headless browser)
 - [ ] **TEST-06**: UI tests cover critical workflows: create account, record transaction, view budget
 - [ ] **TEST-07**: Tests inject time/date for time-dependent logic (scheduled transactions, date queries)
 
