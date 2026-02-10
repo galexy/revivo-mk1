@@ -8,11 +8,11 @@ export default defineConfig({
   plugins: [react(), nxViteTsPaths()],
   server: {
     port: 5173,
-    host: 'localhost',
+    host: '0.0.0.0',
   },
   preview: {
     port: 4300,
-    host: 'localhost',
+    host: '0.0.0.0',
   },
   build: {
     outDir: '../../dist/apps/web',
