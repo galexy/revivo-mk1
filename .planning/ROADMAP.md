@@ -330,7 +330,7 @@ Plans:
   2. shadcn/ui component library integrated and working
   3. Playwright configured for E2E UI testing
   4. Basic smoke test passes (app renders without errors)
-**Plans**: 5 plans
+**Plans**: 6 plans
 
 Plans:
 - [x] 12-01-PLAN.md — pnpm migration + CI update (HITL: PR to verify GitHub Actions)
@@ -338,6 +338,7 @@ Plans:
 - [x] 12-03-PLAN.md — Tailwind CSS v4, fonts, dark mode, ESLint + Prettier
 - [x] 12-04-PLAN.md — libs/ui internal package, shadcn/ui components, app shell
 - [x] 12-05-PLAN.md — Vitest + RTL, Playwright smoke test, Nx targets
+- [ ] 12-06-PLAN.md — Gap closure: replace manual shadcn/ui components with CLI-generated versions
 
 ### Phase 12.1: UI Acceptance Testing Framework (INSERTED)
 **Goal**: Establish Claude Code Chrome-driven acceptance testing framework so all UI phases can write repeatable UAT scenarios
