@@ -25,9 +25,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Nx Monorepo Restructure** - Convert to Nx monorepo with backend and frontend apps
 - [x] **Phase 8: CI & Code Quality** - Fix CI pipeline, code coverage, linting, type checking for green CI
 - [x] **Phase 9: Type Safety & Test Cleanup** - CategoryTree TypedDict, remove redundant immutability tests
-- [ ] **Phase 10: Value Object ORM Mapping** - SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
+- [x] **Phase 10: Value Object ORM Mapping** - SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
 - [x] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
-- [ ] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Vitest
+- [x] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Vitest
 - [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
 - [ ] **Phase 13: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
@@ -330,14 +330,15 @@ Plans:
   2. shadcn/ui component library integrated and working
   3. Playwright configured for E2E UI testing
   4. Basic smoke test passes (app renders without errors)
-**Plans**: 5 plans
+**Plans**: 6 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — pnpm migration + CI update (HITL: PR to verify GitHub Actions)
-- [ ] 12-02-PLAN.md — React+Vite scaffold + FastAPI CORS
-- [ ] 12-03-PLAN.md — Tailwind CSS v4, fonts, dark mode, ESLint + Prettier
-- [ ] 12-04-PLAN.md — libs/ui internal package, shadcn/ui components, app shell
-- [ ] 12-05-PLAN.md — Vitest + RTL, Playwright smoke test, Nx targets
+- [x] 12-01-PLAN.md — pnpm migration + CI update (HITL: PR to verify GitHub Actions)
+- [x] 12-02-PLAN.md — React+Vite scaffold + FastAPI CORS
+- [x] 12-03-PLAN.md — Tailwind CSS v4, fonts, dark mode, ESLint + Prettier
+- [x] 12-04-PLAN.md — libs/ui internal package, shadcn/ui components, app shell
+- [x] 12-05-PLAN.md — Vitest + RTL, Playwright smoke test, Nx targets
+- [x] 12-06-PLAN.md — Gap closure: replace manual shadcn/ui components with CLI-generated versions
 
 ### Phase 12.1: UI Acceptance Testing Framework (INSERTED)
 **Goal**: Establish Claude Code Chrome-driven acceptance testing framework so all UI phases can write repeatable UAT scenarios
@@ -704,7 +705,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 9. Type Safety & Test Cleanup | 1/1 | Complete | 2026-02-09 |
 | 10. Value Object ORM Mapping | 1/1 | Complete | 2026-02-09 |
 | 11. Domain Test Coverage | 1/1 | Complete | 2026-02-09 |
-| 12. Frontend Infrastructure | 0/4 | Not started | - |
+| 12. Frontend Infrastructure | 6/6 | Complete | 2026-02-10 |
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 0/2 | Not started | - |
 | 14. Frontend API & Routing | 0/2 | Not started | - |

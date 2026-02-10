@@ -97,7 +97,10 @@ def create_app() -> FastAPI:
     # CORS middleware for web frontend
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],  # React dev server
+        allow_origins=[
+            "http://localhost:5173",  # Vite dev server
+            "http://localhost:3000",  # Legacy/alternative
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

@@ -28,6 +28,7 @@ services:
       - app-network
     secrets:
       - encryption_key
+    init: true
 
   postgres:
     image: postgres:16
@@ -47,25 +48,6 @@ services:
       - app-network
     ports:
       - "5432:5432"
-
-  postgres-jobs:
-    image: postgres:16
-    restart: unless-stopped
-    volumes:
-      - postgres-jobs-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: jobs
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d jobs"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app-network
-    ports:
-      - "5433:5432"
 
   mailpit:
     image: axllent/mailpit:v1.29
@@ -87,7 +69,6 @@ networks:
 
 volumes:
   postgres-data:
-  postgres-jobs-data:
 
 secrets:
   encryption_key:

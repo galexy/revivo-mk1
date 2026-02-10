@@ -116,7 +116,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ARCH-03**: REST API uses FastAPI with automatic OpenAPI spec generation
 - [ ] **ARCH-04**: DTOs use Pydantic for validation and serialization
 - [ ] **ARCH-05**: PostgreSQL database with Alembic migrations
-- [ ] **ARCH-06**: Frontend uses React with TypeScript
+- [x] **ARCH-06**: Frontend uses React with TypeScript
 - [ ] **ARCH-07**: Frontend uses TanStack Query or similar for API state management
 - [ ] **ARCH-08**: Services are containerized with Dockerfile
 - [ ] **ARCH-09**: Development environment uses devcontainers
@@ -140,7 +140,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TEST-02**: Critical financial calculations have property-based tests (money arithmetic, balance calculations)
 - [ ] **TEST-03**: Use cases have integration tests with test database
 - [ ] **TEST-04**: API endpoints have integration tests
-- [ ] **TEST-05**: UI has end-to-end tests using Playwright (headless browser)
+- [x] **TEST-05**: UI has end-to-end tests using Playwright (headless browser)
 - [ ] **TEST-06**: UI tests cover critical workflows: create account, record transaction, view budget
 - [ ] **TEST-07**: Tests inject time/date for time-dependent logic (scheduled transactions, date queries)
 
@@ -317,7 +317,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-03 | Phase 1 | Pending |
 | ARCH-04 | Phase 1 | Pending |
 | ARCH-05 | Phase 1 | Pending |
-| ARCH-06 | Phase 5, 6 | Pending |
+| ARCH-06 | Phase 12 | Complete (Phase 12) |
 | ARCH-07 | Phase 8 | Pending |
 | ARCH-08 | Phase 1 | Pending |
 | ARCH-09 | Phase 1 | Pending |
@@ -335,7 +335,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-02 | Phase 20 | Pending |
 | TEST-03 | Phase 20 | Pending |
 | TEST-04 | Phase 20 | Pending |
-| TEST-05 | Phase 6, 20 | Pending |
+| TEST-05 | Phase 12 | Complete (Phase 12) |
 | TEST-06 | Phase 20 | Pending |
 | TEST-07 | Phase 20 | Pending |
 | WEB-01 | Phase 7 | Pending |

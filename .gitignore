@@ -10,7 +10,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# Python lib directories (but not TypeScript lib/ in libs/ui)
+apps/*/lib/
+libs/*/lib/
+!libs/ui/src/lib/
 lib64/
 parts/
 sdist/
@@ -93,6 +96,11 @@ alembic/versions/__pycache__/
 # Node.js
 node_modules/
 .claude-local/
+.pnpm-store/
+
+# Playwright
+playwright-report/
+test-results/
 
 # Nx
 .nx/

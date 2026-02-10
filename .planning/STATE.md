@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 11 (Domain Test Coverage) - Complete
+**Current focus:** Phase 12 (Frontend Infrastructure) - Complete
 
 ## Current Position
 
-Phase: 11 of 32 (Domain Test Coverage)
-Plan: 1 of 1 (COMPLETE)
-Status: Phase complete
-Last activity: 2026-02-09 - Completed 11-01-PLAN.md (Transaction, Category, Payee unit tests)
+Phase: 12 of 32 (Frontend Infrastructure)
+Plan: 6 of 6 (gap closure)
+Status: Phase complete with gap closure
+Last activity: 2026-02-10 - Completed 12-06-PLAN.md (shadcn/ui CLI components + Playwright system Chromium)
 
-Progress: [██████░░░░] ~67%
+Progress: [██████░░░░] ~69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57
-- Average duration: 4.9 min
-- Total execution time: 6.27 hours
+- Total plans completed: 63
+- Average duration: 4.7 min
+- Total execution time: 6.71 hours
 
 **By Phase:**
 
@@ -42,10 +42,11 @@ Progress: [██████░░░░] ~67%
 | 09-type-safety-test-cleanup | 1 | 3 min | 3.0 min |
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
+| 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-05 (1 min), 09-01 (3 min), 10-01 (6 min), 11-01 (5 min)
-- Trend: Phase 11 complete. Domain coverage 48%→80% with 89 new unit tests for Transaction, Category, Payee.
+- Last 5 plans: 12-03 (5 min), 12-04 (4 min), 12-05 (5 min), 12-06 (5 min)
+- Trend: Phase 12 complete with gap closure. Official shadcn/ui CLI components replace manual versions. Playwright uses system Chromium (~180 MB saved).
 
 *Updated after each plan completion*
 
@@ -56,6 +57,19 @@ Progress: [██████░░░░] ~67%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Tailwind v4 CSS-first @theme syntax (not tailwind.config.js)
+- shadcn/ui CSS variable naming: HSL values without hsl() wrapper
+- Self-hosted fonts via Fontsource (no external CDN dependencies)
+- ESLint 9 flat config excludes Python projects (apps/api, libs/domain)
+- Dark mode via .dark class on documentElement with localStorage persistence
+- Lazy state initializer for localStorage reads (not useEffect setState)
+- Internal package pattern for libs/ui (no build step, direct TS imports via tsconfig paths)
+- shadcn/ui new-york style for component aesthetics
+- .gitignore allows libs/ui/src/lib/ (shadcn convention) while blocking Python lib/
+- Vitest (not Jest) for component testing - native Vite integration
+- window.matchMedia mock in test-setup.ts for theme detection in JSDOM
+- Playwright chromium-only configuration for e2e smoke tests
+- Explicit Nx targets (lint, format, e2e) complement @nx/vite inferred targets
 - Migrated existing Claude Code devcontainer to Docker Compose-based setup
 - Used Python 3.12-slim with Node.js 20 for Claude Code support
 - Configured import-linter with forbidden/layers/independence contracts
@@ -246,6 +260,15 @@ Recent decisions affecting current work:
 - targetDefaults cache includes test, lint, typecheck, and format for Nx caching
 - TypedDict for structured dict returns with distinct key types (eliminates type: ignore[assignment])
 - Remove tests that verify language mechanics already enforced by static analysis (frozen dataclass field assignment)
+- pnpm as package manager for monorepo (replaces npm, better dependency resolution)
+- pnpm workspace config in pnpm-workspace.yaml (apps/*, libs/*)
+- shamefully-hoist=true in .npmrc for legacy package compatibility
+- pnpm/action-setup@v4 in GitHub Actions for reproducible CI builds
+- shadcn CLI with pnpm wrapper script (/tmp/bin/pnpm calling npx pnpm) for component generation
+- radix-ui meta-package (not individual @radix-ui/* packages) as official CLI pattern
+- Playwright uses system Chromium at /usr/bin/chromium (no bundled browser download)
+- Container-safe browser args: --no-sandbox, --disable-gpu, --disable-dev-shm-usage
+- Minimal SVG favicon in public/ to prevent console 404 errors in e2e tests
 
 ### Pending Todos
 
@@ -264,10 +287,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-09
-Stopped at: Phase 11 complete (1/1 plans, domain coverage 48%→80%)
+Last session: 2026-02-10
+Stopped at: Phase 12 complete with gap closure, verified 27/27 must-haves
 Resume file: None
-Next action: Phase 12 (Frontend Infrastructure)
+Next action: Phase 12.1 (UI Acceptance Testing) or Phase 13 (Login UI)
 
 ## Roadmap Evolution
 
@@ -609,3 +632,34 @@ Key stats:
 - Verification: 5/5 must-haves confirmed
 
 Ready for Phase 11: Domain Test Coverage
+
+## Phase 12 Milestone
+
+**Phase 12: Frontend Infrastructure - COMPLETE**
+
+All success criteria met:
+1. React app runs with Tailwind CSS v4 (Vite 7, React 19, CSS-first @theme)
+2. shadcn/ui component library integrated and working (Button, Card, Input, Label + cn utility)
+3. Playwright configured for E2E UI testing (chromium-only, local-only)
+4. Basic smoke test passes (app renders without errors, 2 Vitest + 2 Playwright tests)
+
+Plans completed (6 of 6):
+- 12-01: pnpm migration + CI update (packageManager field, onlyBuiltDependencies)
+- 12-02: React+Vite scaffold + FastAPI CORS (React 19, Vite 7, port 5173)
+- 12-03: Tailwind CSS v4 + ESLint + Prettier (dark mode, Fontsource fonts, flat config)
+- 12-04: libs/ui + shadcn/ui + app shell (internal package, sidebar layout)
+- 12-05: Vitest + Playwright + Nx targets (test, lint, typecheck, format, e2e)
+- 12-06: shadcn/ui CLI components + Playwright system Chromium (gap closure)
+
+Key stats:
+- 63 total plans completed across all phases
+- All quality gates pass: npx nx test/lint/typecheck/format web
+- Verification: 28/28 must-haves confirmed (22 from 12-05 + 6 from 12-06)
+- Frontend stack: React 19 + Vite 7 + Tailwind CSS v4 + official shadcn/ui + Vitest + Playwright
+- Package manager: pnpm with workspace configuration
+- Dark mode: class-based with localStorage persistence
+- Self-hosted fonts: Inter (UI) + JetBrains Mono (financial figures)
+- Components: Official CLI-generated (use `shadcn diff` to check for updates)
+- E2E: System Chromium at /usr/bin/chromium (~180 MB saved per container rebuild)
+
+Ready for Phase 12.1: UI Acceptance Testing Framework
