@@ -14,9 +14,6 @@ importers:
       nx:
         specifier: ^22.4.5
         version: 22.4.5
-      pnpm:
-        specifier: ^10.29.2
-        version: 10.29.2
 
   apps/web: {}
 
@@ -836,11 +833,6 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
-
-  pnpm@10.29.2:
-    resolution: {integrity: sha512-vvQ/p1nZH9LaSzGaWg0T73pFu5haPXNCBYRw+dIFGjuoZ05ilnJlRobvlEOtE6gtor657rPgIhyHuBVP/510uA==}
-    engines: {node: '>=18.12'}
-    hasBin: true
 
   pretty-format@30.2.0:
     resolution: {integrity: sha512-9uBdv/B4EefsuAL+pWqueZyZS2Ba+LxfFeQ9DN14HU4bN8bhaxKdkpjpB6fs9+pSjIBu+FXQHImEg8j/Lw0+vA==}
@@ -2054,8 +2046,6 @@ snapshots:
       minipass: 7.1.2
 
   picomatch@2.3.1: {}
-
-  pnpm@10.29.2: {}
 
   pretty-format@30.2.0:
     dependencies:
