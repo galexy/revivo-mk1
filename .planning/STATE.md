@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 11 (Domain Test Coverage) - Complete
+**Current focus:** Phase 12 (Frontend Infrastructure) - Complete
 
 ## Current Position
 
@@ -282,10 +282,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-10T07:19:18Z
-Stopped at: Completed 12-05-PLAN.md (Phase 12 complete)
+Last session: 2026-02-10
+Stopped at: Phase 12 complete, verified 22/22 must-haves
 Resume file: None
-Next action: Begin Phase 13 planning
+Next action: Phase 12.1 (UI Acceptance Testing) or Phase 13 (Login UI)
 
 ## Roadmap Evolution
 
@@ -627,3 +627,31 @@ Key stats:
 - Verification: 5/5 must-haves confirmed
 
 Ready for Phase 11: Domain Test Coverage
+
+## Phase 12 Milestone
+
+**Phase 12: Frontend Infrastructure - COMPLETE**
+
+All success criteria met:
+1. React app runs with Tailwind CSS v4 (Vite 7, React 19, CSS-first @theme)
+2. shadcn/ui component library integrated and working (Button, Card, Input, Label + cn utility)
+3. Playwright configured for E2E UI testing (chromium-only, local-only)
+4. Basic smoke test passes (app renders without errors, 2 Vitest + 2 Playwright tests)
+
+Plans completed (5 of 5):
+- 12-01: pnpm migration + CI update (packageManager field, onlyBuiltDependencies)
+- 12-02: React+Vite scaffold + FastAPI CORS (React 19, Vite 7, port 5173)
+- 12-03: Tailwind CSS v4 + ESLint + Prettier (dark mode, Fontsource fonts, flat config)
+- 12-04: libs/ui + shadcn/ui + app shell (internal package, sidebar layout)
+- 12-05: Vitest + Playwright + Nx targets (test, lint, typecheck, format, e2e)
+
+Key stats:
+- 62 total plans completed across all phases
+- All quality gates pass: npx nx test/lint/typecheck/format web
+- Verification: 22/22 must-haves confirmed
+- Frontend stack: React 19 + Vite 7 + Tailwind CSS v4 + shadcn/ui + Vitest + Playwright
+- Package manager: pnpm with workspace configuration
+- Dark mode: class-based with localStorage persistence
+- Self-hosted fonts: Inter (UI) + JetBrains Mono (financial figures)
+
+Ready for Phase 12.1: UI Acceptance Testing Framework
