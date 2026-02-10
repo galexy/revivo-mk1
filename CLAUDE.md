@@ -147,6 +147,16 @@ When executing GSD plans, these rules prevent the pattern of "tests pass, servic
 - **Phase 6:** Sync event handlers calling async Procrastinate `defer()` deadlocked under FastAPI's event loop. Integration tests didn't catch it because they mocked the job queue. Required converting 28 methods across 17 files. Pyright strict mode would have flagged the Coroutine/None type mismatch.
 - **Phase 7:** Nx targets with wrong paths, missing venv prefixes, and incorrect cwd all passed individual checks but failed when run through Nx. Always test through Nx, not directly.
 
+## Chrome DevTools MCP
+
+The Chrome DevTools MCP server requires a headless Chromium instance with the remote debugging port open. Start it before using any `mcp__chrome-devtools__*` tools:
+
+```bash
+chromium --headless=new --no-sandbox --remote-debugging-port=9222 --disable-gpu --disable-dev-shm-usage about:blank
+```
+
+Note: This environment has no external internet access, so Swagger UI at `/docs` won't render (CDN resources are unreachable). Use `/openapi.json` for the raw OpenAPI spec instead.
+
 ## Future Phase Notes
 
 - Phase 8 will add React + Tailwind v4 to apps/web/

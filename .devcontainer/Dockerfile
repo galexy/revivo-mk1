@@ -31,6 +31,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nano \
     vim \
     wget \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    chromium \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 20 for Claude Code
