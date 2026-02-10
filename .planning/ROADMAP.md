@@ -27,7 +27,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 9: Type Safety & Test Cleanup** - CategoryTree TypedDict, remove redundant immutability tests
 - [ ] **Phase 10: Value Object ORM Mapping** - SQLAlchemy composite() for Money, InstitutionDetails, RewardsBalance
 - [x] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
-- [ ] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Claude browsing skill
+- [ ] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Vitest
+- [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
 - [ ] **Phase 13: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
 - [ ] **Phase 15: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
@@ -328,13 +329,27 @@ Plans:
   1. React app runs with Tailwind CSS v4
   2. shadcn/ui component library integrated and working
   3. Playwright configured for E2E UI testing
-  4. Claude browsing skill available for launching site and testing UI changes
-  5. Basic smoke test passes (app renders without errors)
+  4. Basic smoke test passes (app renders without errors)
 **Plans**: TBD
 
 Plans:
 - [ ] 12-01: TBD
 - [ ] 12-02: TBD
+
+### Phase 12.1: UI Acceptance Testing Framework (INSERTED)
+**Goal**: Establish Claude Code Chrome-driven acceptance testing framework so all UI phases can write repeatable UAT scenarios
+**Depends on**: Phase 12
+**Requirements**: TEST-05, TEST-06
+**Success Criteria** (what must be TRUE):
+  1. Claude Code Chrome integration configured and working (`claude --chrome`)
+  2. Acceptance test scenarios written as markdown files in `apps/web/tests/acceptance/`
+  3. Test scenarios are repeatable — Claude Code can read and execute them against running app
+  4. At least one smoke-level acceptance test exists (app loads, no JS errors)
+  5. CLAUDE.md documents the acceptance testing workflow for future phases
+**Plans**: TBD
+
+Plans:
+- [ ] 12.1-01: TBD
 
 ### Phase 13: Login UI
 **Goal**: User can log in and out via web interface
@@ -667,7 +682,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> ... -> 26 -> 27 -> ... -> 32
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 12.1 -> 13 -> ... -> 26 -> 27 -> ... -> 32
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -687,6 +702,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 10. Value Object ORM Mapping | 1/1 | Complete | 2026-02-09 |
 | 11. Domain Test Coverage | 1/1 | Complete | 2026-02-09 |
 | 12. Frontend Infrastructure | 0/2 | Not started | - |
+| 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 0/2 | Not started | - |
 | 14. Frontend API & Routing | 0/2 | Not started | - |
 | 15. API Integration Validation | 0/2 | Not started | - |

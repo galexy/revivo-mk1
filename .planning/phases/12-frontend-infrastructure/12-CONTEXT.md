@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Set up frontend tooling, testing infrastructure, and developer experience for the React app. This phase delivers a working React app with Tailwind CSS v4, shadcn/ui component library, Playwright for smoke tests, Vitest + RTL for component tests, and Claude Code Chrome integration for UI acceptance testing. No UI features are built — those are Phase 13+.
+Set up frontend tooling, testing infrastructure, and developer experience for the React app. This phase delivers a working React app with Tailwind CSS v4, shadcn/ui component library, Playwright for smoke tests, and Vitest + RTL for component tests. Claude Code Chrome acceptance testing framework is Phase 12.1. No UI features are built — those are Phase 13+.
 
 </domain>
 
@@ -58,14 +58,6 @@ Set up frontend tooling, testing infrastructure, and developer experience for th
 - Playwright local only for now — skip CI integration until real UI features exist
 - No Storybook at this stage
 
-### UI Acceptance Testing (Claude Code + Chrome)
-- Acceptance tests are persistent, repeatable test scenarios — not ad-hoc verification
-- Test scenarios written as markdown files in `apps/web/tests/acceptance/`
-- Natural language test steps that Claude Code reads and executes via Chrome integration (`claude --chrome`)
-- Tests run against real API (both API and web servers must be running)
-- NOT Playwright scripts — Claude Code drives the browser via Chrome DevTools integration
-- Build a repository of these test scenarios incrementally as UI features are added
-
 ### TypeScript LSP for Claude Code
 - Install official TypeScript LSP plugin: `/plugin install typescript-lsp@claude-plugins-official`
 - Gives Claude Code real-time diagnostics, go-to-definition, find references while coding
@@ -88,8 +80,7 @@ Set up frontend tooling, testing infrastructure, and developer experience for th
 - Internal packages pattern from Turborepo blog: https://turborepo.dev/blog/you-might-not-need-typescript-project-references
 - shadcn/ui monorepo docs: https://ui.shadcn.com/docs/monorepo
 - Nx TypeScript project linking: https://nx.dev/docs/concepts/typescript-project-linking
-- Claude Code Chrome integration for UAT: https://code.claude.com/docs/en/chrome
-- Acceptance tests should be continuously runnable (like integration tests), not just at verify stage
+- Claude Code Chrome integration for UAT: https://code.claude.com/docs/en/chrome (→ Phase 12.1)
 
 </specifics>
 
@@ -100,6 +91,7 @@ Set up frontend tooling, testing infrastructure, and developer experience for th
 - Playwright CI integration — add when real UI features exist to test
 - Claude Code GSD skills for browser-driven UAT — future automation, start with manual test scenarios first
 - Mobile-specific layouts — desktop-first for now, full mobile support later
+- UI Acceptance Testing framework (Claude Code + Chrome) — moved to Phase 12.1
 
 </deferred>
 
