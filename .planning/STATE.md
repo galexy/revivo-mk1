@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 13 of 32 (Login UI)
-Plan: 2 of 6
+Plan: 1 of 6
 Status: In progress
-Last activity: 2026-02-10 - Completed 13-02-PLAN.md (Form, Checkbox, DropdownMenu, Avatar components)
+Last activity: 2026-02-10 - Completed 13-01-PLAN.md (HTTP client & cookie fixes)
 
-Progress: [██████░░░░] ~70%
+Progress: [███████░░░] ~70%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 64
-- Average duration: 4.6 min
-- Total execution time: 6.76 hours
+- Average duration: 4.7 min
+- Total execution time: 6.80 hours
 
 **By Phase:**
 
@@ -43,11 +43,11 @@ Progress: [██████░░░░] ~70%
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
-| 13-login-ui | 2 | 6 min | 3.0 min |
+| 13-login-ui | 1 | 5 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 12-04 (4 min), 12-05 (5 min), 12-06 (5 min), 13-01 (3 min), 13-02 (3 min)
-- Trend: Phase 13 (Login UI) in progress. Manual shadcn/ui component implementation when CLI unavailable (no internet access).
+- Last 5 plans: 12-04 (4 min), 12-05 (5 min), 12-06 (5 min), 13-01 (5 min)
+- Trend: Phase 13 (Login UI) started. Cross-origin Axios client with failedQueue pattern. Cookie fixes for CORS.
 
 *Updated after each plan completion*
 
@@ -65,6 +65,11 @@ Recent decisions affecting current work:
 - Dark mode via .dark class on documentElement with localStorage persistence
 - Lazy state initializer for localStorage reads (not useEffect setState)
 - Internal package pattern for libs/ui (no build step, direct TS imports via tsconfig paths)
+- Refresh cookie samesite=lax (not strict) for cross-origin CORS compatibility
+- Cookie path /auth (not /auth/refresh) so both refresh and logout endpoints receive cookie
+- remember_me parameter controls session cookie vs 30-day persistent cookie
+- failedQueue pattern for concurrent 401s (first refreshes, others wait and retry)
+- Module-level accessToken storage with getAccessToken/setAccessToken for AuthContext
 - shadcn/ui new-york style for component aesthetics
 - .gitignore allows libs/ui/src/lib/ (shadcn convention) while blocking Python lib/
 - Vitest (not Jest) for component testing - native Vite integration
