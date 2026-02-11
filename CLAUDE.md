@@ -147,13 +147,52 @@ When executing GSD plans, these rules prevent the pattern of "tests pass, servic
 - **Phase 6:** Sync event handlers calling async Procrastinate `defer()` deadlocked under FastAPI's event loop. Integration tests didn't catch it because they mocked the job queue. Required converting 28 methods across 17 files. Pyright strict mode would have flagged the Coroutine/None type mismatch.
 - **Phase 7:** Nx targets with wrong paths, missing venv prefixes, and incorrect cwd all passed individual checks but failed when run through Nx. Always test through Nx, not directly.
 
+## Background Servers
+
+Dev servers (`npx nx serve api`, `npx nx serve web`) and headless Chromium are long-running processes. Use the correct pattern to launch and stop them so they don't become orphaned processes.
+
+### How to launch
+
+Use the Bash tool with `run_in_background: true`. Do **NOT** use `&` in the command itself -- the background task IS the server process.
+
+```
+# Correct -- task stays "running", stoppable via TaskStop
+Bash(command="npx nx serve web", run_in_background=true)  # returns task ID, e.g. "abc123"
+
+# Correct -- Chromium for browser testing
+Bash(command="chromium --headless=new --no-sandbox --remote-debugging-port=9222 --disable-gpu --disable-dev-shm-usage about:blank", run_in_background=true)
+```
+
+```
+# WRONG -- orphans the process, task "completes" immediately, no way to stop
+Bash(command="npx nx serve web &\nsleep 5\necho done", run_in_background=true)
+```
+
+### How to stop
+
+Use `TaskStop` with the task ID returned from the launch call:
+
+```
+TaskStop(task_id="abc123")
+```
+
+For Chromium cleanup (if launched outside the pattern): `pkill -f 'chromium.*remote-debugging'`
+
+### When to use which server
+
+| Task | Server(s) needed |
+|---|---|
+| API smoke test (curl) | `npx nx serve api` |
+| Frontend visual check | `npx nx serve web` + Chromium |
+| Full E2E (frontend + backend) | Both `serve api` and `serve web` + Chromium |
+
+### Cleanup
+
+Always stop background servers when done with visual/smoke testing. Stop in reverse order: Chromium first, then dev servers.
+
 ## Chrome DevTools MCP
 
-The Chrome DevTools MCP server requires a headless Chromium instance with the remote debugging port open. Start it before using any `mcp__chrome-devtools__*` tools:
-
-```bash
-chromium --headless=new --no-sandbox --remote-debugging-port=9222 --disable-gpu --disable-dev-shm-usage about:blank
-```
+The Chrome DevTools MCP server requires a headless Chromium instance with the remote debugging port open. Start it as a background task (see "Background Servers" above) before using any `mcp__chrome-devtools__*` tools.
 
 Note: This environment has no external internet access, so Swagger UI at `/docs` won't render (CDN resources are unreachable). Use `/openapi.json` for the raw OpenAPI spec instead.
 

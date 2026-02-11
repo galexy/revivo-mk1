@@ -99,11 +99,13 @@ Integration tests often mock async infrastructure (job queues, event handlers, e
 # Type check (run FIRST, before tests)
 npx nx typecheck api
 npx nx typecheck domain
+npx nx typecheck web
 npx nx run-many -t typecheck   # all projects
 
 # Run tests
 npx nx test api
 npx nx test domain
+npx nx test web
 npx nx run-many -t test        # all projects
 
 # Lint
@@ -114,15 +116,32 @@ npx nx run-many -t lint        # all projects
 # Run migrations against real DB (from apps/api/)
 cd apps/api && uv run --package personal-finance-api alembic upgrade head
 
-# Start service
-npx nx serve api
-
-# Smoke test
-curl -s http://localhost:8000/docs | head -5
-curl -s -X POST http://localhost:8000/auth/token \
-  -d "username=test@example.com&password=testpass" \
-  -H "Content-Type: application/x-www-form-urlencoded"
-
 # Sync dependencies after pyproject.toml changes
 uv sync --all-packages
 ```
+
+### Starting and stopping background servers
+
+Dev servers and Chromium are long-running processes. Launch them with `run_in_background: true` on the Bash tool (no `&` in the command). Stop them with `TaskStop` using the returned task ID. See CLAUDE.md "Background Servers" for the full pattern.
+
+```bash
+# API server (for curl smoke tests)
+# Launch: Bash(command="npx nx serve api", run_in_background=true) -> task ID
+# Stop:   TaskStop(task_id="<id>")
+
+# Web dev server (for browser testing)
+# Launch: Bash(command="npx nx serve web", run_in_background=true) -> task ID
+# Stop:   TaskStop(task_id="<id>")
+
+# Headless Chromium (for Chrome DevTools MCP)
+# Launch: Bash(command="chromium --headless=new --no-sandbox --remote-debugging-port=9222 --disable-gpu --disable-dev-shm-usage about:blank", run_in_background=true) -> task ID
+# Stop:   TaskStop(task_id="<id>")
+
+# Smoke test (after API server is running)
+curl -s http://localhost:8000/openapi.json | head -5
+curl -s -X POST http://localhost:8000/auth/token \
+  -d "username=test@example.com&password=testpass" \
+  -H "Content-Type: application/x-www-form-urlencoded"
+```
+
+**NEVER** use `&` inside a `run_in_background: true` command -- this orphans the process and makes it impossible to stop cleanly.
