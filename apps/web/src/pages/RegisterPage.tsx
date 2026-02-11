@@ -4,7 +4,15 @@ import { useAuth } from '../features/auth/context/useAuth';
 import { RegisterForm } from '../features/auth/components/RegisterForm';
 import { AuthLayout } from '../features/auth/components/AuthLayout';
 
-function FeatureItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+function FeatureItem({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="flex gap-4">
       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.07]">
@@ -38,7 +46,11 @@ function RegisterHeroContent() {
         <FeatureItem
           icon={
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 text-emerald-400">
-              <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+                clipRule="evenodd"
+              />
             </svg>
           }
           title="Free to get started"
@@ -47,7 +59,11 @@ function RegisterHeroContent() {
         <FeatureItem
           icon={
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 text-blue-400">
-              <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z"
+                clipRule="evenodd"
+              />
             </svg>
           }
           title="Private & secure"

@@ -31,7 +31,12 @@ function SocialProof() {
       <div>
         <div className="flex items-center gap-1">
           {[...Array(5)].map((_, i) => (
-            <svg key={i} viewBox="0 0 16 16" fill="currentColor" className="size-3.5 text-amber-400">
+            <svg
+              key={i}
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              className="size-3.5 text-amber-400"
+            >
               <path d="M8 1.318l1.91 3.87 4.27.621-3.09 3.01.73 4.253L8 11.052l-3.82 2.01.73-4.254-3.09-3.01 4.27-.62L8 1.317Z" />
             </svg>
           ))}
@@ -64,8 +69,20 @@ export function AuthLayout({
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex items-center gap-3 text-muted-foreground">
           <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="3"
+              className="opacity-20"
+            />
+            <path
+              d="M12 2a10 10 0 0 1 10 10"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
           </svg>
           <span>Loading...</span>
         </div>

@@ -6,12 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 import { mockAccountsList, mockCategoriesList, mockCategoryTree } from '../mocks/fixtures';
-import {
-  fetchAccounts,
-  fetchAccount,
-  fetchCategories,
-  fetchCategoryTree,
-} from './api-client';
+import { fetchAccounts, fetchAccount, fetchCategories, fetchCategoryTree } from './api-client';
 
 describe('Account API client', () => {
   it('fetchAccounts returns typed account list', async () => {

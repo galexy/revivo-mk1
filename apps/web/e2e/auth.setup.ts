@@ -29,7 +29,7 @@ setup('authenticate', async ({ page }) => {
     verificationEmail = messagesData.messages?.find(
       (msg: { To: Array<{ Address: string }>; Subject: string }) =>
         msg.To?.some((to: { Address: string }) => to.Address === TEST_USER.email) &&
-        (msg.Subject?.includes('erif') || msg.Subject?.includes('onfirm'))
+        (msg.Subject?.includes('erif') || msg.Subject?.includes('onfirm')),
     );
     if (verificationEmail) break;
   }
@@ -50,7 +50,7 @@ setup('authenticate', async ({ page }) => {
 
   // Step 3: Verify email via API
   const verifyResponse = await page.request.get(
-    `${API_BASE}/auth/verify?token=${encodeURIComponent(verificationToken)}`
+    `${API_BASE}/auth/verify?token=${encodeURIComponent(verificationToken)}`,
   );
   expect(verifyResponse.ok()).toBeTruthy();
 

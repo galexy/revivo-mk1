@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { createRootRouteWithContext, createRoute, redirect, Outlet, useNavigate } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  createRoute,
+  redirect,
+  Outlet,
+  useNavigate,
+} from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
 import type { AuthContextType } from './features/auth/context/AuthContext';
 import { useAuth } from './features/auth/context/useAuth';
@@ -81,8 +87,20 @@ function IndexRedirect() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="flex items-center gap-3 text-muted-foreground">
         <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3"
+            className="opacity-20"
+          />
+          <path
+            d="M12 2a10 10 0 0 1 10 10"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
         </svg>
         <span>Loading...</span>
       </div>

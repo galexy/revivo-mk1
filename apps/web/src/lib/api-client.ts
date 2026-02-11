@@ -16,7 +16,8 @@ export type CategoryTreeResponse = components['schemas']['CategoryTreeResponse']
 
 export type CreateCheckingAccountRequest = components['schemas']['CreateCheckingAccountRequest'];
 export type CreateSavingsAccountRequest = components['schemas']['CreateSavingsAccountRequest'];
-export type CreateCreditCardAccountRequest = components['schemas']['CreateCreditCardAccountRequest'];
+export type CreateCreditCardAccountRequest =
+  components['schemas']['CreateCreditCardAccountRequest'];
 export type UpdateAccountRequest = components['schemas']['UpdateAccountRequest'];
 
 export type CreateTransactionRequest = components['schemas']['CreateTransactionRequest'];
@@ -57,7 +58,10 @@ export async function createCreditCardAccount(
   return response.data;
 }
 
-export async function updateAccount(id: string, data: UpdateAccountRequest): Promise<AccountResponse> {
+export async function updateAccount(
+  id: string,
+  data: UpdateAccountRequest,
+): Promise<AccountResponse> {
   const response = await api.patch<AccountResponse>(`/api/v1/accounts/${id}`, data);
   return response.data;
 }
@@ -78,7 +82,9 @@ export async function fetchTransaction(id: string): Promise<TransactionResponse>
   return response.data;
 }
 
-export async function createTransaction(data: CreateTransactionRequest): Promise<TransactionResponse> {
+export async function createTransaction(
+  data: CreateTransactionRequest,
+): Promise<TransactionResponse> {
   const response = await api.post<TransactionResponse>('/api/v1/transactions', data);
   return response.data;
 }
@@ -111,7 +117,10 @@ export async function createCategory(data: CreateCategoryRequest): Promise<Categ
   return response.data;
 }
 
-export async function updateCategory(id: string, data: UpdateCategoryRequest): Promise<CategoryResponse> {
+export async function updateCategory(
+  id: string,
+  data: UpdateCategoryRequest,
+): Promise<CategoryResponse> {
   const response = await api.patch<CategoryResponse>(`/api/v1/categories/${id}`, data);
   return response.data;
 }
