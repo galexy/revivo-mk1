@@ -12,13 +12,22 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+      use: {
+        launchOptions: {
+          executablePath: '/usr/bin/chromium',
+          args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+        },
+      },
+    },
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         headless: true,
-        storageState: 'apps/web/e2e/.auth/user.json',
+        storageState: 'e2e/.auth/user.json',
         launchOptions: {
           executablePath: '/usr/bin/chromium',
           args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
