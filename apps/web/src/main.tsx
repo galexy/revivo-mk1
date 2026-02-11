@@ -1,9 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createRouter, Navigate, RouterProvider } from '@tanstack/react-router';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { useAuth } from './features/auth/context/useAuth';
 import { routeTree } from './routes';
+import { queryClient } from './lib/query-client';
 
 // Self-hosted fonts
 import '@fontsource/inter/400.css';
@@ -20,7 +23,7 @@ import './styles/globals.css';
 const router = createRouter({
   routeTree,
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- provided by InnerApp at runtime
-  context: { auth: undefined! },
+  context: { auth: undefined!, queryClient },
   defaultNotFoundComponent: () => <Navigate to="/" />,
 });
 
@@ -37,7 +40,7 @@ declare module '@tanstack/react-router' {
 // before any effects fire. No manual router.invalidate() needed.
 function InnerApp() {
   const auth = useAuth();
-  return <RouterProvider router={router} context={{ auth }} />;
+  return <RouterProvider router={router} context={{ auth, queryClient }} />;
 }
 
 const root = document.getElementById('root');
@@ -45,8 +48,11 @@ if (!root) throw new Error('Root element not found');
 
 createRoot(root).render(
   <StrictMode>
-    <AuthProvider>
-      <InnerApp />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <InnerApp />
+      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   </StrictMode>,
 );

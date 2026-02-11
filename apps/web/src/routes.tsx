@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { createRootRouteWithContext, createRoute, redirect, Outlet, useNavigate } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
 import type { AuthContextType } from './features/auth/context/AuthContext';
 import { useAuth } from './features/auth/context/useAuth';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
@@ -8,8 +9,11 @@ import { RegisterPage } from './pages/RegisterPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { DashboardPage } from './pages/DashboardPage';
 
-// Root route with auth context injection
-const rootRoute = createRootRouteWithContext<{ auth: AuthContextType }>()({
+// Root route with auth and queryClient context injection
+const rootRoute = createRootRouteWithContext<{
+  auth: AuthContextType;
+  queryClient: QueryClient;
+}>()({
   component: () => <Outlet />,
 });
 
