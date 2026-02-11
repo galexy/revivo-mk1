@@ -8,6 +8,9 @@ import {
   mockAccountsList,
   mockCategoriesList,
   mockCategoryTree,
+  mockCreditCardAccount,
+  mockLoanAccount,
+  mockRewardsAccount,
   mockTokenResponse,
   mockUserProfile,
 } from './fixtures';
@@ -52,7 +55,23 @@ export const handlers = [
   }),
 
   http.post(`${baseURL}/api/v1/accounts/credit-card`, () => {
+    return HttpResponse.json(mockCreditCardAccount);
+  }),
+
+  http.post(`${baseURL}/api/v1/accounts/loan`, () => {
+    return HttpResponse.json(mockLoanAccount);
+  }),
+
+  http.post(`${baseURL}/api/v1/accounts/brokerage`, () => {
     return HttpResponse.json(mockAccount);
+  }),
+
+  http.post(`${baseURL}/api/v1/accounts/ira`, () => {
+    return HttpResponse.json(mockAccount);
+  }),
+
+  http.post(`${baseURL}/api/v1/accounts/rewards`, () => {
+    return HttpResponse.json(mockRewardsAccount);
   }),
 
   http.patch(`${baseURL}/api/v1/accounts/:accountId`, ({ params }) => {
