@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { AuthProvider } from './features/auth/context/AuthContext';
@@ -36,6 +36,13 @@ declare module '@tanstack/react-router' {
 // Inner component that provides auth context to router
 function InnerApp() {
   const auth = useAuth();
+
+  // When auth state changes (loading completes, login/logout), invalidate the
+  // router so beforeLoad guards re-evaluate with the new auth context.
+  useEffect(() => {
+    router.invalidate();
+  }, [auth.isLoading, auth.isAuthenticated]);
+
   return <RouterProvider router={router} context={{ auth }} />;
 }
 

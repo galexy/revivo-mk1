@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import {
   Button,
   Form,
@@ -19,7 +19,6 @@ import { PasswordInput } from './PasswordInput';
 
 export function LoginForm() {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginFormData>({
@@ -35,8 +34,9 @@ export function LoginForm() {
     try {
       setServerError(null);
       await login(data.email, data.password, data.rememberMe);
-      // On success, navigate to dashboard
-      navigate({ to: '/dashboard' });
+      // Full page navigation ensures router context has fresh auth state.
+      // TanStack Router's navigate() would race with the context update.
+      window.location.href = '/dashboard';
     } catch (error: any) {
       // Extract error message from API response
       const message =

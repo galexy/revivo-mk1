@@ -55,10 +55,15 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // If 401 on /auth/refresh endpoint, redirect to login with expired flag
-    if (originalRequest.url?.includes('/auth/refresh')) {
-      accessToken = null;
-      window.location.href = '/login?expired=true';
+    // Don't attempt token refresh for auth endpoints themselves:
+    // - /auth/refresh: prevents infinite loop (refresh 401 → retry refresh → 401 → ...)
+    // - /auth/token: 401 means wrong credentials, not expired session
+    // - /auth/logout: no retry needed
+    // Callers handle their own error display (e.g., LoginForm shows "Invalid credentials").
+    if (originalRequest.url?.startsWith('/auth/')) {
+      if (originalRequest.url.includes('/auth/refresh')) {
+        accessToken = null;
+      }
       return Promise.reject(error);
     }
 
