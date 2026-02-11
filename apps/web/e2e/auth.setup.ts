@@ -61,7 +61,7 @@ setup('authenticate', async ({ page }) => {
   await page.getByRole('button', { name: /sign in/i }).click();
 
   await page.waitForURL('**/dashboard');
-  await expect(page.getByText('Personal Finance')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Personal Finance', exact: true })).toBeVisible();
 
   await page.context().storageState({ path: 'e2e/.auth/user.json' });
 });
