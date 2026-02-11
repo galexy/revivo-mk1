@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 13 (Login UI) - Complete
+**Current focus:** Phase 14 (Frontend API & Routing) - In progress
 
 ## Current Position
 
-Phase: 13 of 32 (Login UI)
-Plan: 6 of 6
-Status: Complete
-Last activity: 2026-02-10 - Completed 13-06-PLAN.md (Unit Tests & E2E Verification)
+Phase: 14 of 32 (Frontend API & Routing)
+Plan: 4 of 4
+Status: In progress
+Last activity: 2026-02-11 - Completed 14-04-PLAN.md (E2E Test Auth Fixtures)
 
-Progress: [███████░░░] ~70%
+Progress: [███████░░░] ~71%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 68
-- Average duration: 4.5 min
-- Total execution time: 6.95 hours
+- Total plans completed: 70
+- Average duration: 4.4 min
+- Total execution time: 7.00 hours
 
 **By Phase:**
 
@@ -44,10 +44,11 @@ Progress: [███████░░░] ~70%
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
+| 14-frontend-api-routing | 2 | 4 min | 2.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 13-02 (5 min), 13-03 (2 min), 13-04 (3 min), 13-05 (4 min), 13-06 (30 min)
-- Trend: Phase 13 (Login UI) complete. Full auth flow verified E2E via Chrome DevTools.
+- Last 5 plans: 13-04 (3 min), 13-05 (4 min), 13-06 (30 min), 14-01 (2 min), 14-04 (2 min)
+- Trend: Phase 14 in progress. Playwright auth fixtures ready for e2e testing.
 
 *Updated after each plan completion*
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - window.matchMedia mock in test-setup.ts for theme detection in JSDOM
 - Playwright chromium-only configuration for e2e smoke tests
 - Explicit Nx targets (lint, format, e2e) complement @nx/vite inferred targets
+- Playwright auth setup uses Mailpit REST API to extract verification token from email
+- Setup project as dependency pattern (runs once, saves storageState for all tests)
+- Unauthenticated tests override storageState with empty cookies/origins
 - Migrated existing Claude Code devcontainer to Docker Compose-based setup
 - Used Python 3.12-slim with Node.js 20 for Claude Code support
 - Manual shadcn/ui component implementation when CLI unavailable (no internet access)
@@ -291,6 +295,10 @@ Recent decisions affecting current work:
 - Playwright uses system Chromium at /usr/bin/chromium (no bundled browser download)
 - Container-safe browser args: --no-sandbox, --disable-gpu, --disable-dev-shm-usage
 - Minimal SVG favicon in public/ to prevent console 404 errors in e2e tests
+- OpenAPI-first type generation (backend FastAPI spec drives frontend types via openapi-typescript)
+- Python script extracts OpenAPI JSON from create_app().openapi() without server startup
+- Nx generate-api-types target for one-command type regeneration after API changes
+- npx pnpm pattern for pnpm access in environments without global install
 
 ### Pending Todos
 
