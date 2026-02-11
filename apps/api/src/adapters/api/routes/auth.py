@@ -19,7 +19,16 @@ Design decisions:
 import os
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, Form, HTTPException, Query, Response, status
+from fastapi import (
+    APIRouter,
+    Cookie,
+    Depends,
+    Form,
+    HTTPException,
+    Query,
+    Response,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.adapters.api.dependencies import (
@@ -58,7 +67,9 @@ def _is_secure_cookies() -> bool:
     return os.getenv("ENVIRONMENT", "development") == "production"
 
 
-def _set_refresh_cookie(response: Response, token: str, max_age: int | None = REFRESH_TOKEN_MAX_AGE) -> None:
+def _set_refresh_cookie(
+    response: Response, token: str, max_age: int | None = REFRESH_TOKEN_MAX_AGE
+) -> None:
     """Set refresh token as HttpOnly cookie.
 
     Secure flag is environment-aware: True in production (HTTPS required),
