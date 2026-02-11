@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 12 (Frontend Infrastructure) - Complete
+**Current focus:** Phase 13 (Login UI) - Complete
 
 ## Current Position
 
-Phase: 12 of 32 (Frontend Infrastructure)
-Plan: 6 of 6 (gap closure)
-Status: Phase complete with gap closure
-Last activity: 2026-02-10 - Completed 12-06-PLAN.md (shadcn/ui CLI components + Playwright system Chromium)
+Phase: 13 of 32 (Login UI)
+Plan: 6 of 6
+Status: Complete
+Last activity: 2026-02-10 - Completed 13-06-PLAN.md (Unit Tests & E2E Verification)
 
-Progress: [██████░░░░] ~69%
+Progress: [███████░░░] ~70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 63
-- Average duration: 4.7 min
-- Total execution time: 6.71 hours
+- Total plans completed: 68
+- Average duration: 4.5 min
+- Total execution time: 6.95 hours
 
 **By Phase:**
 
@@ -43,10 +43,11 @@ Progress: [██████░░░░] ~69%
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
+| 13-login-ui | 6 | 49 min | 8.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 12-03 (5 min), 12-04 (4 min), 12-05 (5 min), 12-06 (5 min)
-- Trend: Phase 12 complete with gap closure. Official shadcn/ui CLI components replace manual versions. Playwright uses system Chromium (~180 MB saved).
+- Last 5 plans: 13-02 (5 min), 13-03 (2 min), 13-04 (3 min), 13-05 (4 min), 13-06 (30 min)
+- Trend: Phase 13 (Login UI) complete. Full auth flow verified E2E via Chrome DevTools.
 
 *Updated after each plan completion*
 
@@ -64,6 +65,26 @@ Recent decisions affecting current work:
 - Dark mode via .dark class on documentElement with localStorage persistence
 - Lazy state initializer for localStorage reads (not useEffect setState)
 - Internal package pattern for libs/ui (no build step, direct TS imports via tsconfig paths)
+- Refresh cookie samesite=lax (not strict) for cross-origin CORS compatibility
+- Cookie path /auth (not /auth/refresh) so both refresh and logout endpoints receive cookie
+- remember_me parameter controls session cookie vs 30-day persistent cookie
+- failedQueue pattern for concurrent 401s (first refreshes, others wait and retry)
+- Module-level accessToken storage with getAccessToken/setAccessToken for AuthContext
+- window.location.href for logout redirect (full state reset vs router.navigate)
+- Auth guard logic in route beforeLoad (not component useEffect) for type-safe redirects
+- AbortController cleanup in refresh useEffect prevents StrictMode double-mount race
+- Form-encoded URLSearchParams body for /auth/token (OAuth2PasswordRequestForm compatibility)
+- isLoading state starts true, prevents flash of login page during auth check
+- PasswordInput uses forwardRef for react-hook-form compatibility, tabIndex=-1 on toggle button
+- TanStack Router validateSearch requires explicit return type for optional params
+- Registration success shows verification notice, does NOT auto-login per user decision
+- Server errors displayed as destructive banner above submit button (not toast)
+- validateSearch with optional types ({ expired?: boolean }) makes search params optional for type-safe navigation
+- Email resend on expired token uses POST /auth/register (enumeration protection via always-202)
+- UserMenu generates initials from first + last word of display_name (max 2 chars)
+- Logout is immediate (no confirmation dialog) per UX specification
+- Session expired message shown via /login?expired=true from api.ts interceptor
+- DashboardPage owns sidebar + header layout (dark mode state managed there)
 - shadcn/ui new-york style for component aesthetics
 - .gitignore allows libs/ui/src/lib/ (shadcn convention) while blocking Python lib/
 - Vitest (not Jest) for component testing - native Vite integration
@@ -72,6 +93,7 @@ Recent decisions affecting current work:
 - Explicit Nx targets (lint, format, e2e) complement @nx/vite inferred targets
 - Migrated existing Claude Code devcontainer to Docker Compose-based setup
 - Used Python 3.12-slim with Node.js 20 for Claude Code support
+- Manual shadcn/ui component implementation when CLI unavailable (no internet access)
 - Configured import-linter with forbidden/layers/independence contracts
 - Used Docker secrets for encryption key (not env vars)
 - Frozen dataclass with slots for Money value object (immutability + performance)
@@ -272,7 +294,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -288,9 +310,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Phase 12 complete with gap closure, verified 27/27 must-haves
+Stopped at: Phase 13 complete (6/6 plans, E2E verified)
 Resume file: None
-Next action: Phase 12.1 (UI Acceptance Testing) or Phase 13 (Login UI)
+Next action: Phase 14 (Frontend API & Routing) or Phase 12.1 (UI Acceptance Testing)
 
 ## Roadmap Evolution
 
@@ -663,3 +685,31 @@ Key stats:
 - E2E: System Chromium at /usr/bin/chromium (~180 MB saved per container rebuild)
 
 Ready for Phase 12.1: UI Acceptance Testing Framework
+
+## Phase 13 Milestone
+
+**Phase 13: Login UI - COMPLETE**
+
+All success criteria met:
+1. Login page with form (email/password, remember me, validation)
+2. Successful login stores JWT token and redirects to dashboard
+3. Session persists across browser refresh (cookie-based refresh)
+4. User can log out from dashboard (UserMenu dropdown)
+5. Unauthenticated users redirected to login (protected route guards)
+
+Plans completed (6 of 6):
+- 13-01: Backend cookie fixes (samesite=lax, remember_me) + Axios client + auth types
+- 13-02: shadcn/ui components (Form, Checkbox, DropdownMenu, Avatar)
+- 13-03: AuthContext provider + useAuth hook + routing + ProtectedRoute
+- 13-04: Login page + Registration page (forms, validation, password toggle)
+- 13-05: Email verification page + UserMenu (logout) + Dashboard shell
+- 13-06: Unit tests + E2E verification (4 bug fixes during E2E)
+
+Key stats:
+- 68 total plans completed across all phases
+- 17 unit tests for auth components and context
+- 4 bugs fixed during E2E verification (redirect loop, stuck loading, form reload, post-login nav)
+- Full login-to-logout cycle verified via Chrome DevTools
+- Verification: 5/5 success criteria confirmed
+
+Ready for Phase 14: Frontend API & Routing

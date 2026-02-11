@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@workspace/ui';
 
+/**
+ * Legacy App component - content will be moved to DashboardPage in Plan 05
+ * This component is temporarily preserved for reference but is no longer used in routing
+ */
 export function App() {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === 'undefined') return false;

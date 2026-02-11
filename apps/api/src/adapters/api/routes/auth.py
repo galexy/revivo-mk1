@@ -19,7 +19,16 @@ Design decisions:
 import os
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
+from fastapi import (
+    APIRouter,
+    Cookie,
+    Depends,
+    Form,
+    HTTPException,
+    Query,
+    Response,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.adapters.api.dependencies import (
@@ -47,7 +56,7 @@ CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 # --- Cookie Configuration ---
 
 REFRESH_TOKEN_COOKIE = "refresh_token"
-REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7 days in seconds
+REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60  # 30 days in seconds
 
 
 def _is_secure_cookies() -> bool:
@@ -58,7 +67,9 @@ def _is_secure_cookies() -> bool:
     return os.getenv("ENVIRONMENT", "development") == "production"
 
 
-def _set_refresh_cookie(response: Response, token: str) -> None:
+def _set_refresh_cookie(
+    response: Response, token: str, max_age: int | None = REFRESH_TOKEN_MAX_AGE
+) -> None:
     """Set refresh token as HttpOnly cookie.
 
     Secure flag is environment-aware: True in production (HTTPS required),
@@ -67,15 +78,16 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
     Args:
         response: FastAPI response to set cookie on.
         token: Raw refresh token value.
+        max_age: Cookie max_age in seconds. None = session cookie (deleted on browser close).
     """
     response.set_cookie(
         key=REFRESH_TOKEN_COOKIE,
         value=token,
         httponly=True,
         secure=_is_secure_cookies(),
-        samesite="strict",
-        path="/auth/refresh",
-        max_age=REFRESH_TOKEN_MAX_AGE,
+        samesite="lax",
+        path="/auth",
+        max_age=max_age,
     )
 
 
@@ -87,10 +99,10 @@ def _clear_refresh_cookie(response: Response) -> None:
     """
     response.delete_cookie(
         key=REFRESH_TOKEN_COOKIE,
-        path="/auth/refresh",
+        path="/auth",
         httponly=True,
         secure=_is_secure_cookies(),
-        samesite="strict",
+        samesite="lax",
     )
 
 
@@ -148,6 +160,7 @@ async def register(
 async def login(
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
+    remember_me: bool = Form(default=False),
     service: AuthService = Depends(get_auth_service),
 ) -> TokenResponse:
     """Authenticate user and return tokens.
@@ -158,6 +171,8 @@ async def login(
     Args:
         response: FastAPI response for setting cookies.
         form_data: OAuth2 form with username (email) and password.
+        remember_me: If True, refresh token cookie is persistent (30 days).
+                     If False, refresh token cookie is session-only (deleted on browser close).
         service: AuthService from dependency injection.
 
     Returns:
@@ -179,7 +194,9 @@ async def login(
         )
 
     # Set refresh token as HttpOnly cookie
-    _set_refresh_cookie(response, result.refresh_token)
+    # Session cookie (max_age=None) if remember_me=False, persistent if True
+    max_age = REFRESH_TOKEN_MAX_AGE if remember_me else None
+    _set_refresh_cookie(response, result.refresh_token, max_age=max_age)
 
     return TokenResponse(
         access_token=result.access_token,
