@@ -14,7 +14,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { accountsQueryOptions } from './lib/query-options';
+import { AccountDetailPage } from './pages/AccountDetailPage';
+import { accountsQueryOptions, accountDetailQueryOptions } from './lib/query-options';
 
 // Root route with auth and queryClient context injection
 const rootRoute = createRootRouteWithContext<{
@@ -72,6 +73,16 @@ const dashboardRoute = createRoute({
   component: DashboardPage,
 });
 
+const accountDetailRoute = createRoute({
+  getParentRoute: () => dashboardRoute,
+  path: '/accounts/$accountId',
+  loader: ({ context, params }) => {
+    // Prefetch account detail data
+    context.queryClient.ensureQueryData(accountDetailQueryOptions(params.accountId));
+  },
+  component: AccountDetailPage,
+});
+
 // Index route component that redirects once auth state resolves
 function IndexRedirect() {
   const { isLoading, isAuthenticated } = useAuth();
@@ -127,7 +138,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   verifyRoute,
-  protectedLayoutRoute.addChildren([dashboardRoute]),
+  protectedLayoutRoute.addChildren([dashboardRoute.addChildren([accountDetailRoute])]),
   indexRoute,
 ]);
 

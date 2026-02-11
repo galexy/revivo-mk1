@@ -3,6 +3,7 @@
  * Includes "Add Account" button and dark mode toggle at bottom.
  */
 import { useState } from 'react';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { Plus, Sun, Moon } from 'lucide-react';
 import { Button, Separator } from '@workspace/ui';
 import { AccountGroupHeader } from './AccountGroupHeader';
@@ -27,7 +28,10 @@ export function AccountSidebar({
   isDarkMode = false,
   onToggleDarkMode,
 }: AccountSidebarProps) {
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const params = useParams({ strict: false }) as { accountId?: string };
+  const activeAccountId = params.accountId || null;
+
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     cash: true,
     credit: true,
@@ -45,6 +49,10 @@ export function AccountSidebar({
 
   const handleGroupToggle = (category: string, expanded: boolean) => {
     setExpandedGroups((prev) => ({ ...prev, [category]: expanded }));
+  };
+
+  const handleAccountClick = (accountId: string) => {
+    navigate({ to: '/dashboard/accounts/$accountId', params: { accountId } });
   };
 
   return (
@@ -81,8 +89,8 @@ export function AccountSidebar({
                   <AccountListItem
                     key={account.id}
                     account={account}
-                    isActive={selectedAccountId === account.id}
-                    onClick={() => setSelectedAccountId(account.id)}
+                    isActive={activeAccountId === account.id}
+                    onClick={() => handleAccountClick(account.id)}
                     onEdit={onEditAccount}
                     onDelete={onDeleteAccount}
                   />
