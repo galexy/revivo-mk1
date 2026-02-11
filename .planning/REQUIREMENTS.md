@@ -117,7 +117,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ARCH-04**: DTOs use Pydantic for validation and serialization
 - [ ] **ARCH-05**: PostgreSQL database with Alembic migrations
 - [x] **ARCH-06**: Frontend uses React with TypeScript
-- [ ] **ARCH-07**: Frontend uses TanStack Query or similar for API state management
+- [x] **ARCH-07**: Frontend uses TanStack Query or similar for API state management
 - [ ] **ARCH-08**: Services are containerized with Dockerfile
 - [ ] **ARCH-09**: Development environment uses devcontainers
 - [ ] **ARCH-10**: External service secrets use Envoy sidecar (not environment variables in container)
@@ -153,7 +153,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **WEB-05**: UI is responsive and usable on desktop browsers
 - [ ] **WEB-06**: UI displays loading states during API calls
 - [ ] **WEB-07**: UI displays error messages for failed operations
-- [ ] **WEB-08**: UI uses type-safe API client generated from OpenAPI spec
+- [x] **WEB-08**: UI uses type-safe API client generated from OpenAPI spec
 
 ### REST API
 
@@ -318,7 +318,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-04 | Phase 1 | Pending |
 | ARCH-05 | Phase 1 | Pending |
 | ARCH-06 | Phase 12 | Complete (Phase 12) |
-| ARCH-07 | Phase 8 | Pending |
+| ARCH-07 | Phase 14 | Complete (Phase 14) |
 | ARCH-08 | Phase 1 | Pending |
 | ARCH-09 | Phase 1 | Pending |
 | ARCH-10 | Phase 1 | Pending |
@@ -345,7 +345,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WEB-05 | Phase 6 | Pending |
 | WEB-06 | Phase 9, 10 | Pending |
 | WEB-07 | Phase 9, 10 | Pending |
-| WEB-08 | Phase 8 | Pending |
+| WEB-08 | Phase 14 | Complete (Phase 14) |
 | API-01 | Phase 4 | Pending |
 | API-02 | Phase 4 | Pending |
 | API-03 | Phase 4 | Pending |
