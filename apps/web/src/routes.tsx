@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { accountsQueryOptions } from './lib/query-options';
 
 // Root route with auth and queryClient context injection
 const rootRoute = createRootRouteWithContext<{
@@ -57,6 +58,11 @@ const protectedLayoutRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   path: '/dashboard',
+  loader: ({ context }) => {
+    // Prefetch accounts data for instant navigation
+    // ensureQueryData returns cached data if fresh, or fetches if stale/missing
+    context.queryClient.ensureQueryData(accountsQueryOptions);
+  },
   component: DashboardPage,
 });
 
