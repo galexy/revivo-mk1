@@ -402,7 +402,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can create an account via UI
   2. User can update an account via UI
-  3. User can create a transaction with single split via UI
+  3. User can create a transaction with category via UI
   4. User can update a transaction via UI
   5. E2E tests cover these flows
   6. Claude browsing skill used to automate UAT

@@ -38,11 +38,16 @@ The established libraries/tools for this domain:
 | TanStack Query | SWR | SWR is simpler but lacks mutations, optimistic updates, prefetching, and devtools |
 | axios | openapi-fetch | openapi-fetch is fetch-based (6kb), but project already has Axios with auth interceptors |
 
+### Testing
+| Library | Version | Purpose | Why Standard |
+|---------|---------|---------|--------------|
+| msw | ^2.x | Network-level API mocking | TkDodo-recommended, tests full chain (hook → axios → interceptors → request), no mock drift |
+
 **Installation:**
 ```bash
 # In apps/web/
 pnpm add @tanstack/react-query @tanstack/react-query-devtools
-pnpm add -D openapi-typescript
+pnpm add -D openapi-typescript msw
 ```
 
 ## Architecture Patterns
@@ -65,8 +70,28 @@ apps/web/src/
 └── routes.tsx              # TanStack Router routes with loaders
 ```
 
-### Pattern 1: Query Options API (TkDodo v5 Pattern)
-**What:** Co-locate queryKey and queryFn in reusable queryOptions objects for type-safe queries
+### Pattern 1: Query Key Standard & Query Options API
+
+#### Conceptual Model
+
+Every query key is an array that reads like a path from broad to narrow: `[entity, scope, identity]`. TanStack Query matches keys by prefix — invalidating `['accounts']` hits every key that starts with `'accounts'`. The key structure IS the invalidation strategy.
+
+Three levels:
+
+- **Entity** — the domain noun: `['accounts']`, `['transactions']`. This is the "invalidate everything about this thing" handle. After deleting an account, invalidate `['accounts']` and every list, detail, and filtered view refreshes in one call.
+
+- **Scope** — what shape of data: `['accounts', 'list']` vs `['accounts', 'detail']`. This lets you invalidate all lists without touching cached details (or vice versa). A mutation that creates a new item invalidates `'list'` scope — the detail cache of existing items is still valid.
+
+- **Identity** — which specific data: `['accounts', 'detail', '507f1f77']` or `['transactions', 'list', { accountId: '507f1f77', startDate: '2026-01' }]`. Filters and IDs go here. This is the leaf — the most precise cache entry.
+
+**The rule: every query key in the app comes from a factory object, never hardcoded.** The factory is the single source of truth for how keys are structured. If you want to know what keys exist for accounts, you look at `accountsQueries`. If you want to invalidate, you call a factory method — never construct an array by hand.
+
+Cross-entity invalidation follows naturally. When a transaction is created, invalidate `['transactions']` (new item in lists) but also `['accounts']` (balances changed). The factory pattern makes this explicit — you can see exactly what gets invalidated by reading the mutation's `onSettled`.
+
+**PLANNING NOTE:** This conceptual model MUST be documented in `apps/web/CLAUDE.md` as a project standard so all future phases (15-26) follow it consistently.
+
+#### Implementation (TkDodo v5 Pattern)
+**What:** Co-locate queryKey and queryFn in reusable queryOptions objects
 **When to use:** All queries (preferred over inline useQuery)
 **Example:**
 ```typescript
@@ -139,6 +164,33 @@ const accountDetailRoute = createRoute({
 ```
 
 ### Pattern 3: Optimistic Updates with Rollback
+
+#### Conceptual Model
+
+An optimistic update is a speculative branch of the cache. You show the user a predicted future while the server confirms. If the server disagrees, you rewind to the present.
+
+The lifecycle has four steps, and skipping any one of them causes bugs:
+
+1. **Freeze the world** (`cancelQueries`) — Stop any in-flight background refetches for this entity. Without this, a refetch that started before your mutation can complete *after* your optimistic update and silently overwrite it with stale server data. The user sees their edit briefly, then it vanishes.
+
+2. **Snapshot the present** (`getQueryData`) — Read the current cache value and stash it. This is your rollback point. You need this *before* you mutate the cache, because once you call `setQueryData` the old value is gone.
+
+3. **Write the predicted future** (`setQueryData`) — Update the cache as if the mutation already succeeded. The UI re-renders instantly. The user sees the change with zero network latency.
+
+4. **Reconcile with reality** — Two outcomes:
+   - **Success** (`onSettled`): Invalidate the query so it refetches the real server state. This quietly corrects any differences between your prediction and what the server actually stored (e.g., server-computed fields like `updated_at`).
+   - **Failure** (`onError`): Restore the snapshot from step 2. The UI reverts. Show feedback (toast or inline error) so the user knows their edit didn't stick.
+
+**When to use optimistic updates vs wait-for-server:**
+
+| Pattern | Use when | Example |
+|---------|----------|---------|
+| Optimistic (instant UI) | Edit is low-risk, easily reversible, user expects desktop-app responsiveness | Editing a transaction amount, toggling a category |
+| Wait-for-server (show spinner) | Action is destructive, has side effects, or user expects confirmation | Deleting an account, creating a transfer between accounts |
+
+The distinction maps to the user's mental model: if they think of it as "typing in a cell," it should feel instant. If they think of it as "submitting a form," a brief wait is expected and reassuring.
+
+#### Implementation
 **What:** Update UI immediately, rollback if mutation fails
 **When to use:** Inline edits (transaction fields), low-cost actions
 **Example:**
@@ -301,6 +353,7 @@ Problems that look simple but have existing solutions:
 | Retry logic with exponential backoff | Custom retry loop | TanStack Query retry option | Built-in exponential backoff, configurable per query |
 | Stale-while-revalidate | Custom cache + timestamp checks | TanStack Query staleTime + gcTime | Automatic background refetch when data becomes stale |
 | Loading/error/success states | Manual useState flags | TanStack Query status | Single source of truth for query lifecycle state |
+| API mocking for tests | Manual axios mocks, mock queryFn | MSW (Mock Service Worker) | Tests full chain including interceptors; mocking axios skips auth logic, mocking queryFn skips everything |
 
 **Key insight:** TanStack Query handles the hard parts of async state management (race conditions, cache invalidation, concurrent requests, error recovery). openapi-typescript eliminates type drift between frontend and backend (one source of truth: the OpenAPI spec).
 
@@ -580,6 +633,91 @@ function CreateAccountForm() {
 }
 ```
 
+## Testing Strategy: MSW + TDD
+
+### Conceptual Model
+
+Tests for server state management should verify **behavior the user sees**, not cache internals. The question a test answers is: "when the server responds with X, does the UI show Y?"
+
+MSW intercepts at the network boundary — the outermost edge of the frontend. This means every test exercises the full chain: component → hook → TanStack Query → Axios → interceptors (auth token injection, refresh) → HTTP request → MSW handler → response parsing. Mocking at any inner layer (mock axios, mock queryFn) skips parts of that chain and creates blind spots — exactly the kind of blind spots that caused the Phase 6 incident where mocks hid async mismatches.
+
+**Three test categories for server state code:**
+
+1. **Happy path** — Server returns data, UI renders it. Tests that queryFn parses the response correctly, that the query key hierarchy works, and that components consume the data.
+
+2. **Error handling** — Server returns 4xx/5xx or network fails. Tests that errors surface correctly (inline for 4xx, error boundary for 5xx, toast for background failures). Override the default MSW handler per-test with `server.use()`.
+
+3. **Optimistic update lifecycle** — Mutation fires, UI updates instantly, then server confirms or rejects. Tests the full freeze → snapshot → predict → reconcile cycle. On failure, verify the cache rolls back to the snapshot.
+
+### TDD Workflow
+
+**PLANNING NOTE:** Plans for this phase MUST follow TDD style for all query/mutation code. The workflow:
+
+1. **Write the test first** — Define the MSW handler (expected API shape) and the assertion (expected UI behavior). This is the contract between frontend and backend.
+2. **Run it, watch it fail** — Confirms the test is actually testing something.
+3. **Implement the query/mutation** — Write the queryOptions factory, the hook, or the mutation. Run the test again.
+4. **Iterate** — The test is the feedback loop. No need to start the dev server, open a browser, or manually test during implementation. Save browser testing for the final smoke test.
+
+This matters because query hooks, optimistic updates, and error handling have subtle async timing. Manual testing in a browser is slow and non-repeatable. A test that runs in milliseconds lets you iterate rapidly on the tricky parts (rollback logic, retry behavior, cache invalidation scope).
+
+### Test Infrastructure
+
+**Fresh QueryClient per test** — Prevents cache leaking between tests:
+```typescript
+function createTestQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,        // Don't wait for retries in tests
+        gcTime: Infinity,    // Prevent premature garbage collection
+      },
+      mutations: { retry: false },
+    },
+  });
+}
+```
+
+**MSW setup in vitest.setup.ts:**
+```typescript
+import { beforeAll, afterEach, afterAll } from 'vitest';
+import { server } from './src/mocks/node';
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+`onUnhandledRequest: 'error'` is critical — it fails tests that make unexpected API calls, catching missing handlers early.
+
+**Per-test handler overrides:**
+```typescript
+it('handles server error', async () => {
+  server.use(
+    http.get('/api/accounts', () => {
+      return HttpResponse.json({ error: 'Internal' }, { status: 500 });
+    })
+  );
+  // ... assert error boundary / toast behavior
+});
+// afterEach resets to default handlers automatically
+```
+
+### Testing Pitfalls
+
+| Pitfall | Symptom | Fix |
+|---------|---------|-----|
+| Shared QueryClient across tests | Test A's cached data appears in Test B | Fresh `createTestQueryClient()` per test |
+| Retries enabled in tests | Tests timeout waiting for 3 retries with backoff | `retry: false` in test QueryClient |
+| Not awaiting async state | Assertion runs before query resolves, always passes/fails | `await waitFor(() => expect(result.current.isSuccess).toBe(true))` |
+| Mocking axios instead of network | Auth interceptor bugs invisible to tests | Use MSW, never `vi.mock('axios')` |
+| gcTime: 0 in tests | Queries garbage-collected mid-test, causing infinite loops | `gcTime: Infinity` in test QueryClient |
+
+### Sources
+- [TkDodo: Testing React Query](https://tkdodo.eu/blog/testing-react-query) — maintainer's recommended approach
+- [TanStack Query Testing Guide](https://tanstack.com/query/v5/docs/framework/react/guides/testing) — official docs
+- [MSW Quick Start](https://mswjs.io/docs/quick-start/) — setup and handler patterns
+- [MSW Node Integration](https://mswjs.io/docs/integrations/node/) — Vitest/Node setup
+
 ## State of the Art
 
 | Old Approach | Current Approach | When Changed | Impact |
@@ -601,10 +739,10 @@ function CreateAccountForm() {
 
 Things that couldn't be fully resolved:
 
-1. **OpenAPI spec access in CI/CD**
-   - What we know: Backend serves spec at `/openapi.json`, needs running API
-   - What's unclear: How to generate types in CI without starting backend (chicken-egg problem)
-   - Recommendation: Add `generate:api-types` as manual script, document in CLAUDE.md. Future: export static OpenAPI file from backend for CI
+1. **OpenAPI spec generation without running server**
+   - What we know: FastAPI's `app.openapi()` returns the spec programmatically — no server needed
+   - Resolution: Write a Python script that imports `create_app()`, calls `app.openapi()`, and writes JSON to file. Wire as Nx target so `openapi-typescript` reads the static file, not a live URL. Works in CI too.
+   - **PLANNING NOTE:** Plan must include this script approach instead of requiring a running server
 
 2. **Skeleton loader implementation**
    - What we know: shadcn/ui doesn't include skeleton component yet (needs CLI generation)
