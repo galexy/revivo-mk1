@@ -24,6 +24,7 @@
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
     "jsdom": "^28.0.0",
+    "msw": "^2.12.10",
     "openapi-typescript": "^7.12.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
