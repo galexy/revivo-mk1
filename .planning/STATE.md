@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 12 (Frontend Infrastructure) - Complete
+**Current focus:** Phase 13 (Login UI) - Complete
 
 ## Current Position
 
 Phase: 13 of 32 (Login UI)
-Plan: 5 of 6
-Status: In progress
-Last activity: 2026-02-10 - Completed 13-05-PLAN.md (Email Verification, User Menu & Dashboard Shell)
+Plan: 6 of 6
+Status: Complete
+Last activity: 2026-02-10 - Completed 13-06-PLAN.md (Unit Tests & E2E Verification)
 
 Progress: [███████░░░] ~70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 67
+- Total plans completed: 68
 - Average duration: 4.5 min
 - Total execution time: 6.95 hours
 
@@ -43,11 +43,11 @@ Progress: [███████░░░] ~70%
 | 10-value-object-orm-mapping | 1 | 6 min | 6.0 min |
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
-| 13-login-ui | 5 | 19 min | 3.8 min |
+| 13-login-ui | 6 | 49 min | 8.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 13-01 (5 min), 13-02 (5 min), 13-03 (2 min), 13-04 (3 min), 13-05 (4 min)
-- Trend: Phase 13 (Login UI) wave 3 complete. Email verification, user menu with logout, dashboard shell ready.
+- Last 5 plans: 13-02 (5 min), 13-03 (2 min), 13-04 (3 min), 13-05 (4 min), 13-06 (30 min)
+- Trend: Phase 13 (Login UI) complete. Full auth flow verified E2E via Chrome DevTools.
 
 *Updated after each plan completion*
 
@@ -310,9 +310,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed 13-05-PLAN.md (Email Verification, User Menu & Dashboard Shell)
+Stopped at: Phase 13 complete (6/6 plans, E2E verified)
 Resume file: None
-Next action: Continue Phase 13 (Login UI) - Plan 13-06 (Account List UI) or verify phase complete
+Next action: Phase 14 (Frontend API & Routing) or Phase 12.1 (UI Acceptance Testing)
 
 ## Roadmap Evolution
 
@@ -685,3 +685,31 @@ Key stats:
 - E2E: System Chromium at /usr/bin/chromium (~180 MB saved per container rebuild)
 
 Ready for Phase 12.1: UI Acceptance Testing Framework
+
+## Phase 13 Milestone
+
+**Phase 13: Login UI - COMPLETE**
+
+All success criteria met:
+1. Login page with form (email/password, remember me, validation)
+2. Successful login stores JWT token and redirects to dashboard
+3. Session persists across browser refresh (cookie-based refresh)
+4. User can log out from dashboard (UserMenu dropdown)
+5. Unauthenticated users redirected to login (protected route guards)
+
+Plans completed (6 of 6):
+- 13-01: Backend cookie fixes (samesite=lax, remember_me) + Axios client + auth types
+- 13-02: shadcn/ui components (Form, Checkbox, DropdownMenu, Avatar)
+- 13-03: AuthContext provider + useAuth hook + routing + ProtectedRoute
+- 13-04: Login page + Registration page (forms, validation, password toggle)
+- 13-05: Email verification page + UserMenu (logout) + Dashboard shell
+- 13-06: Unit tests + E2E verification (4 bug fixes during E2E)
+
+Key stats:
+- 68 total plans completed across all phases
+- 17 unit tests for auth components and context
+- 4 bugs fixed during E2E verification (redirect loop, stuck loading, form reload, post-login nav)
+- Full login-to-logout cycle verified via Chrome DevTools
+- Verification: 5/5 success criteria confirmed
+
+Ready for Phase 14: Frontend API & Routing

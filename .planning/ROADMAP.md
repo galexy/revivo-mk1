@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Domain Test Coverage** - Transaction, Category, Payee domain unit tests
 - [x] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Vitest
 - [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
-- [ ] **Phase 13: Login UI** - Login page, session/token management, logout
+- [x] **Phase 13: Login UI** - Login page, session/token management, logout
 - [ ] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
 - [ ] **Phase 15: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
 - [ ] **Phase 16: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
@@ -368,12 +368,12 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Backend cookie fixes (samesite=lax, remember_me) + Axios client + auth types
-- [ ] 13-02-PLAN.md — shadcn/ui components (Form, Checkbox, DropdownMenu, Avatar)
-- [ ] 13-03-PLAN.md — AuthContext provider + useAuth hook + routing + ProtectedRoute
-- [ ] 13-04-PLAN.md — Login page + Registration page (forms, validation, password toggle)
-- [ ] 13-05-PLAN.md — Email verification page + UserMenu (logout) + Dashboard shell
-- [ ] 13-06-PLAN.md — Unit tests + end-to-end verification checkpoint
+- [x] 13-01-PLAN.md — Backend cookie fixes (samesite=lax, remember_me) + Axios client + auth types
+- [x] 13-02-PLAN.md — shadcn/ui components (Form, Checkbox, DropdownMenu, Avatar)
+- [x] 13-03-PLAN.md — AuthContext provider + useAuth hook + routing + ProtectedRoute
+- [x] 13-04-PLAN.md — Login page + Registration page (forms, validation, password toggle)
+- [x] 13-05-PLAN.md — Email verification page + UserMenu (logout) + Dashboard shell
+- [x] 13-06-PLAN.md — Unit tests + end-to-end verification checkpoint
 
 ### Phase 14: Frontend API & Routing
 **Goal**: Establish patterns for API communication and client-side routing
@@ -711,7 +711,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 11. Domain Test Coverage | 1/1 | Complete | 2026-02-09 |
 | 12. Frontend Infrastructure | 6/6 | Complete | 2026-02-10 |
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
-| 13. Login UI | 0/6 | Not started | - |
+| 13. Login UI | 6/6 | Complete | 2026-02-10 |
 | 14. Frontend API & Routing | 0/2 | Not started | - |
 | 15. API Integration Validation | 0/2 | Not started | - |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
