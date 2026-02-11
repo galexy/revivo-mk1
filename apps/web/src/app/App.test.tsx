@@ -38,7 +38,7 @@ describe('App routing', () => {
     render(
       <AuthContext.Provider value={mockAuthContext}>
         <RouterProvider router={router} />
-      </AuthContext.Provider>
+      </AuthContext.Provider>,
     );
 
     // Wait for redirect to complete
@@ -83,7 +83,7 @@ describe('App routing', () => {
     render(
       <AuthContext.Provider value={mockAuthContext}>
         <RouterProvider router={router} />
-      </AuthContext.Provider>
+      </AuthContext.Provider>,
     );
 
     // Wait for redirect to complete

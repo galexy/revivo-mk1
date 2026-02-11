@@ -21,7 +21,15 @@ vi.mock('@tanstack/react-router', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
+    Link: ({
+      to,
+      children,
+      className,
+    }: {
+      to: string;
+      children: React.ReactNode;
+      className?: string;
+    }) => (
       <a href={to} className={className}>
         {children}
       </a>
@@ -30,7 +38,9 @@ vi.mock('@tanstack/react-router', async () => {
 });
 
 describe('LoginForm', () => {
-  let mockLogin: ReturnType<typeof vi.fn<(email: string, password: string, rememberMe: boolean) => Promise<void>>>;
+  let mockLogin: ReturnType<
+    typeof vi.fn<(email: string, password: string, rememberMe: boolean) => Promise<void>>
+  >;
   let mockAuthContext: AuthContextType;
 
   beforeEach(() => {
@@ -49,7 +59,7 @@ describe('LoginForm', () => {
     return render(
       <AuthContext.Provider value={mockAuthContext}>
         <LoginForm />
-      </AuthContext.Provider>
+      </AuthContext.Provider>,
     );
   };
 
@@ -82,9 +92,12 @@ describe('LoginForm', () => {
     });
 
     // Verify error message is shown (may not render immediately in test environment)
-    await waitFor(() => {
-      expect(screen.queryByText(/please enter a valid email address/i)).toBeInTheDocument();
-    }, { timeout: 500 }).catch(() => {
+    await waitFor(
+      () => {
+        expect(screen.queryByText(/please enter a valid email address/i)).toBeInTheDocument();
+      },
+      { timeout: 500 },
+    ).catch(() => {
       // Fallback: if error message doesn't render, at least verify login wasn't called
       expect(mockLogin).not.toHaveBeenCalled();
     });
@@ -108,9 +121,12 @@ describe('LoginForm', () => {
     });
 
     // Verify error message is shown (may not render immediately in test environment)
-    await waitFor(() => {
-      expect(screen.queryByText(/password is required/i)).toBeInTheDocument();
-    }, { timeout: 500 }).catch(() => {
+    await waitFor(
+      () => {
+        expect(screen.queryByText(/password is required/i)).toBeInTheDocument();
+      },
+      { timeout: 500 },
+    ).catch(() => {
       // Fallback: if error message doesn't render, at least verify login wasn't called
       expect(mockLogin).not.toHaveBeenCalled();
     });

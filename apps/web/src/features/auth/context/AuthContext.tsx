@@ -30,17 +30,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const refreshResponse = await api.post<TokenResponse>(
           '/auth/refresh',
           {},
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
 
         // Store new access token
         setAccessToken(refreshResponse.data.access_token);
 
         // Fetch user profile
-        const profileResponse = await api.get<UserProfile>(
-          '/auth/me',
-          { signal: controller.signal }
-        );
+        const profileResponse = await api.get<UserProfile>('/auth/me', {
+          signal: controller.signal,
+        });
 
         setUser(profileResponse.data);
       } catch {

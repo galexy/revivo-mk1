@@ -48,5 +48,5 @@ createRoot(root).render(
     <AuthProvider>
       <InnerApp />
     </AuthProvider>
-  </StrictMode>
+  </StrictMode>,
 );

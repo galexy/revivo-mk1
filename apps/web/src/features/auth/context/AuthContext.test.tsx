@@ -29,9 +29,7 @@ function TestConsumer() {
       <div data-testid="isLoading">{String(auth.isLoading)}</div>
       <div data-testid="isAuthenticated">{String(auth.isAuthenticated)}</div>
       <div data-testid="user">{auth.user ? auth.user.email : 'null'}</div>
-      <button onClick={() => auth.login('test@example.com', 'password', false)}>
-        Login
-      </button>
+      <button onClick={() => auth.login('test@example.com', 'password', false)}>Login</button>
       <button onClick={() => auth.logout()}>Logout</button>
     </div>
   );
@@ -68,7 +66,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByTestId('isLoading')).toHaveTextContent('true');
@@ -83,7 +81,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Wait for refresh to complete
@@ -109,7 +107,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Initially loading
@@ -132,7 +130,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Wait for refresh attempt to fail
@@ -158,7 +156,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Wait for initial refresh to fail
@@ -183,7 +181,7 @@ describe('AuthContext', () => {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        })
+        }),
       );
     });
 
@@ -212,7 +210,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Wait for initial auth to complete

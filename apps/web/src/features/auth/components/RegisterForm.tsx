@@ -41,7 +41,12 @@ export function RegisterForm() {
       setIsRegistered(true);
     } catch (error: unknown) {
       // Extract error message from API response
-      const axiosError = error as { response?: { status?: number; data?: { detail?: string | Array<{ loc?: string[]; msg?: string }> } } };
+      const axiosError = error as {
+        response?: {
+          status?: number;
+          data?: { detail?: string | Array<{ loc?: string[]; msg?: string }> };
+        };
+      };
       if (axiosError?.response?.status === 422) {
         // Validation error - show field-level errors
         const validationErrors = axiosError.response.data?.detail;
@@ -61,7 +66,9 @@ export function RegisterForm() {
         }
       } else {
         const message =
-          (typeof axiosError?.response?.data?.detail === 'string' ? axiosError.response.data.detail : null) || 'Registration failed. Please try again.';
+          (typeof axiosError?.response?.data?.detail === 'string'
+            ? axiosError.response.data.detail
+            : null) || 'Registration failed. Please try again.';
         setServerError(message);
       }
     }
@@ -76,11 +83,7 @@ export function RegisterForm() {
             Check your email to verify your account
           </p>
         </div>
-        <Link
-          to="/login"
-          search={{}}
-          className="inline-block text-sm text-primary hover:underline"
-        >
+        <Link to="/login" search={{}} className="inline-block text-sm text-primary hover:underline">
           Back to login
         </Link>
       </div>
@@ -97,12 +100,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  {...field}
-                />
+                <Input type="email" placeholder="you@example.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,12 +132,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Display Name</FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Your name"
-                  autoComplete="name"
-                  {...field}
-                />
+                <Input type="text" placeholder="Your name" autoComplete="name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

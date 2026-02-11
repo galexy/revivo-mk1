@@ -40,8 +40,7 @@ export function LoginForm() {
     } catch (error: unknown) {
       // Extract error message from API response
       const axiosError = error as { response?: { data?: { detail?: string } } };
-      const message =
-        axiosError?.response?.data?.detail || 'Login failed. Please try again.';
+      const message = axiosError?.response?.data?.detail || 'Login failed. Please try again.';
       setServerError(message);
     }
   };
@@ -56,12 +55,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  {...field}
-                />
+                <Input type="email" placeholder="you@example.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,14 +86,9 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2 space-y-0">
               <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormLabel className="cursor-pointer text-sm font-normal">
-                Remember me
-              </FormLabel>
+              <FormLabel className="cursor-pointer text-sm font-normal">Remember me</FormLabel>
             </FormItem>
           )}
         />

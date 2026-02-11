@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSearch, useNavigate } from '@tanstack/react-router';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from '@workspace/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+} from '@workspace/ui';
 import api from '../lib/api';
 import type { VerifyEmailResponse, RegisterResponse } from '../features/auth/types';
 
@@ -96,7 +105,12 @@ export function VerifyEmailPage() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <CardTitle className="text-2xl text-center">Email Verified</CardTitle>
@@ -121,14 +135,16 @@ export function VerifyEmailPage() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl">Verification Link Expired</CardTitle>
             <CardDescription>
-              This verification link has expired. Please enter your email below to receive a new verification link.
+              This verification link has expired. Please enter your email below to receive a new
+              verification link.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {resendSuccess ? (
               <div className="rounded-md bg-green-50 p-4 dark:bg-green-900/20">
                 <p className="text-sm text-green-800 dark:text-green-300">
-                  If an account exists with that email, a new verification link has been sent. Please check your inbox.
+                  If an account exists with that email, a new verification link has been sent.
+                  Please check your inbox.
                 </p>
               </div>
             ) : (
@@ -150,7 +166,11 @@ export function VerifyEmailPage() {
                 </Button>
               </form>
             )}
-            <Button variant="outline" className="w-full" onClick={() => navigate({ to: '/login', search: {} })}>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => navigate({ to: '/login', search: {} })}
+            >
               Back to Login
             </Button>
           </CardContent>
@@ -171,14 +191,23 @@ export function VerifyEmailPage() {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </div>
           <CardTitle className="text-2xl text-center">Verification Failed</CardTitle>
           <CardDescription className="text-center">{errorMessage}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="outline" className="w-full" onClick={() => navigate({ to: '/login', search: {} })}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => navigate({ to: '/login', search: {} })}
+          >
             Back to Login
           </Button>
         </CardContent>

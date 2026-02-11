@@ -1,9 +1,4 @@
-import {
-  createRootRouteWithContext,
-  createRoute,
-  redirect,
-  Outlet,
-} from '@tanstack/react-router';
+import { createRootRouteWithContext, createRoute, redirect, Outlet } from '@tanstack/react-router';
 import type { AuthContextType } from './features/auth/context/AuthContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
