@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 Phase: 15 of 32 (API Integration Validation)
 Plan: 4 of 8
 Status: In Progress
-Last activity: 2026-02-11 - Completed 15-05-PLAN.md (Account Wizard State Hook)
+Last activity: 2026-02-11 - Completed 15-04-PLAN.md (Account CRUD Integration)
 
 Progress: [███████░░░] ~73%
 
@@ -20,8 +20,8 @@ Progress: [███████░░░] ~73%
 
 **Velocity:**
 - Total plans completed: 76
-- Average duration: 4.2 min
-- Total execution time: 7.36 hours
+- Average duration: 4.3 min
+- Total execution time: 7.42 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [███████░░░] ~73%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
-| 15-api-integration-validation | 4 | 13 min | 3.3 min |
+| 15-api-integration-validation | 4 | 19 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 14-03 (4 min), 15-01 (4 min), 15-02 (3 min), 15-03 (5 min), 15-05 (1 min)
-- Trend: Phase 15 progressing. Wizard state hook implemented.
+- Last 5 plans: 15-01 (4 min), 15-02 (3 min), 15-03 (5 min), 15-04 (6 min), 15-05 (1 min)
+- Trend: Phase 15 progressing. Account CRUD integration complete.
 
 *Updated after each plan completion*
 
@@ -98,6 +98,12 @@ Recent decisions affecting current work:
 - Unauthenticated tests override storageState with empty cookies/origins
 - QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
 - QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
+- API accepts amount as number | string (MoneySchema-Input), pass form string values directly
+- Rewards accounts use rewards_balance with value/unit, not opening_balance with amount/currency
+- Mutation hooks invalidate queryKeys.accounts.lists() in onSettled for cache refresh
+- useDeleteAccount also removeQueries for specific account detail query
+- Account detail route nested under dashboard (/dashboard/accounts/$accountId) for layout inheritance
+- AccountSidebar uses useParams to detect active account from route params for highlighting
 - Edit mode skips step 0 in multi-step wizards (immutable field like account type)
 - Form data accumulation pattern: merge current + accumulated on navigation for persistence
 - Auth context stays React Context (TanStack Query for server state only)
