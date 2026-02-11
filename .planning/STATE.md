@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 14 (Frontend API & Routing) - Complete
+**Current focus:** Phase 15 (API Integration Validation) - Complete
 
 ## Current Position
 
 Phase: 15 of 32 (API Integration Validation)
-Plan: 7 of 8
-Status: In Progress
-Last activity: 2026-02-11 - Completed 15-07-PLAN.md (Account CRUD E2E Tests)
+Plan: 8 of 8
+Status: Complete
+Last activity: 2026-02-11 - Completed 15-08-PLAN.md (UAT via Chrome DevTools MCP)
 
-Progress: [███████░░░] ~75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 78
+- Total plans completed: 79
 - Average duration: 4.4 min
-- Total execution time: 7.67 hours
+- Total execution time: 7.85 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [███████░░░] ~75%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
-| 15-api-integration-validation | 7 | 39 min | 5.6 min |
+| 15-api-integration-validation | 8 | 50 min | 6.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 15-03 (5 min), 15-04 (6 min), 15-05 (1 min), 15-06 (7 min), 15-07 (13 min)
-- Trend: Phase 15 progressing. E2E tests written (blocked by auth infrastructure issue).
+- Last 5 plans: 15-04 (6 min), 15-05 (1 min), 15-06 (7 min), 15-07 (13 min), 15-08 (11 min)
+- Trend: Phase 15 complete. All 8 plans executed, UAT passed 6/6 flows.
 
 *Updated after each plan completion*
 
@@ -342,9 +342,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 15-06-PLAN.md (Account Feature Tests)
+Stopped at: Phase 15 complete (8/8 plans, verified 8/8 must-haves)
 Resume file: None
-Next action: Execute remaining Phase 15 plans (15-07 through 15-08)
+Next action: Plan Phase 16 (Error Handling Patterns) or user-directed next step
 
 ## Roadmap Evolution
 
@@ -745,3 +745,61 @@ Key stats:
 - Verification: 5/5 success criteria confirmed
 
 Ready for Phase 14: Frontend API & Routing
+
+## Phase 14 Milestone
+
+**Phase 14: Frontend API & Routing - COMPLETE**
+
+All success criteria met:
+1. TanStack Query configured for API state management
+2. TanStack Router loaders use queryOptions + ensureQueryData for instant navigation
+3. Type-safe API client generated from OpenAPI spec
+4. Authentication token automatically included in API requests
+5. API error responses handled consistently
+6. Playwright e2e smoke tests updated for auth
+
+Plans completed (4 of 4):
+- 14-01: OpenAPI type generation + TanStack Query install
+- 14-02: TanStack Query setup + type-safe API client + queryOptions + route loaders
+- 14-03: MSW test infrastructure + API client/error tests
+- 14-04: Playwright e2e auth fixtures + smoke tests
+
+Key stats:
+- 72 total plans completed across all phases
+- OpenAPI type generation pipeline (Python script -> openapi-typescript -> api-types.generated.ts)
+- MSW v2 for API mocking in Vitest tests
+- Playwright auth fixture chain (register -> Mailpit verify -> login -> storageState)
+
+Ready for Phase 15: API Integration Validation
+
+## Phase 15 Milestone
+
+**Phase 15: API Integration Validation - COMPLETE**
+
+All success criteria met:
+1. User can create an account via 4-step wizard UI (all 7 types)
+2. User can update an account via edit wizard (pre-filled, type locked)
+3. User can delete an account via type-to-confirm dialog
+4. Sidebar shows accounts grouped by type (Cash, Credit, Loans, Investments, Rewards) with subtotals
+5. E2E tests cover account CRUD flows
+6. Chrome DevTools MCP used to automate UAT (6/6 flows passed)
+
+Plans completed (8 of 8):
+- 15-01: Dependencies, shadcn/ui components, API client completion
+- 15-02: Empty state welcome screen + account sidebar with grouping
+- 15-03: Account wizard modal (4-step) + delete confirmation dialog
+- 15-04: TanStack Query mutation hooks + DashboardPage rewire + routing
+- 15-05: useAccountWizard hook (multi-step form state)
+- 15-06: Vitest unit/component tests (50 new tests, 88 total)
+- 15-07: Playwright E2E tests for account CRUD flows
+- 15-08: UAT via Chrome DevTools MCP (6/6 flows passed)
+
+Key stats:
+- 79 total plans completed across all phases
+- 50 new Vitest tests (88 total web tests)
+- 3 Playwright E2E tests for account CRUD
+- 5 shadcn/ui components added (Dialog, Select, RadioGroup, Separator, Badge)
+- Full account CRUD: 7 account types, type-specific fields, currency formatting
+- Verification: 8/8 must-haves confirmed
+
+Ready for Phase 16: Error Handling Patterns

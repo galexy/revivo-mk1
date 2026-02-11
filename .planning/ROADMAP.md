@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
 - [x] **Phase 13: Login UI** - Login page, session/token management, logout
 - [x] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
-- [ ] **Phase 15: API Integration Validation** - Account CRUD via wizard UI, sidebar with grouping, E2E tests
+- [x] **Phase 15: API Integration Validation** - Account CRUD via wizard UI, sidebar with grouping, E2E tests
 - [ ] **Phase 16: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
 - [ ] **Phase 17: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
 - [ ] **Phase 18: Split Transactions UI** - Create and update split transactions
@@ -412,14 +412,14 @@ Plans:
 **Plans**: 8 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Dependencies, shadcn/ui components (Dialog, Select, RadioGroup, Separator, Badge), API client completion
-- [ ] 15-02-PLAN.md — Design: empty state welcome screen + account sidebar with grouping
-- [ ] 15-03-PLAN.md — Design: account wizard modal (4-step) + delete confirmation dialog
-- [ ] 15-04-PLAN.md — Functionality: TanStack Query mutation hooks + DashboardPage rewire + routing
-- [ ] 15-05-PLAN.md — Functionality: useAccountWizard hook (multi-step form state) + error handling
-- [ ] 15-06-PLAN.md — Vitest unit/component tests (utils, wizard, sidebar, delete dialog, hooks)
-- [ ] 15-07-PLAN.md — Playwright E2E tests for account CRUD flows
-- [ ] 15-08-PLAN.md — UAT via Chrome DevTools MCP + human verification checkpoint
+- [x] 15-01-PLAN.md — Dependencies, shadcn/ui components (Dialog, Select, RadioGroup, Separator, Badge), API client completion
+- [x] 15-02-PLAN.md — Design: empty state welcome screen + account sidebar with grouping
+- [x] 15-03-PLAN.md — Design: account wizard modal (4-step) + delete confirmation dialog
+- [x] 15-04-PLAN.md — Functionality: TanStack Query mutation hooks + DashboardPage rewire + routing
+- [x] 15-05-PLAN.md — Functionality: useAccountWizard hook (multi-step form state) + error handling
+- [x] 15-06-PLAN.md — Vitest unit/component tests (utils, wizard, sidebar, delete dialog, hooks)
+- [x] 15-07-PLAN.md — Playwright E2E tests for account CRUD flows
+- [x] 15-08-PLAN.md — UAT via Chrome DevTools MCP + human verification checkpoint
 
 ### Phase 16: Error Handling Patterns
 **Goal**: Define and implement consistent error handling across the UI
@@ -726,7 +726,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
 | 14. Frontend API & Routing | 4/4 | Complete | 2026-02-11 |
-| 15. API Integration Validation | 0/8 | Not started | - |
+| 15. API Integration Validation | 8/8 | Complete | 2026-02-11 |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
 | 17. Transaction UI (Simple) | 0/3 | Not started | - |
 | 18. Split Transactions UI | 0/2 | Not started | - |
