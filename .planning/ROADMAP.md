@@ -385,7 +385,11 @@ Plans:
   3. Type-safe API client generated from OpenAPI spec
   4. Authentication token automatically included in API requests
   5. API error responses handled consistently
+  6. Playwright e2e smoke tests updated for auth (login page smoke test, auth fixtures for authenticated tests)
 **Plans**: TBD
+
+**Notes**:
+- `apps/web/e2e/smoke.spec.ts` expects old placeholder shell but Phase 13 replaced it with auth-guarded login flow. Needs login page smoke test and Playwright auth fixtures.
 
 Plans:
 - [ ] 14-01: TBD
