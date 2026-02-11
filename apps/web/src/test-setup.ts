@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from './mocks/server';
 
 // Mock window.matchMedia for theme detection
 Object.defineProperty(window, 'matchMedia', {
@@ -29,6 +30,10 @@ window.ResizeObserver = class ResizeObserver {
 // submission. The test runner reports them before react-hook-form processes them, but
 // the tests verify correct behavior (login function not called on validation failure).
 
+// MSW server lifecycle
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => {
+  server.resetHandlers();
   cleanup();
 });
+afterAll(() => server.close());

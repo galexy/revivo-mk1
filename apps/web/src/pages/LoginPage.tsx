@@ -8,7 +8,14 @@ import { AuthLayout } from '../features/auth/components/AuthLayout';
 function Sparkline({ color, d }: { color: string; d: string }) {
   return (
     <svg viewBox="0 0 80 24" className="h-6 w-20">
-      <path d={d} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={d}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -38,7 +45,9 @@ function DashboardPreview() {
           <div className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex size-8 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400">
-                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4"><path d="M2 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Zm3 1a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5Zm0 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H5Z" /></svg>
+                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4">
+                  <path d="M2 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Zm3 1a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5Zm0 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H5Z" />
+                </svg>
               </div>
               <div>
                 <p className="text-sm font-medium text-white">Checking</p>
@@ -47,14 +56,19 @@ function DashboardPreview() {
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold tabular-nums text-white">$12,847.32</p>
-              <Sparkline color="#34d399" d="M2 18 L12 14 L22 16 L32 10 L42 12 L52 8 L62 6 L72 4 L78 6" />
+              <Sparkline
+                color="#34d399"
+                d="M2 18 L12 14 L22 16 L32 10 L42 12 L52 8 L62 6 L72 4 L78 6"
+              />
             </div>
           </div>
 
           <div className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex size-8 items-center justify-center rounded-lg bg-violet-500/20 text-violet-400">
-                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM5.5 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5ZM6 9a.5.5 0 0 0 0 1h2.5a.5.5 0 0 0 0-1H6Z" /></svg>
+                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4">
+                  <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM5.5 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5ZM6 9a.5.5 0 0 0 0 1h2.5a.5.5 0 0 0 0-1H6Z" />
+                </svg>
               </div>
               <div>
                 <p className="text-sm font-medium text-white">Savings</p>
@@ -63,14 +77,19 @@ function DashboardPreview() {
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold tabular-nums text-white">$25,200.00</p>
-              <Sparkline color="#a78bfa" d="M2 20 L12 18 L22 16 L32 15 L42 12 L52 10 L62 8 L72 5 L78 4" />
+              <Sparkline
+                color="#a78bfa"
+                d="M2 20 L12 18 L22 16 L32 15 L42 12 L52 10 L62 8 L72 5 L78 4"
+              />
             </div>
           </div>
 
           <div className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
-                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4"><path d="M8 1a.5.5 0 0 1 .5.5V2h3a2 2 0 0 1 2 2v1.5a2 2 0 0 1-2 2H8.5v1h2a2 2 0 0 1 2 2V12a2 2 0 0 1-2 2H8.5v.5a.5.5 0 0 1-1 0V14H5a2 2 0 0 1-2-2v-1.5a2 2 0 0 1 2-2h2.5v-1H5.5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2H7.5v-.5A.5.5 0 0 1 8 1Z" /></svg>
+                <svg viewBox="0 0 16 16" fill="currentColor" className="size-4">
+                  <path d="M8 1a.5.5 0 0 1 .5.5V2h3a2 2 0 0 1 2 2v1.5a2 2 0 0 1-2 2H8.5v1h2a2 2 0 0 1 2 2V12a2 2 0 0 1-2 2H8.5v.5a.5.5 0 0 1-1 0V14H5a2 2 0 0 1-2-2v-1.5a2 2 0 0 1 2-2h2.5v-1H5.5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2H7.5v-.5A.5.5 0 0 1 8 1Z" />
+                </svg>
               </div>
               <div>
                 <p className="text-sm font-medium text-white">Investment</p>
@@ -79,7 +98,10 @@ function DashboardPreview() {
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold tabular-nums text-white">$10,244.22</p>
-              <Sparkline color="#fbbf24" d="M2 12 L12 14 L22 10 L32 12 L42 8 L52 10 L62 6 L72 8 L78 4" />
+              <Sparkline
+                color="#fbbf24"
+                d="M2 12 L12 14 L22 10 L32 12 L42 8 L52 10 L62 6 L72 8 L78 4"
+              />
             </div>
           </div>
         </div>
@@ -110,7 +132,8 @@ function LoginHeroContent() {
           </span>
         </h1>
         <p className="text-base leading-relaxed text-slate-400">
-          Track spending, manage budgets, and build wealth — the modern alternative to legacy desktop software.
+          Track spending, manage budgets, and build wealth — the modern alternative to legacy
+          desktop software.
         </p>
       </div>
 
@@ -140,8 +163,16 @@ export function LoginPage() {
     >
       {expired && (
         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800/50 dark:bg-amber-950/30">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0 text-amber-600 dark:text-amber-500">
-            <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 6a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 6Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="size-5 shrink-0 text-amber-600 dark:text-amber-500"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 6a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 6Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+              clipRule="evenodd"
+            />
           </svg>
           <p className="text-sm text-amber-800 dark:text-amber-300">
             Your session has expired. Please sign in again.

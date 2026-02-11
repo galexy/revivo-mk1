@@ -1,5 +1,12 @@
 import { useEffect } from 'react';
-import { createRootRouteWithContext, createRoute, redirect, Outlet, useNavigate } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  createRoute,
+  redirect,
+  Outlet,
+  useNavigate,
+} from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
 import type { AuthContextType } from './features/auth/context/AuthContext';
 import { useAuth } from './features/auth/context/useAuth';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
@@ -7,9 +14,13 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { accountsQueryOptions } from './lib/query-options';
 
-// Root route with auth context injection
-const rootRoute = createRootRouteWithContext<{ auth: AuthContextType }>()({
+// Root route with auth and queryClient context injection
+const rootRoute = createRootRouteWithContext<{
+  auth: AuthContextType;
+  queryClient: QueryClient;
+}>()({
   component: () => <Outlet />,
 });
 
@@ -53,6 +64,11 @@ const protectedLayoutRoute = createRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => protectedLayoutRoute,
   path: '/dashboard',
+  loader: ({ context }) => {
+    // Prefetch accounts data for instant navigation
+    // ensureQueryData returns cached data if fresh, or fetches if stale/missing
+    context.queryClient.ensureQueryData(accountsQueryOptions);
+  },
   component: DashboardPage,
 });
 
@@ -71,8 +87,20 @@ function IndexRedirect() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="flex items-center gap-3 text-muted-foreground">
         <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3"
+            className="opacity-20"
+          />
+          <path
+            d="M12 2a10 10 0 0 1 10 10"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
         </svg>
         <span>Loading...</span>
       </div>

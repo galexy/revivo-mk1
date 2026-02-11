@@ -79,14 +79,26 @@ export function RegisterForm() {
     return (
       <div className="space-y-4 text-center">
         <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 dark:border-emerald-800/50 dark:bg-emerald-950/30">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0 text-emerald-600 dark:text-emerald-400">
-            <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="size-5 shrink-0 text-emerald-600 dark:text-emerald-400"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+              clipRule="evenodd"
+            />
           </svg>
           <p className="text-sm text-emerald-800 dark:text-emerald-200">
             Check your email to verify your account
           </p>
         </div>
-        <Link to="/login" search={{}} className="inline-block text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+        <Link
+          to="/login"
+          search={{}}
+          className="inline-block text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+        >
           Back to sign in
         </Link>
       </div>
@@ -158,7 +170,11 @@ export function RegisterForm() {
         {serverError && (
           <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-4 shrink-0">
-              <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z"
+                clipRule="evenodd"
+              />
             </svg>
             {serverError}
           </div>
@@ -172,8 +188,20 @@ export function RegisterForm() {
           {form.formState.isSubmitting ? (
             <span className="flex items-center gap-2">
               <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  className="opacity-20"
+                />
+                <path
+                  d="M12 2a10 10 0 0 1 10 10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
               </svg>
               Creating account...
             </span>
@@ -193,7 +221,11 @@ export function RegisterForm() {
 
         <div className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/login" search={{}} className="font-medium text-primary hover:text-primary/80 transition-colors">
+          <Link
+            to="/login"
+            search={{}}
+            className="font-medium text-primary hover:text-primary/80 transition-colors"
+          >
             Sign in
           </Link>
         </div>

@@ -1,36 +1,38 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Smoke Tests', () => {
-  test('app loads without errors', async ({ page }) => {
+test.describe('Unauthenticated', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('redirects to login page', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForURL('**/login');
+    await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible();
+  });
+
+  test('login page loads without errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
-        errors.push(msg.text());
+        const text = msg.text();
+        // Ignore expected 401 from auth refresh attempt when not logged in
+        if (text.includes('401')) return;
+        errors.push(text);
       }
     });
 
-    await page.goto('/');
-    await expect(page).toHaveTitle(/Personal Finance/);
-    await expect(page.getByRole('heading', { name: 'Personal Finance' })).toBeVisible();
+    await page.goto('/login');
+    await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible();
+    await expect(page.getByLabel('Email address')).toBeVisible();
+    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
     expect(errors).toHaveLength(0);
   });
+});
 
-  test('app renders key UI elements', async ({ page }) => {
-    await page.goto('/');
-
-    // Check sidebar with accounts
-    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
-
-    // Check account cards with balances
-    await expect(page.getByText('$1,234.56')).toBeVisible();
-    await expect(page.getByText('$15,678.90')).toBeVisible();
-    await expect(page.getByText('-$542.30')).toBeVisible();
-
-    // Check Quick Add Transaction form
-    await expect(page.getByText('Quick Add Transaction')).toBeVisible();
-    await expect(page.getByPlaceholder('Enter payee name')).toBeVisible();
-
-    // Check theme toggle button
-    await expect(page.getByRole('button', { name: /Mode/ })).toBeVisible();
+test.describe('Authenticated', () => {
+  test('dashboard loads with expected elements', async ({ page }) => {
+    await page.goto('/dashboard');
+    await expect(page.getByText('Personal Finance')).toBeVisible();
+    // User menu button contains user initials from display_name
+    await expect(page.locator('[data-slot="button"][aria-haspopup="menu"]')).toBeVisible();
   });
 });

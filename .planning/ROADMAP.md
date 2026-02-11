@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Frontend Infrastructure** - React, Tailwind v4, shadcn/ui, Playwright, Vitest
 - [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
 - [x] **Phase 13: Login UI** - Login page, session/token management, logout
-- [ ] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
+- [x] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
 - [ ] **Phase 15: API Integration Validation** - Simple account/transaction CRUD to prove infrastructure
 - [ ] **Phase 16: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
 - [ ] **Phase 17: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
@@ -381,19 +381,22 @@ Plans:
 **Requirements**: WEB-08, ARCH-07
 **Success Criteria** (what must be TRUE):
   1. TanStack Query configured for API state management
-  2. TanStack Router configured for client-side routing
+  2. TanStack Router loaders use queryOptions + ensureQueryData for instant navigation (builds on Phase 13 router config)
   3. Type-safe API client generated from OpenAPI spec
   4. Authentication token automatically included in API requests
   5. API error responses handled consistently
   6. Playwright e2e smoke tests updated for auth (login page smoke test, auth fixtures for authenticated tests)
-**Plans**: TBD
+**Plans**: 4 plans
 
 **Notes**:
 - `apps/web/e2e/smoke.spec.ts` expects old placeholder shell but Phase 13 replaced it with auth-guarded login flow. Needs login page smoke test and Playwright auth fixtures.
+- TanStack Router was configured in Phase 13 (routes.tsx, ProtectedRoute, beforeLoad guards). Phase 14 adds the data layer: route loaders with queryClient in router context.
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
+- [x] 14-01-PLAN.md — OpenAPI type generation + TanStack Query install
+- [x] 14-02-PLAN.md — TanStack Query setup + type-safe API client + queryOptions + route loaders
+- [x] 14-03-PLAN.md — MSW test infrastructure + API client/error tests
+- [x] 14-04-PLAN.md — Playwright e2e auth fixtures + smoke tests
 
 ### Phase 15: API Integration Validation
 **Goal**: Validate frontend-backend integration with minimal CRUD operations
@@ -402,7 +405,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can create an account via UI
   2. User can update an account via UI
-  3. User can create a transaction with single split via UI
+  3. User can create a transaction with category via UI
   4. User can update a transaction via UI
   5. E2E tests cover these flows
   6. Claude browsing skill used to automate UAT
@@ -716,7 +719,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 12. Frontend Infrastructure | 6/6 | Complete | 2026-02-10 |
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
-| 14. Frontend API & Routing | 0/2 | Not started | - |
+| 14. Frontend API & Routing | 4/4 | Complete | 2026-02-11 |
 | 15. API Integration Validation | 0/2 | Not started | - |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
 | 17. Transaction UI (Simple) | 0/3 | Not started | - |

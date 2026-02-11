@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 import { AuthContext, type AuthContextType } from '../features/auth/context/AuthContext';
 import { routeTree } from '../routes';
+import { createQueryClient } from '../lib/query-client';
 
 // Mock the api module
 vi.mock('../lib/api', () => ({
@@ -32,7 +33,7 @@ describe('App routing', () => {
     const router = createRouter({
       routeTree,
       history,
-      context: { auth: mockAuthContext },
+      context: { auth: mockAuthContext, queryClient: createQueryClient() },
     });
 
     render(
@@ -77,7 +78,7 @@ describe('App routing', () => {
     const router = createRouter({
       routeTree,
       history,
-      context: { auth: mockAuthContext },
+      context: { auth: mockAuthContext, queryClient: createQueryClient() },
     });
 
     render(

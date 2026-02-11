@@ -75,7 +75,10 @@ export function LoginForm() {
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel className="text-sm font-medium">Password</FormLabel>
-                <button type="button" className="text-xs text-primary hover:text-primary/80 transition-colors">
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:text-primary/80 transition-colors"
+                >
                   Forgot password?
                 </button>
               </div>
@@ -110,7 +113,11 @@ export function LoginForm() {
         {serverError && (
           <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-4 shrink-0">
-              <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z"
+                clipRule="evenodd"
+              />
             </svg>
             {serverError}
           </div>
@@ -124,8 +131,20 @@ export function LoginForm() {
           {form.formState.isSubmitting ? (
             <span className="flex items-center gap-2">
               <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  className="opacity-20"
+                />
+                <path
+                  d="M12 2a10 10 0 0 1 10 10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
               </svg>
               Signing in...
             </span>
@@ -145,7 +164,10 @@ export function LoginForm() {
 
         <div className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="font-medium text-primary hover:text-primary/80 transition-colors">
+          <Link
+            to="/register"
+            className="font-medium text-primary hover:text-primary/80 transition-colors"
+          >
             Create one now
           </Link>
         </div>

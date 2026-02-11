@@ -30,6 +30,17 @@
       },
       "inputs": ["{projectRoot}/e2e/**/*.ts", "{projectRoot}/playwright.config.ts"],
       "outputs": []
+    },
+    "generate-api-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "uv run --package personal-finance-api python apps/api/scripts/generate_openapi.py > /tmp/openapi.json",
+          "npx openapi-typescript /tmp/openapi.json -o apps/web/src/lib/api-types.generated.ts"
+        ],
+        "cwd": "{workspaceRoot}",
+        "parallel": false
+      }
     }
   }
 }
