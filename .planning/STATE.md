@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 14 of 32 (Frontend API & Routing)
-Plan: 2 of 4
+Plan: 3 of 4
 Status: In progress
-Last activity: 2026-02-11 - Completed 14-02-PLAN.md (TanStack Query Infrastructure)
+Last activity: 2026-02-11 - Completed 14-03-PLAN.md (API Testing Infrastructure)
 
-Progress: [███████░░░] ~71%
+Progress: [███████░░░] ~72%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 71
+- Total plans completed: 72
 - Average duration: 4.4 min
-- Total execution time: 7.08 hours
+- Total execution time: 7.15 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [███████░░░] ~71%
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
-| 14-frontend-api-routing | 3 | 9 min | 3.0 min |
+| 14-frontend-api-routing | 4 | 13 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 13-05 (4 min), 13-06 (30 min), 14-01 (2 min), 14-04 (2 min), 14-02 (5 min)
-- Trend: Phase 14 in progress. TanStack Query infrastructure complete.
+- Last 5 plans: 13-06 (30 min), 14-01 (2 min), 14-04 (2 min), 14-02 (5 min), 14-03 (4 min)
+- Trend: Phase 14 in progress. API testing infrastructure complete (MSW + fixtures).
 
 *Updated after each plan completion*
 
@@ -98,6 +98,9 @@ Recent decisions affecting current work:
 - QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
 - QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
 - Auth context stays React Context (TanStack Query for server state only)
+- MSW for API mocking (intercepts at network boundary, tests full axios chain)
+- Test fixtures use generated OpenAPI types for type safety
+- MSW handlers use full URL (baseURL in axios instance)
 - API client unwraps AxiosResponse.data for cleaner function signatures
 - Route loader pattern: ensureQueryData (not prefetchQuery) for instant navigation
 - Query keys follow TkDodo v5 hierarchical pattern: entity.all → lists() → list(filters)
@@ -323,10 +326,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-11T05:48:32Z
-Stopped at: Completed 14-02-PLAN.md (TanStack Query Infrastructure)
+Last session: 2026-02-11T05:56:02Z
+Stopped at: Completed 14-03-PLAN.md (API Testing Infrastructure)
 Resume file: None
-Next action: Continue Phase 14 (2 of 4 plans complete)
+Next action: Continue Phase 14 (3 of 4 plans complete)
 
 ## Roadmap Evolution
 
