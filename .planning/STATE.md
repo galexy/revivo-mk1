@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 14 of 32 (Frontend API & Routing)
-Plan: 4 of 4
+Plan: 2 of 4
 Status: In progress
-Last activity: 2026-02-11 - Completed 14-04-PLAN.md (E2E Test Auth Fixtures)
+Last activity: 2026-02-11 - Completed 14-02-PLAN.md (TanStack Query Infrastructure)
 
 Progress: [███████░░░] ~71%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 70
+- Total plans completed: 71
 - Average duration: 4.4 min
-- Total execution time: 7.00 hours
+- Total execution time: 7.08 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [███████░░░] ~71%
 | 11-domain-test-coverage | 1 | 5 min | 5.0 min |
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
-| 14-frontend-api-routing | 2 | 4 min | 2.0 min |
+| 14-frontend-api-routing | 3 | 9 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 13-04 (3 min), 13-05 (4 min), 13-06 (30 min), 14-01 (2 min), 14-04 (2 min)
-- Trend: Phase 14 in progress. Playwright auth fixtures ready for e2e testing.
+- Last 5 plans: 13-05 (4 min), 13-06 (30 min), 14-01 (2 min), 14-04 (2 min), 14-02 (5 min)
+- Trend: Phase 14 in progress. TanStack Query infrastructure complete.
 
 *Updated after each plan completion*
 
@@ -95,6 +95,12 @@ Recent decisions affecting current work:
 - Playwright auth setup uses Mailpit REST API to extract verification token from email
 - Setup project as dependency pattern (runs once, saves storageState for all tests)
 - Unauthenticated tests override storageState with empty cookies/origins
+- QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
+- QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
+- Auth context stays React Context (TanStack Query for server state only)
+- API client unwraps AxiosResponse.data for cleaner function signatures
+- Route loader pattern: ensureQueryData (not prefetchQuery) for instant navigation
+- Query keys follow TkDodo v5 hierarchical pattern: entity.all → lists() → list(filters)
 - Migrated existing Claude Code devcontainer to Docker Compose-based setup
 - Used Python 3.12-slim with Node.js 20 for Claude Code support
 - Manual shadcn/ui component implementation when CLI unavailable (no internet access)
@@ -317,10 +323,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Phase 13 complete (6/6 plans, E2E verified)
+Last session: 2026-02-11T05:48:32Z
+Stopped at: Completed 14-02-PLAN.md (TanStack Query Infrastructure)
 Resume file: None
-Next action: Phase 14 (Frontend API & Routing) or Phase 12.1 (UI Acceptance Testing)
+Next action: Continue Phase 14 (2 of 4 plans complete)
 
 ## Roadmap Evolution
 
