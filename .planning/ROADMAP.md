@@ -386,14 +386,17 @@ Plans:
   4. Authentication token automatically included in API requests
   5. API error responses handled consistently
   6. Playwright e2e smoke tests updated for auth (login page smoke test, auth fixtures for authenticated tests)
-**Plans**: TBD
+**Plans**: 5 plans
 
 **Notes**:
 - `apps/web/e2e/smoke.spec.ts` expects old placeholder shell but Phase 13 replaced it with auth-guarded login flow. Needs login page smoke test and Playwright auth fixtures.
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
+- [ ] 14-01-PLAN.md — OpenAPI type generation + TanStack Query install
+- [ ] 14-02-PLAN.md — TanStack Query setup + type-safe API client + query patterns
+- [ ] 14-03-PLAN.md — queryOptions factories + API error handling utilities
+- [ ] 14-04-PLAN.md — MSW test infrastructure + API client/error tests
+- [ ] 14-05-PLAN.md — Playwright e2e auth fixtures + smoke tests
 
 ### Phase 15: API Integration Validation
 **Goal**: Validate frontend-backend integration with minimal CRUD operations
@@ -716,7 +719,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 12. Frontend Infrastructure | 6/6 | Complete | 2026-02-10 |
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
-| 14. Frontend API & Routing | 0/2 | Not started | - |
+| 14. Frontend API & Routing | 0/5 | Not started | - |
 | 15. API Integration Validation | 0/2 | Not started | - |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
 | 17. Transaction UI (Simple) | 0/3 | Not started | - |
