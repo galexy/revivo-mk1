@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@source '../../../../libs/ui/src';
 
 /* Finance-appropriate color palette using CSS variables */
 /* Uses shadcn/ui compatible variable naming for future component integration */
