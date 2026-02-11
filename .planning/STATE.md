@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 15 of 32 (API Integration Validation)
-Plan: 4 of 8
+Plan: 6 of 8
 Status: In Progress
-Last activity: 2026-02-11 - Completed 15-04-PLAN.md (Account CRUD Integration)
+Last activity: 2026-02-11 - Completed 15-06-PLAN.md (Account Feature Tests)
 
-Progress: [███████░░░] ~73%
+Progress: [███████░░░] ~74%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 76
+- Total plans completed: 77
 - Average duration: 4.3 min
-- Total execution time: 7.42 hours
+- Total execution time: 7.54 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [███████░░░] ~73%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
-| 15-api-integration-validation | 4 | 19 min | 4.8 min |
+| 15-api-integration-validation | 6 | 26 min | 4.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 15-01 (4 min), 15-02 (3 min), 15-03 (5 min), 15-04 (6 min), 15-05 (1 min)
-- Trend: Phase 15 progressing. Account CRUD integration complete.
+- Last 5 plans: 15-02 (3 min), 15-03 (5 min), 15-04 (6 min), 15-05 (1 min), 15-06 (7 min)
+- Trend: Phase 15 progressing. Account feature test coverage complete (88 passing tests).
 
 *Updated after each plan completion*
 
@@ -93,6 +93,9 @@ Recent decisions affecting current work:
 - window.matchMedia mock in test-setup.ts for theme detection in JSDOM
 - Playwright chromium-only configuration for e2e smoke tests
 - Explicit Nx targets (lint, format, e2e) complement @nx/vite inferred targets
+- Testing Library queries: use getAllByText for duplicate elements (DialogTitle + content)
+- Wizard step tests query unique form elements (labelText) not generic headings
+- waitFor uses queryByX (returns null) not getByX (throws) for async element appearance
 - Playwright auth setup uses Mailpit REST API to extract verification token from email
 - Setup project as dependency pattern (runs once, saves storageState for all tests)
 - Unauthenticated tests override storageState with empty cookies/origins
@@ -336,9 +339,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 15-03-PLAN.md (Account Wizard and Delete Dialog Design)
+Stopped at: Completed 15-06-PLAN.md (Account Feature Tests)
 Resume file: None
-Next action: Execute remaining Phase 15 plans (15-04 through 15-08)
+Next action: Execute remaining Phase 15 plans (15-07 through 15-08)
 
 ## Roadmap Evolution
 
