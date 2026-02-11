@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 15 of 32 (API Integration Validation)
-Plan: 6 of 8
+Plan: 7 of 8
 Status: In Progress
-Last activity: 2026-02-11 - Completed 15-06-PLAN.md (Account Feature Tests)
+Last activity: 2026-02-11 - Completed 15-07-PLAN.md (Account CRUD E2E Tests)
 
-Progress: [███████░░░] ~74%
+Progress: [███████░░░] ~75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 77
-- Average duration: 4.3 min
-- Total execution time: 7.54 hours
+- Total plans completed: 78
+- Average duration: 4.4 min
+- Total execution time: 7.67 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [███████░░░] ~74%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
-| 15-api-integration-validation | 6 | 26 min | 4.3 min |
+| 15-api-integration-validation | 7 | 39 min | 5.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 15-02 (3 min), 15-03 (5 min), 15-04 (6 min), 15-05 (1 min), 15-06 (7 min)
-- Trend: Phase 15 progressing. Account feature test coverage complete (88 passing tests).
+- Last 5 plans: 15-03 (5 min), 15-04 (6 min), 15-05 (1 min), 15-06 (7 min), 15-07 (13 min)
+- Trend: Phase 15 progressing. E2E tests written (blocked by auth infrastructure issue).
 
 *Updated after each plan completion*
 
@@ -98,6 +98,9 @@ Recent decisions affecting current work:
 - waitFor uses queryByX (returns null) not getByX (throws) for async element appearance
 - Playwright auth setup uses Mailpit REST API to extract verification token from email
 - Setup project as dependency pattern (runs once, saves storageState for all tests)
+- E2E account tests use wizard UI (not API) for test data setup (page.request doesn't inherit storageState cookies)
+- Account wizard radio buttons need getByLabel().click({ force: true }) (labels intercept pointer events)
+- Unique account names with Date.now() timestamps prevent test data collisions
 - Unauthenticated tests override storageState with empty cookies/origins
 - QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
 - QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
