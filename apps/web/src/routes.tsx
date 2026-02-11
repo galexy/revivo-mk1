@@ -1,5 +1,7 @@
-import { createRootRouteWithContext, createRoute, redirect, Outlet } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { createRootRouteWithContext, createRoute, redirect, Outlet, useNavigate } from '@tanstack/react-router';
 import type { AuthContextType } from './features/auth/context/AuthContext';
+import { useAuth } from './features/auth/context/useAuth';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -54,19 +56,42 @@ const dashboardRoute = createRoute({
   component: DashboardPage,
 });
 
+// Index route component that redirects once auth state resolves
+function IndexRedirect() {
+  const { isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading) {
+      navigate({ to: isAuthenticated ? '/dashboard' : '/login' });
+    }
+  }, [isLoading, isAuthenticated, navigate]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex items-center gap-3 text-muted-foreground">
+        <svg className="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
+          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        <span>Loading...</span>
+      </div>
+    </div>
+  );
+}
+
 // Root index route — redirect based on auth state
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   beforeLoad: ({ context }) => {
-    if (context.auth.isLoading) return; // let component handle loading
-    throw redirect({ to: context.auth.isAuthenticated ? '/dashboard' : '/login' });
+    // If auth is already resolved, redirect immediately (avoids flash)
+    if (!context.auth.isLoading) {
+      throw redirect({ to: context.auth.isAuthenticated ? '/dashboard' : '/login' });
+    }
+    // Otherwise let the component handle it via useEffect
   },
-  component: () => (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-muted-foreground">Loading...</div>
-    </div>
-  ),
+  component: IndexRedirect,
 });
 
 // Build route tree

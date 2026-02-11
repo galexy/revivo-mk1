@@ -68,8 +68,8 @@ describe('LoginForm', () => {
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: /remember me/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /keep me signed in/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('shows validation error when email is invalid', async () => {
@@ -78,7 +78,7 @@ describe('LoginForm', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/^password$/i);
-    const submitButton = screen.getByRole('button', { name: /log in/i });
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     // Type invalid email and a password (so only email validation fails)
     await user.type(emailInput, 'not-an-email');
@@ -108,7 +108,7 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
 
     const emailInput = screen.getByLabelText(/email/i);
-    const submitButton = screen.getByRole('button', { name: /log in/i });
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     // Type valid email but leave password empty
     await user.type(emailInput, 'test@example.com');
@@ -139,8 +139,8 @@ describe('LoginForm', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/^password$/i);
-    const rememberMeCheckbox = screen.getByRole('checkbox', { name: /remember me/i });
-    const submitButton = screen.getByRole('button', { name: /log in/i });
+    const rememberMeCheckbox = screen.getByRole('checkbox', { name: /keep me signed in/i });
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
@@ -166,7 +166,7 @@ describe('LoginForm', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/^password$/i);
-    const submitButton = screen.getByRole('button', { name: /log in/i });
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'wrongpassword');
@@ -190,7 +190,7 @@ describe('LoginForm', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/^password$/i);
-    const submitButton = screen.getByRole('button', { name: /log in/i });
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
@@ -198,8 +198,8 @@ describe('LoginForm', () => {
 
     // Check loading state appears
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /logging in\.\.\./i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /logging in\.\.\./i })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /signing in\.\.\./i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /signing in\.\.\./i })).toBeDisabled();
     });
 
     // Resolve the login promise
@@ -207,7 +207,7 @@ describe('LoginForm', () => {
 
     // Wait for loading state to disappear
     await waitFor(() => {
-      expect(screen.queryByText(/logging in\.\.\./i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/signing in\.\.\./i)).not.toBeInTheDocument();
     });
   });
 

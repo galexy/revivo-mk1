@@ -48,7 +48,7 @@ describe('App routing', () => {
 
     // Verify login page is rendered
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
     });
   });
 

@@ -27,10 +27,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const attemptRefresh = async () => {
       try {
         // Attempt silent refresh with existing cookie
+        // Short timeout so the login page loads quickly if API is unreachable
         const refreshResponse = await api.post<TokenResponse>(
           '/auth/refresh',
           {},
-          { signal: controller.signal },
+          { signal: controller.signal, timeout: 5000 },
         );
 
         // Store new access token

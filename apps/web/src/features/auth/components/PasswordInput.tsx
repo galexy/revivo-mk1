@@ -1,15 +1,20 @@
 import { useState, forwardRef } from 'react';
 import { EyeOpenIcon, EyeClosedIcon } from '@radix-ui/react-icons';
-import { Input, Button } from '@workspace/ui';
+import { Input, Button, cn } from '@workspace/ui';
 
 // Use forwardRef so react-hook-form's register can attach a ref
 export const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<typeof Input>>(
-  function PasswordInput(props, ref) {
+  function PasswordInput({ className, ...props }, ref) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
       <div className="relative">
-        <Input type={showPassword ? 'text' : 'password'} ref={ref} {...props} className="pr-10" />
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          ref={ref}
+          className={cn(className, 'pr-10')}
+          {...props}
+        />
         <Button
           type="button"
           variant="ghost"
