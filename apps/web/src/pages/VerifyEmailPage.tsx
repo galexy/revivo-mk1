@@ -26,8 +26,9 @@ export function VerifyEmailPage() {
       try {
         await api.get<VerifyEmailResponse>(`/auth/verify?token=${encodeURIComponent(token)}`);
         setState('success');
-      } catch (error: any) {
-        const message = error.response?.data?.detail || 'Verification failed';
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { data?: { detail?: string } } };
+        const message = axiosError?.response?.data?.detail || 'Verification failed';
         setErrorMessage(message);
         // Check if the error indicates an expired token
         if (message.toLowerCase().includes('expired')) {
@@ -57,7 +58,7 @@ export function VerifyEmailPage() {
       });
       setResendSuccess(true);
       setResendEmail('');
-    } catch (error: any) {
+    } catch {
       // Silently succeed even on error (enumeration protection)
       // The API returns 202 for duplicate emails, so this should always succeed
       setResendSuccess(true);

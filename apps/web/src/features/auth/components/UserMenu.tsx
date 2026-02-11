@@ -1,3 +1,4 @@
+import { useRouter, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../context/useAuth';
 import {
   DropdownMenu,
@@ -13,6 +14,8 @@ import {
 
 export function UserMenu() {
   const { user, logout } = useAuth();
+  const router = useRouter();
+  const navigate = useNavigate();
 
   if (!user) {
     return null;
@@ -31,6 +34,11 @@ export function UserMenu() {
 
   const handleLogout = async () => {
     await logout();
+    // Invalidate cached route data so beforeLoad guards re-evaluate,
+    // then navigate to login. Matches the official TanStack Router
+    // authenticated-routes example pattern.
+    await router.invalidate();
+    await navigate({ to: '/login' });
   };
 
   return (

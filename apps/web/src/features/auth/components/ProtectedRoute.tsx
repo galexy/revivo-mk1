@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router';
+import { Navigate, Outlet } from '@tanstack/react-router';
 import { useAuth } from '../context/useAuth';
 
 export function ProtectedRoute() {
@@ -14,9 +14,10 @@ export function ProtectedRoute() {
   }
 
   if (!isAuthenticated) {
-    // Silent redirect — no toast/message
-    window.location.href = '/login';
-    return null;
+    // Fallback redirect if beforeLoad guard didn't catch this.
+    // Navigate renders null and navigates in a useEffect (after render),
+    // so the router context is already updated by this point.
+    return <Navigate to="/login" />;
   }
 
   return <Outlet />;

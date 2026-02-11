@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { AuthProvider, type AuthContextType } from './AuthContext';
+import { AuthProvider } from './AuthContext';
 import { useAuth } from './useAuth';
 import type { UserProfile, TokenResponse } from '../types';
 
@@ -59,9 +59,6 @@ describe('AuthContext', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock window.location.href for logout test
-    delete (window as any).location;
-    window.location = { href: '' } as any;
   });
 
   it('starts in loading state', () => {
@@ -239,9 +236,10 @@ describe('AuthContext', () => {
       expect(mockSetAccessToken).toHaveBeenCalledWith(null);
     });
 
-    // Verify window.location.href was set
+    // Verify user is cleared (navigation is handled by the call site, not AuthContext)
     await waitFor(() => {
-      expect(window.location.href).toBe('/login');
+      expect(screen.getByTestId('user')).toHaveTextContent('null');
+      expect(screen.getByTestId('isAuthenticated')).toHaveTextContent('false');
     });
   });
 });

@@ -43,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         );
 
         setUser(profileResponse.data);
-      } catch (error) {
+      } catch {
         // Refresh failed or was aborted - user stays null (not authenticated)
         // This is expected for users without valid refresh cookie
         setUser(null);
@@ -92,8 +92,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Always clear client-side state, even if logout endpoint fails
       setAccessToken(null);
       setUser(null);
-      // Full page reload clears all state (router cache, component state, etc.)
-      window.location.href = '/login';
+      // Navigation is handled by the call site (e.g. UserMenu) using
+      // router.invalidate() + navigate(), matching the official TanStack
+      // Router authenticated-routes example pattern.
     }
   };
 

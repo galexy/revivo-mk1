@@ -34,13 +34,14 @@ export function LoginForm() {
     try {
       setServerError(null);
       await login(data.email, data.password, data.rememberMe);
-      // Full page navigation ensures router context has fresh auth state.
-      // TanStack Router's navigate() would race with the context update.
-      window.location.href = '/dashboard';
-    } catch (error: any) {
+      // Navigation is handled by LoginPage's useEffect watching isAuthenticated.
+      // By the time the effect fires, RouterProvider has already updated the
+      // router context during render, so beforeLoad guards see the new auth state.
+    } catch (error: unknown) {
       // Extract error message from API response
+      const axiosError = error as { response?: { data?: { detail?: string } } };
       const message =
-        error?.response?.data?.detail || 'Login failed. Please try again.';
+        axiosError?.response?.data?.detail || 'Login failed. Please try again.';
       setServerError(message);
     }
   };
@@ -114,7 +115,7 @@ export function LoginForm() {
         </Button>
 
         <div className="text-center text-sm text-muted-foreground">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link to="/register" className="text-primary hover:underline">
             Sign up
           </Link>

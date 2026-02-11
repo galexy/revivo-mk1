@@ -1,6 +1,6 @@
-import { StrictMode, useEffect } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { createRouter, Navigate, RouterProvider } from '@tanstack/react-router';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { useAuth } from './features/auth/context/useAuth';
 import { routeTree } from './routes';
@@ -19,11 +19,9 @@ import './styles/globals.css';
 // Create router
 const router = createRouter({
   routeTree,
-  context: { auth: undefined! }, // will be provided by InnerApp
-  defaultNotFoundComponent: () => {
-    window.location.href = '/';
-    return null;
-  },
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- provided by InnerApp at runtime
+  context: { auth: undefined! },
+  defaultNotFoundComponent: () => <Navigate to="/" />,
 });
 
 // Register router type for type safety
@@ -33,16 +31,12 @@ declare module '@tanstack/react-router' {
   }
 }
 
-// Inner component that provides auth context to router
+// Inner component that provides auth context to router.
+// RouterProvider calls router.update() during render, so whenever auth state
+// changes and InnerApp re-renders, the router context is updated synchronously
+// before any effects fire. No manual router.invalidate() needed.
 function InnerApp() {
   const auth = useAuth();
-
-  // When auth state changes (loading completes, login/logout), invalidate the
-  // router so beforeLoad guards re-evaluate with the new auth context.
-  useEffect(() => {
-    router.invalidate();
-  }, [auth.isLoading, auth.isAuthenticated]);
-
   return <RouterProvider router={router} context={{ auth }} />;
 }
 

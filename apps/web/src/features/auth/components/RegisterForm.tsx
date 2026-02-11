@@ -39,14 +39,15 @@ export function RegisterForm() {
       });
       // On success, show verification notice (do NOT auto-login)
       setIsRegistered(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Extract error message from API response
-      if (error?.response?.status === 422) {
+      const axiosError = error as { response?: { status?: number; data?: { detail?: string | Array<{ loc?: string[]; msg?: string }> } } };
+      if (axiosError?.response?.status === 422) {
         // Validation error - show field-level errors
-        const validationErrors = error.response.data?.detail;
+        const validationErrors = axiosError.response.data?.detail;
         if (Array.isArray(validationErrors)) {
           // FastAPI returns array of {loc, msg, type}
-          validationErrors.forEach((err: any) => {
+          validationErrors.forEach((err) => {
             const field = err.loc?.[1]; // ["body", "email"] -> "email"
             if (field === 'email' || field === 'password' || field === 'display_name') {
               const formField = field === 'display_name' ? 'displayName' : field;
@@ -60,7 +61,7 @@ export function RegisterForm() {
         }
       } else {
         const message =
-          error?.response?.data?.detail || 'Registration failed. Please try again.';
+          (typeof axiosError?.response?.data?.detail === 'string' ? axiosError.response.data.detail : null) || 'Registration failed. Please try again.';
         setServerError(message);
       }
     }

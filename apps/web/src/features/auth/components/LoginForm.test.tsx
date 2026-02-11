@@ -21,7 +21,7 @@ vi.mock('@tanstack/react-router', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    Link: ({ to, children, className }: any) => (
+    Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
       <a href={to} className={className}>
         {children}
       </a>
@@ -163,7 +163,7 @@ describe('LoginForm', () => {
 
   it('submit button shows loading state during submission', async () => {
     // Create a promise we can control
-    let resolveLogin: () => void;
+    let resolveLogin: () => void = () => {};
     const loginPromise = new Promise<void>((resolve) => {
       resolveLogin = resolve;
     });
@@ -187,7 +187,7 @@ describe('LoginForm', () => {
     });
 
     // Resolve the login promise
-    resolveLogin!();
+    resolveLogin();
 
     // Wait for loading state to disappear
     await waitFor(() => {
