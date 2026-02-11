@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 15 of 32 (API Integration Validation)
-Plan: 3 of 8
+Plan: 4 of 8
 Status: In Progress
-Last activity: 2026-02-11 - Completed 15-03-PLAN.md (Account Wizard and Delete Dialog Design)
+Last activity: 2026-02-11 - Completed 15-05-PLAN.md (Account Wizard State Hook)
 
 Progress: [███████░░░] ~73%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 75
-- Average duration: 4.3 min
-- Total execution time: 7.35 hours
+- Total plans completed: 76
+- Average duration: 4.2 min
+- Total execution time: 7.36 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [███████░░░] ~73%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
-| 15-api-integration-validation | 3 | 12 min | 4.0 min |
+| 15-api-integration-validation | 4 | 13 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 14-02 (5 min), 14-03 (4 min), 15-01 (4 min), 15-02 (3 min), 15-03 (5 min)
-- Trend: Phase 15 progressing. Wizard and delete dialog designed.
+- Last 5 plans: 14-03 (4 min), 15-01 (4 min), 15-02 (3 min), 15-03 (5 min), 15-05 (1 min)
+- Trend: Phase 15 progressing. Wizard state hook implemented.
 
 *Updated after each plan completion*
 
@@ -98,6 +98,8 @@ Recent decisions affecting current work:
 - Unauthenticated tests override storageState with empty cookies/origins
 - QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
 - QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
+- Edit mode skips step 0 in multi-step wizards (immutable field like account type)
+- Form data accumulation pattern: merge current + accumulated on navigation for persistence
 - Auth context stays React Context (TanStack Query for server state only)
 - MSW for API mocking (intercepts at network boundary, tests full axios chain)
 - Test fixtures use generated OpenAPI types for type safety
