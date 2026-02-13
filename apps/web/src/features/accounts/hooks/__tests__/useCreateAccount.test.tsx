@@ -150,7 +150,7 @@ describe('useCreateAccount', () => {
       accountType: 'loan',
       name: 'Auto Loan',
       openingBalance: '25000.00',
-      apr: '0.0599',
+      apr: '5.99', // User enters percentage
       termMonths: '60',
       subtype: 'auto_loan',
     };
@@ -164,7 +164,7 @@ describe('useCreateAccount', () => {
           amount: '25000.00',
           currency: 'USD',
         },
-        apr: '0.0599',
+        apr: '0.0599', // Hook converts to decimal for API
         term_months: 60,
         subtype: 'auto_loan',
       });

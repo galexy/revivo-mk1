@@ -24,7 +24,17 @@ export const stepDetailsSchema = z.object({
     .min(1, 'Account name is required')
     .max(100, 'Name cannot exceed 100 characters'),
   creditLimit: z.string().optional(), // For credit cards
-  apr: z.string().optional(), // For loans
+  apr: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true; // optional
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= 0 && num <= 100;
+      },
+      { message: 'APR must be between 0 and 100' }
+    ), // For loans (percentage)
   termMonths: z.string().optional(), // For loans
   subtype: z
     .enum([

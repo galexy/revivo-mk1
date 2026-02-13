@@ -77,7 +77,8 @@ export function AccountWizard({
         editData.creditLimit = editAccount.credit_limit.amount;
       }
       if (editAccount.apr) {
-        editData.apr = editAccount.apr;
+        // Convert APR from decimal (API returns) to percentage (form displays)
+        editData.apr = (parseFloat(editAccount.apr) * 100).toString();
       }
       if (editAccount.term_months) {
         editData.termMonths = editAccount.term_months.toString();

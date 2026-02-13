@@ -44,7 +44,8 @@ function mapAccountToFormData(account: AccountResponse): Partial<AccountFormData
     formData.creditLimit = account.credit_limit.amount;
   }
   if (account.apr) {
-    formData.apr = account.apr;
+    // Convert APR from decimal (API returns) to percentage (form displays)
+    formData.apr = (parseFloat(account.apr) * 100).toString();
   }
   if (account.term_months) {
     formData.termMonths = account.term_months.toString();
