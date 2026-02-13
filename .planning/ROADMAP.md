@@ -409,7 +409,7 @@ Plans:
   4. Sidebar shows accounts grouped by type (Cash, Credit, Loans, Investments, Rewards) with subtotals
   5. E2E tests cover account CRUD flows
   6. Chrome DevTools MCP used to automate UAT
-**Plans**: 8 plans
+**Plans**: 9 plans
 
 Plans:
 - [x] 15-01-PLAN.md — Dependencies, shadcn/ui components (Dialog, Select, RadioGroup, Separator, Badge), API client completion
@@ -420,6 +420,7 @@ Plans:
 - [x] 15-06-PLAN.md — Vitest unit/component tests (utils, wizard, sidebar, delete dialog, hooks)
 - [x] 15-07-PLAN.md — Playwright E2E tests for account CRUD flows
 - [x] 15-08-PLAN.md — UAT via Chrome DevTools MCP + human verification checkpoint
+- [ ] 15-09-PLAN.md — Gap closure: Tailwind v4 @theme color fix + APR percentage/decimal conversion
 
 ### Phase 16: Error Handling Patterns
 **Goal**: Define and implement consistent error handling across the UI
@@ -726,7 +727,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
 | 14. Frontend API & Routing | 4/4 | Complete | 2026-02-11 |
-| 15. API Integration Validation | 8/8 | Complete | 2026-02-11 |
+| 15. API Integration Validation | 8/9 | In Progress | - |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
 | 17. Transaction UI (Simple) | 0/3 | Not started | - |
 | 18. Split Transactions UI | 0/2 | Not started | - |
