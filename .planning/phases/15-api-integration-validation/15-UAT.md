@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 15-api-integration-validation
 source: 15-01-SUMMARY.md, 15-02-SUMMARY.md, 15-03-SUMMARY.md, 15-04-SUMMARY.md, 15-05-SUMMARY.md, 15-06-SUMMARY.md, 15-07-SUMMARY.md, 15-08-SUMMARY.md
 started: 2026-02-11T12:00:00Z
@@ -63,22 +63,30 @@ skipped: 0
   reason: "User reported: the darken modal view makes it impossible to read anything"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "globals.css @theme block only registers font variables, not color variables. Tailwind v4 silently ignores all shadcn/ui semantic color utilities (bg-background, text-foreground, etc.) so DialogContent has no background color — it is transparent."
+  artifacts:
+    - path: "apps/web/src/styles/globals.css"
+      issue: "@theme block missing --color-* mappings; :root color values use raw HSL components without hsl() wrapper"
+  missing:
+    - "Wrap :root color values in hsl() for complete color values"
+    - "Add @theme inline block mapping --color-background, --color-foreground, etc. to CSS variables"
+  debug_session: ".planning/debug/dialog-overlay-bleed.md"
 
 - truth: "Loan accounts can be created via wizard with APR percentage input"
   status: failed
   reason: "API returns 422: APR field validates <= 1 (expects decimal like 0.065) but UI sends percentage (6.5)"
   severity: major
   test: 8
-  root_cause: "UI sends APR as user-entered percentage (e.g., 6.5), API schema validates apr <= 1.0 expecting decimal fraction"
+  root_cause: "useCreateAccount hook sends formData.apr raw without dividing by 100. UI label says 'APR (%)' but no conversion from percentage to decimal fraction before API call."
   artifacts:
-    - path: "apps/web/src/lib/api/accounts.ts"
-      issue: "Sends APR value as-is without dividing by 100"
-    - path: "apps/api/src/adapters/api/schemas/account_schemas.py"
-      issue: "APR field has le=1 validation expecting decimal"
+    - path: "apps/web/src/features/accounts/hooks/useCreateAccount.ts"
+      issue: "Line 67: sends apr as-is without / 100 conversion"
+    - path: "apps/web/src/features/accounts/validation/accountSchemas.ts"
+      issue: "APR field is z.string().optional() with no numeric range validation"
+    - path: "apps/web/src/components/accounts/AccountWizard.tsx"
+      issue: "Line 80: edit mode populates apr from API without * 100 conversion back to percentage"
   missing:
-    - "Either convert APR to decimal in frontend before submit (6.5 -> 0.065) or change API to accept percentage and convert server-side"
-  debug_session: ""
+    - "Convert APR from percentage to decimal in useCreateAccount before sending (6.5 -> 0.065)"
+    - "Add 0-100 range validation in accountSchemas.ts Zod schema"
+    - "Convert API decimal back to percentage in edit mode form population"
+  debug_session: ".planning/debug/apr-mismatch-loan.md"
