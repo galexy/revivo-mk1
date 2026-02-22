@@ -32,8 +32,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: Login UI** - Login page, session/token management, logout
 - [x] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
 - [x] **Phase 15: API Integration Validation** - Account CRUD via wizard UI, sidebar with grouping, E2E tests, gap closure (Tailwind v4 + APR fix + wizard UX)
-- [ ] **Phase 16: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
-- [ ] **Phase 17: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
+- [ ] **Phase 16: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
+- [ ] **Phase 17: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
 - [ ] **Phase 18: Split Transactions UI** - Create and update split transactions
 - [ ] **Phase 19: Transfers UI** - Account transfers, transfers in splits
 - [ ] **Phase 20: Pagination & Infinite Scroll** - API pagination, infinite scroll UI
@@ -423,25 +423,9 @@ Plans:
 - [x] 15-09-PLAN.md — Gap closure: Tailwind v4 @theme color fix + APR percentage/decimal conversion
 - [x] 15-10-PLAN.md — Gap closure: wizard type auto-advance, Enter key navigation, edit mode fixes
 
-### Phase 16: Error Handling Patterns
-**Goal**: Define and implement consistent error handling across the UI
-**Depends on**: Phase 15
-**Requirements**: WEB-06, WEB-07
-**Success Criteria** (what must be TRUE):
-  1. Transient errors (network) show retry UI
-  2. System errors show appropriate error message
-  3. User errors (validation) show inline feedback
-  4. Error handling patterns documented in frontend CLAUDE.md
-  5. Reusable error UI components created
-**Plans**: TBD
-
-Plans:
-- [ ] 16-01: TBD
-- [ ] 16-02: TBD
-
-### Phase 17: Transaction UI (Simple Accounts)
+### Phase 16: Transaction UI (Simple Accounts)
 **Goal**: Full transaction management for checking/savings accounts
-**Depends on**: Phase 16
+**Depends on**: Phase 15
 **Requirements**: TRAN-01, TRAN-02, TRAN-03, TRAN-04, TRAN-11
 **Success Criteria** (what must be TRUE):
   1. Transaction list view for checking/savings accounts
@@ -453,9 +437,25 @@ Plans:
 **Plans**: TBD
 
 Plans:
+- [ ] 16-01: TBD
+- [ ] 16-02: TBD
+- [ ] 16-03: TBD
+
+### Phase 17: Error Handling Patterns
+**Goal**: Define and implement consistent error handling across the UI
+**Depends on**: Phase 16
+**Requirements**: WEB-06, WEB-07
+**Success Criteria** (what must be TRUE):
+  1. Transient errors (network) show retry UI
+  2. System errors show appropriate error message
+  3. User errors (validation) show inline feedback
+  4. Error handling patterns documented in frontend CLAUDE.md
+  5. Reusable error UI components created
+**Plans**: TBD
+
+Plans:
 - [ ] 17-01: TBD
 - [ ] 17-02: TBD
-- [ ] 17-03: TBD
 
 ### Phase 18: Split Transactions UI
 **Goal**: Support creating and editing split transactions
@@ -729,8 +729,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
 | 14. Frontend API & Routing | 4/4 | Complete | 2026-02-11 |
 | 15. API Integration Validation | 10/10 | Complete | 2026-02-22 |
-| 16. Error Handling Patterns | 0/2 | Not started | - |
-| 17. Transaction UI (Simple) | 0/3 | Not started | - |
+| 16. Transaction UI (Simple) | 0/3 | Not started | - |
+| 17. Error Handling Patterns | 0/2 | Not started | - |
 | 18. Split Transactions UI | 0/2 | Not started | - |
 | 19. Transfers UI | 0/2 | Not started | - |
 | 20. Pagination & Infinite Scroll | 0/2 | Not started | - |
