@@ -19,8 +19,7 @@ export type CreateSavingsAccountRequest = components['schemas']['CreateSavingsAc
 export type CreateCreditCardAccountRequest =
   components['schemas']['CreateCreditCardAccountRequest'];
 export type CreateLoanAccountRequest = components['schemas']['CreateLoanAccountRequest'];
-export type CreateBrokerageAccountRequest =
-  components['schemas']['CreateBrokerageAccountRequest'];
+export type CreateBrokerageAccountRequest = components['schemas']['CreateBrokerageAccountRequest'];
 export type CreateIraAccountRequest = components['schemas']['CreateIraAccountRequest'];
 export type CreateRewardsAccountRequest = components['schemas']['CreateRewardsAccountRequest'];
 export type UpdateAccountRequest = components['schemas']['UpdateAccountRequest'];
@@ -63,9 +62,7 @@ export async function createCreditCardAccount(
   return response.data;
 }
 
-export async function createLoanAccount(
-  data: CreateLoanAccountRequest,
-): Promise<AccountResponse> {
+export async function createLoanAccount(data: CreateLoanAccountRequest): Promise<AccountResponse> {
   const response = await api.post<AccountResponse>('/api/v1/accounts/loan', data);
   return response.data;
 }
@@ -77,9 +74,7 @@ export async function createBrokerageAccount(
   return response.data;
 }
 
-export async function createIraAccount(
-  data: CreateIraAccountRequest,
-): Promise<AccountResponse> {
+export async function createIraAccount(data: CreateIraAccountRequest): Promise<AccountResponse> {
   const response = await api.post<AccountResponse>('/api/v1/accounts/ira', data);
   return response.data;
 }

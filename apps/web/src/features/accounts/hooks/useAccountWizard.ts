@@ -5,10 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  stepSchemas,
-  type AccountFormData,
-} from '../validation/accountSchemas';
+import { stepSchemas, type AccountFormData } from '../validation/accountSchemas';
 import type { AccountResponse } from '@/lib/api-client';
 
 export interface UseAccountWizardOptions {
@@ -76,9 +73,7 @@ function mapAccountToFormData(account: AccountResponse): Partial<AccountFormData
  * @param options - Configuration options
  * @returns Wizard state and control functions
  */
-export function useAccountWizard(
-  options: UseAccountWizardOptions = {}
-): UseAccountWizardReturn {
+export function useAccountWizard(options: UseAccountWizardOptions = {}): UseAccountWizardReturn {
   const { editAccount } = options;
 
   // Edit mode skips step 0 (type selection)

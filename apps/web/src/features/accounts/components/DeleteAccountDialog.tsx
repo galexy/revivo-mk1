@@ -67,9 +67,8 @@ export function DeleteAccountDialog({
         <DialogHeader>
           <DialogTitle>Delete Account</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            account <strong>{accountName}</strong> and all associated
-            transactions.
+            This action cannot be undone. This will permanently delete the account{' '}
+            <strong>{accountName}</strong> and all associated transactions.
           </DialogDescription>
         </DialogHeader>
 

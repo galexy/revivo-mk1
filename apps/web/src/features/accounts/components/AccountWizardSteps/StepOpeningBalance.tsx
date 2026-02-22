@@ -14,12 +14,7 @@ interface StepOpeningBalanceProps {
   onBack: () => void;
 }
 
-export function StepOpeningBalance({
-  form,
-  accountType,
-  onNext,
-  onBack,
-}: StepOpeningBalanceProps) {
+export function StepOpeningBalance({ form, accountType, onNext, onBack }: StepOpeningBalanceProps) {
   const {
     register,
     formState: { errors },
@@ -53,9 +48,7 @@ export function StepOpeningBalance({
               {...register('openingBalance')}
             />
             {errors.openingBalance?.message && (
-              <p className="text-sm text-destructive">
-                {String(errors.openingBalance.message)}
-              </p>
+              <p className="text-sm text-destructive">{String(errors.openingBalance.message)}</p>
             )}
           </div>
         ) : (
@@ -75,9 +68,7 @@ export function StepOpeningBalance({
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
             {errors.openingBalance?.message && (
-              <p className="text-sm text-destructive">
-                {String(errors.openingBalance.message)}
-              </p>
+              <p className="text-sm text-destructive">{String(errors.openingBalance.message)}</p>
             )}
           </div>
         )}

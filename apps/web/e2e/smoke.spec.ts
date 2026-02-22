@@ -33,7 +33,9 @@ test.describe('Authenticated', () => {
     await page.goto('/dashboard');
     // Wait for page to fully load - may show empty state or accounts
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('heading', { name: 'Personal Finance', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Personal Finance', exact: true }),
+    ).toBeVisible();
     // User menu button contains user initials from display_name
     await expect(page.locator('[data-slot="button"][aria-haspopup="menu"]')).toBeVisible();
   });

@@ -19,10 +19,7 @@ export const stepTypeSchema = z.object({
 
 // Step 2: Account details (conditional fields based on type)
 export const stepDetailsSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Account name is required')
-    .max(100, 'Name cannot exceed 100 characters'),
+  name: z.string().min(1, 'Account name is required').max(100, 'Name cannot exceed 100 characters'),
   creditLimit: z.string().optional(), // For credit cards
   apr: z
     .string()
@@ -33,7 +30,7 @@ export const stepDetailsSchema = z.object({
         const num = parseFloat(val);
         return !isNaN(num) && num >= 0 && num <= 100;
       },
-      { message: 'APR must be between 0 and 100' }
+      { message: 'APR must be between 0 and 100' },
     ), // For loans (percentage)
   termMonths: z.string().optional(), // For loans
   subtype: z

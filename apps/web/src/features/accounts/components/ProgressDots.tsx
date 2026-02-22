@@ -28,11 +28,7 @@ export function ProgressDots({ currentStep, totalSteps }: ProgressDotsProps) {
                 : 'bg-muted'
           }`}
           aria-label={`Step ${index + 1}${
-            index === currentStep
-              ? ' (current)'
-              : index < currentStep
-                ? ' (completed)'
-                : ''
+            index === currentStep ? ' (current)' : index < currentStep ? ' (completed)' : ''
           }`}
         />
       ))}

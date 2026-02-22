@@ -77,9 +77,7 @@ export function AccountDetailPage() {
           </div>
           <div>
             <span className="text-sm text-muted-foreground">Opened:</span>
-            <p className="text-sm">
-              {new Date(account.opening_date).toLocaleDateString()}
-            </p>
+            <p className="text-sm">{new Date(account.opening_date).toLocaleDateString()}</p>
           </div>
           {account.account_number_last4 && (
             <div>

@@ -25,11 +25,7 @@ describe('AccountWizard', () => {
 
     return render(
       <QueryClientProvider client={queryClient}>
-        <AccountWizard
-          open={open}
-          onOpenChange={mockOnOpenChange}
-          onSubmit={mockOnSubmit}
-        />
+        <AccountWizard open={open} onOpenChange={mockOnOpenChange} onSubmit={mockOnSubmit} />
       </QueryClientProvider>,
     );
   };
@@ -190,11 +186,7 @@ describe('AccountWizard', () => {
           })
         }
       >
-        <AccountWizard
-          open={false}
-          onOpenChange={mockOnOpenChange}
-          onSubmit={mockOnSubmit}
-        />
+        <AccountWizard open={false} onOpenChange={mockOnOpenChange} onSubmit={mockOnSubmit} />
       </QueryClientProvider>,
     );
 

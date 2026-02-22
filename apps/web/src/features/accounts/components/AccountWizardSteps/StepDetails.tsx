@@ -2,7 +2,16 @@
  * Step 2: Account Details
  * Shows name field and type-specific fields based on account type.
  */
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui';
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui';
 import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormData } from '../../validation/accountSchemas';
 
@@ -63,9 +72,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
               {...register('creditLimit')}
             />
             {errors.creditLimit?.message && (
-              <p className="text-sm text-destructive">
-                {String(errors.creditLimit.message)}
-              </p>
+              <p className="text-sm text-destructive">{String(errors.creditLimit.message)}</p>
             )}
           </div>
         )}
@@ -75,12 +82,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
           <>
             <div className="space-y-2">
               <Label htmlFor="apr">APR (%)</Label>
-              <Input
-                id="apr"
-                type="text"
-                placeholder="3.5"
-                {...register('apr')}
-              />
+              <Input id="apr" type="text" placeholder="3.5" {...register('apr')} />
               {errors.apr?.message && (
                 <p className="text-sm text-destructive">{String(errors.apr.message)}</p>
               )}
@@ -88,22 +90,18 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
 
             <div className="space-y-2">
               <Label htmlFor="termMonths">Term (months)</Label>
-              <Input
-                id="termMonths"
-                type="text"
-                placeholder="360"
-                {...register('termMonths')}
-              />
+              <Input id="termMonths" type="text" placeholder="360" {...register('termMonths')} />
               {errors.termMonths?.message && (
-                <p className="text-sm text-destructive">
-                  {String(errors.termMonths.message)}
-                </p>
+                <p className="text-sm text-destructive">{String(errors.termMonths.message)}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="loanSubtype">Loan Type</Label>
-              <Select value={subtype} onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}>
+              <Select
+                value={subtype}
+                onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}
+              >
                 <SelectTrigger id="loanSubtype">
                   <SelectValue placeholder="Select loan type" />
                 </SelectTrigger>
@@ -115,9 +113,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
                 </SelectContent>
               </Select>
               {errors.subtype?.message && (
-                <p className="text-sm text-destructive">
-                  {String(errors.subtype.message)}
-                </p>
+                <p className="text-sm text-destructive">{String(errors.subtype.message)}</p>
               )}
             </div>
           </>
@@ -127,7 +123,10 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
         {accountType === 'ira' && (
           <div className="space-y-2">
             <Label htmlFor="iraSubtype">IRA Type</Label>
-            <Select value={subtype} onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}>
+            <Select
+              value={subtype}
+              onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}
+            >
               <SelectTrigger id="iraSubtype">
                 <SelectValue placeholder="Select IRA type" />
               </SelectTrigger>
@@ -138,9 +137,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
               </SelectContent>
             </Select>
             {errors.subtype?.message && (
-              <p className="text-sm text-destructive">
-                {String(errors.subtype.message)}
-              </p>
+              <p className="text-sm text-destructive">{String(errors.subtype.message)}</p>
             )}
           </div>
         )}
@@ -155,9 +152,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
               {...register('rewardsUnit')}
             />
             {errors.rewardsUnit?.message && (
-              <p className="text-sm text-destructive">
-                {String(errors.rewardsUnit.message)}
-              </p>
+              <p className="text-sm text-destructive">{String(errors.rewardsUnit.message)}</p>
             )}
           </div>
         )}

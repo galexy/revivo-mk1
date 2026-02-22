@@ -13,7 +13,9 @@ async function openAccountWizard(page: any) {
   await page.waitForLoadState('networkidle');
 
   // Wait for dashboard to load (confirms auth worked)
-  await expect(page.getByRole('heading', { name: 'Personal Finance', exact: true })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('heading', { name: 'Personal Finance', exact: true })).toBeVisible({
+    timeout: 10000,
+  });
 
   // Try empty state button first (visible when no accounts exist)
   const emptyStateButton = page.getByRole('button', { name: /add your first account/i });
@@ -160,7 +162,10 @@ test.describe('Account CRUD', () => {
     await confirmInput.fill(accountName);
 
     // Click Delete button
-    await page.getByRole('dialog').getByRole('button', { name: /delete account/i }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /delete account/i })
+      .click();
 
     // Wait for dialog to close and verify account removed from sidebar
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });

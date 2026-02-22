@@ -43,9 +43,7 @@ export function AccountListItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm truncate">{account.name}</span>
-          <span
-            className={`text-sm font-mono ${isNegative ? 'text-destructive' : ''}`}
-          >
+          <span className={`text-sm font-mono ${isNegative ? 'text-destructive' : ''}`}>
             {formatCurrency(account.current_balance.amount)}
           </span>
         </div>

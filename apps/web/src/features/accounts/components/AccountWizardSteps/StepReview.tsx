@@ -40,8 +40,7 @@ export function StepReview({
   isSubmitting = false,
   isEditMode = false,
 }: StepReviewProps) {
-  const accountTypeLabel =
-    accountTypeLabels[formData.accountType || ''] || formData.accountType;
+  const accountTypeLabel = accountTypeLabels[formData.accountType || ''] || formData.accountType;
 
   const formatBalance = (balance: string | undefined, accountType: string) => {
     if (!balance) return '$0.00';
@@ -110,9 +109,7 @@ export function StepReview({
               <Separator />
               <div>
                 <p className="text-sm text-muted-foreground">Type</p>
-                <p className="font-medium">
-                  {subtypeLabels[formData.subtype] || formData.subtype}
-                </p>
+                <p className="font-medium">{subtypeLabels[formData.subtype] || formData.subtype}</p>
               </div>
             </>
           )}
@@ -132,10 +129,7 @@ export function StepReview({
           <div>
             <p className="text-sm text-muted-foreground">Opening Balance</p>
             <p className="font-medium">
-              {formatBalance(
-                formData.openingBalance,
-                formData.accountType || '',
-              )}
+              {formatBalance(formData.openingBalance, formData.accountType || '')}
             </p>
           </div>
         </div>
@@ -147,8 +141,12 @@ export function StepReview({
         </Button>
         <Button onClick={onSubmit} disabled={isSubmitting}>
           {isSubmitting
-            ? (isEditMode ? 'Saving...' : 'Creating...')
-            : (isEditMode ? 'Update Account' : 'Create Account')}
+            ? isEditMode
+              ? 'Saving...'
+              : 'Creating...'
+            : isEditMode
+              ? 'Update Account'
+              : 'Create Account'}
         </Button>
       </div>
     </div>

@@ -17,7 +17,6 @@ import {
 import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormData } from '../../validation/accountSchemas';
 
-
 interface AccountType {
   value: string;
   label: string;
@@ -90,9 +89,7 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
     <div className="space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Choose Account Type</h3>
-        <p className="text-sm text-muted-foreground">
-          Select the type of account you want to add
-        </p>
+        <p className="text-sm text-muted-foreground">Select the type of account you want to add</p>
       </div>
 
       <RadioGroup
@@ -104,11 +101,7 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
           const Icon = type.icon;
           return (
             <div key={type.value}>
-              <RadioGroupItem
-                value={type.value}
-                id={type.value}
-                className="peer sr-only"
-              />
+              <RadioGroupItem value={type.value} id={type.value} className="peer sr-only" />
               <Label
                 htmlFor={type.value}
                 className="flex cursor-pointer flex-col gap-2 rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
@@ -117,9 +110,7 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
                   <Icon className="h-5 w-5" />
                   <span className="font-semibold">{type.label}</span>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {type.description}
-                </span>
+                <span className="text-xs text-muted-foreground">{type.description}</span>
               </Label>
             </div>
           );

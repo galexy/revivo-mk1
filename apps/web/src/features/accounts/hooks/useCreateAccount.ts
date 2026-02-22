@@ -62,15 +62,17 @@ export function useCreateAccount() {
         }
         case 'loan': {
           // Convert APR from percentage (user input) to decimal (API expects)
-          const aprDecimal = formData.apr
-            ? (parseFloat(formData.apr) / 100).toString()
-            : '0';
+          const aprDecimal = formData.apr ? (parseFloat(formData.apr) / 100).toString() : '0';
           const data: CreateLoanAccountRequest = {
             name,
             opening_balance: commonData.opening_balance,
             apr: aprDecimal,
             term_months: parseInt(formData.termMonths || '0', 10),
-            subtype: formData.subtype as 'mortgage' | 'auto_loan' | 'personal_loan' | 'line_of_credit',
+            subtype: formData.subtype as
+              | 'mortgage'
+              | 'auto_loan'
+              | 'personal_loan'
+              | 'line_of_credit',
           };
           return createLoanAccount(data);
         }

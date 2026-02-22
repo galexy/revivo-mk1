@@ -6,21 +6,13 @@
 import { useState, useEffect } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@workspace/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@workspace/ui';
 import { ProgressDots } from './ProgressDots';
 import { StepTypeSelection } from './AccountWizardSteps/StepTypeSelection';
 import { StepDetails } from './AccountWizardSteps/StepDetails';
 import { StepOpeningBalance } from './AccountWizardSteps/StepOpeningBalance';
 import { StepReview } from './AccountWizardSteps/StepReview';
-import {
-  stepSchemas,
-  type AccountFormData,
-} from '../validation/accountSchemas';
+import { stepSchemas, type AccountFormData } from '../validation/accountSchemas';
 import type { AccountResponse } from '@/lib/api-client';
 
 interface AccountWizardProps {
@@ -37,12 +29,7 @@ const stepTitles = [
   'Review & Confirm',
 ];
 
-export function AccountWizard({
-  open,
-  onOpenChange,
-  editAccount,
-  onSubmit,
-}: AccountWizardProps) {
+export function AccountWizard({ open, onOpenChange, editAccount, onSubmit }: AccountWizardProps) {
   const [currentStep, setCurrentStep] = useState(editAccount ? 1 : 0);
   const [formData, setFormData] = useState<Partial<AccountFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,9 +133,7 @@ export function AccountWizard({
         </DialogHeader>
 
         <div className="mt-4">
-          {currentStep === 0 && (
-            <StepTypeSelection form={form} onNext={goToNextStep} />
-          )}
+          {currentStep === 0 && <StepTypeSelection form={form} onNext={goToNextStep} />}
           {currentStep === 1 && (
             <StepDetails
               form={form}
