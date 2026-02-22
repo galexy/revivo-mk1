@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 12.1: UI Acceptance Testing Framework** - Claude Code Chrome integration, markdown test scenarios, repeatable UAT (INSERTED)
 - [x] **Phase 13: Login UI** - Login page, session/token management, logout
 - [x] **Phase 14: Frontend API & Routing** - TanStack Query, TanStack Router, state management patterns
-- [x] **Phase 15: API Integration Validation** - Account CRUD via wizard UI, sidebar with grouping, E2E tests, gap closure (Tailwind v4 + APR fix)
+- [ ] **Phase 15: API Integration Validation** - Account CRUD via wizard UI, sidebar with grouping, E2E tests, gap closure (Tailwind v4 + APR fix + wizard UX)
 - [ ] **Phase 16: Error Handling Patterns** - Transient/system/user errors, UX patterns, CLAUDE.md standards
 - [ ] **Phase 17: Transaction UI (Simple)** - Checking/savings transactions, inline editing, auto-create payees/categories
 - [ ] **Phase 18: Split Transactions UI** - Create and update split transactions
@@ -409,7 +409,7 @@ Plans:
   4. Sidebar shows accounts grouped by type (Cash, Credit, Loans, Investments, Rewards) with subtotals
   5. E2E tests cover account CRUD flows
   6. Chrome DevTools MCP used to automate UAT
-**Plans**: 9 plans
+**Plans**: 10 plans
 
 Plans:
 - [x] 15-01-PLAN.md — Dependencies, shadcn/ui components (Dialog, Select, RadioGroup, Separator, Badge), API client completion
@@ -421,6 +421,7 @@ Plans:
 - [x] 15-07-PLAN.md — Playwright E2E tests for account CRUD flows
 - [x] 15-08-PLAN.md — UAT via Chrome DevTools MCP + human verification checkpoint
 - [x] 15-09-PLAN.md — Gap closure: Tailwind v4 @theme color fix + APR percentage/decimal conversion
+- [ ] 15-10-PLAN.md — Gap closure: wizard type auto-advance, Enter key navigation, edit mode fixes
 
 ### Phase 16: Error Handling Patterns
 **Goal**: Define and implement consistent error handling across the UI
@@ -727,7 +728,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 3.2 -> 4 -> 4.1 -> 4.2 ->
 | 12.1 UI Acceptance Testing Framework | 0/1 | Not started | - |
 | 13. Login UI | 6/6 | Complete | 2026-02-10 |
 | 14. Frontend API & Routing | 4/4 | Complete | 2026-02-11 |
-| 15. API Integration Validation | 9/9 | Complete | 2026-02-13 |
+| 15. API Integration Validation | 9/10 | In Progress | 2026-02-13 |
 | 16. Error Handling Patterns | 0/2 | Not started | - |
 | 17. Transaction UI (Simple) | 0/3 | Not started | - |
 | 18. Split Transactions UI | 0/2 | Not started | - |
