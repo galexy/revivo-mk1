@@ -57,7 +57,7 @@ export function AccountWizard({
   useEffect(() => {
     if (!open) {
       setFormData({});
-      form.reset();
+      form.reset({ accountType: undefined, name: '', openingBalance: '' });
       setIsSubmitting(false);
       setCurrentStep(0);
     } else {
