@@ -10,6 +10,7 @@ interface StepReviewProps {
   onSubmit: () => void;
   onBack: () => void;
   isSubmitting?: boolean;
+  isEditMode?: boolean;
 }
 
 const accountTypeLabels: Record<string, string> = {
@@ -37,6 +38,7 @@ export function StepReview({
   onSubmit,
   onBack,
   isSubmitting = false,
+  isEditMode = false,
 }: StepReviewProps) {
   const accountTypeLabel =
     accountTypeLabels[formData.accountType || ''] || formData.accountType;
@@ -53,7 +55,9 @@ export function StepReview({
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Review & Confirm</h3>
         <p className="text-sm text-muted-foreground">
-          Please review the details before creating your account
+          {isEditMode
+            ? 'Please review the changes before saving'
+            : 'Please review the details before creating your account'}
         </p>
       </div>
 
@@ -142,7 +146,9 @@ export function StepReview({
           Back
         </Button>
         <Button onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Account'}
+          {isSubmitting
+            ? (isEditMode ? 'Saving...' : 'Creating...')
+            : (isEditMode ? 'Update Account' : 'Create Account')}
         </Button>
       </div>
     </div>

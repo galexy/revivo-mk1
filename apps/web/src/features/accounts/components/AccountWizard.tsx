@@ -43,7 +43,7 @@ export function AccountWizard({
   editAccount,
   onSubmit,
 }: AccountWizardProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(editAccount ? 1 : 0);
   const [formData, setFormData] = useState<Partial<AccountFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,12 +56,12 @@ export function AccountWizard({
   // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
-      setCurrentStep(0);
+      setCurrentStep(editAccount ? 1 : 0);
       setFormData({});
       form.reset();
       setIsSubmitting(false);
     }
-  }, [open, form]);
+  }, [open, form, editAccount]);
 
   // Populate form data when editing
   useEffect(() => {
@@ -69,7 +69,7 @@ export function AccountWizard({
       const editData: Partial<AccountFormData> = {
         accountType: editAccount.account_type as any,
         name: editAccount.name,
-        openingBalance: editAccount.current_balance.amount,
+        openingBalance: parseFloat(editAccount.current_balance.amount).toFixed(2),
       };
 
       // Add type-specific fields
@@ -108,7 +108,7 @@ export function AccountWizard({
   const goToPreviousStep = () => {
     const currentValues = form.getValues();
     setFormData({ ...formData, ...currentValues });
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
+    setCurrentStep((prev) => Math.max(prev - 1, editAccount ? 1 : 0));
   };
 
   const handleSubmit = async () => {
@@ -130,7 +130,10 @@ export function AccountWizard({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <ProgressDots currentStep={currentStep} totalSteps={4} />
+          <ProgressDots
+            currentStep={editAccount ? currentStep - 1 : currentStep}
+            totalSteps={editAccount ? 3 : 4}
+          />
           <DialogTitle className="text-center">
             {editAccount ? 'Edit Account' : stepTitles[currentStep]}
           </DialogTitle>
@@ -162,6 +165,7 @@ export function AccountWizard({
               onSubmit={handleSubmit}
               onBack={goToPreviousStep}
               isSubmitting={isSubmitting}
+              isEditMode={!!editAccount}
             />
           )}
         </div>

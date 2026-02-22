@@ -248,4 +248,60 @@ describe('AccountWizard', () => {
     // (We can't easily test the visual state, but verify the wizard renders)
     expect(screen.getAllByText('Choose Account Type').length).toBeGreaterThan(0);
   });
+
+  it('edit mode starts at step 2, skips type selection, shows Update Account button', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    const mockEditAccount = {
+      id: '123',
+      account_type: 'checking',
+      name: 'Test Checking',
+      current_balance: { amount: '1500.00', currency: 'USD' },
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+    };
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AccountWizard
+          open={true}
+          onOpenChange={mockOnOpenChange}
+          onSubmit={mockOnSubmit}
+          editAccount={mockEditAccount as any}
+        />
+      </QueryClientProvider>,
+    );
+
+    // Should start at step 2 (Account Details) - dialog title should be "Edit Account"
+    expect(screen.getByText('Edit Account')).toBeInTheDocument();
+
+    // Should show Account Name field (step 2)
+    expect(screen.getByLabelText(/account name/i)).toBeInTheDocument();
+
+    // Navigate to review step
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    // Step 3: Opening Balance
+    await waitFor(
+      () => {
+        expect(screen.queryByLabelText(/^balance$/i)).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    // Step 4: Review should show "Update Account" button
+    await waitFor(
+      () => {
+        expect(screen.getByRole('button', { name: /update account/i })).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+  });
 });
