@@ -47,29 +47,32 @@ describe('AccountWizard', () => {
     expect(screen.getByLabelText(/rewards/i)).toBeInTheDocument();
   });
 
-  it('Next button is disabled until account type is selected', () => {
-    renderWizard();
-
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    expect(nextButton).toBeDisabled();
-  });
-
-  it('selecting type and clicking Next advances to step 2', async () => {
+  it('clicking account type auto-advances to step 2', async () => {
     renderWizard();
     const user = userEvent.setup();
 
-    // Select checking account type
+    // Click checking account type (should auto-advance)
     const checkingRadio = screen.getByLabelText(/checking/i);
     await user.click(checkingRadio);
 
-    // Now Next button should be enabled
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    expect(nextButton).not.toBeDisabled();
+    // Should auto-advance to step 2 after brief delay
+    await waitFor(
+      () => {
+        expect(screen.queryByLabelText(/account name/i)).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+  });
 
-    // Click Next
-    await user.click(nextButton);
+  it('selected account type shows visual feedback before advancing', async () => {
+    renderWizard();
+    const user = userEvent.setup();
 
-    // Should now be on step 2 (Account Details)
+    // Select checking account type (should show border change and auto-advance)
+    const checkingRadio = screen.getByLabelText(/checking/i);
+    await user.click(checkingRadio);
+
+    // Should auto-advance to step 2 (Account Details)
     await waitFor(
       () => {
         expect(screen.queryByLabelText(/account name/i)).toBeInTheDocument();
@@ -82,9 +85,8 @@ describe('AccountWizard', () => {
     renderWizard();
     const user = userEvent.setup();
 
-    // Select account type
+    // Select account type (auto-advances to step 2)
     await user.click(screen.getByLabelText(/checking/i));
-    await user.click(screen.getByRole('button', { name: /next/i }));
 
     // Step 2 should show name input
     await waitFor(
@@ -102,9 +104,8 @@ describe('AccountWizard', () => {
     renderWizard();
     const user = userEvent.setup();
 
-    // Advance to step 2
+    // Advance to step 2 (auto-advance)
     await user.click(screen.getByLabelText(/checking/i));
-    await user.click(screen.getByRole('button', { name: /next/i }));
 
     await waitFor(
       () => {
@@ -130,9 +131,8 @@ describe('AccountWizard', () => {
     renderWizard();
     const user = userEvent.setup();
 
-    // Step 1: Select account type
+    // Step 1: Select account type (auto-advances to step 2)
     await user.click(screen.getByLabelText(/checking/i));
-    await user.click(screen.getByRole('button', { name: /next/i }));
 
     // Step 2: Enter account name
     await waitFor(
@@ -170,9 +170,8 @@ describe('AccountWizard', () => {
     const { rerender } = renderWizard(true);
     const user = userEvent.setup();
 
-    // Advance to step 2
+    // Advance to step 2 (auto-advance)
     await user.click(screen.getByLabelText(/checking/i));
-    await user.click(screen.getByRole('button', { name: /next/i }));
 
     await waitFor(
       () => {
@@ -224,9 +223,8 @@ describe('AccountWizard', () => {
     renderWizard();
     const user = userEvent.setup();
 
-    // Advance to step 2
+    // Advance to step 2 (auto-advance)
     await user.click(screen.getByLabelText(/checking/i));
-    await user.click(screen.getByRole('button', { name: /next/i }));
 
     await waitFor(
       () => {

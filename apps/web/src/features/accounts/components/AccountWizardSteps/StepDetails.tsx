@@ -40,6 +40,12 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
             id="name"
             placeholder="e.g., Chase Checking"
             {...register('name')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onNext();
+              }
+            }}
           />
           {errors.name?.message && (
             <p className="text-sm text-destructive">{String(errors.name.message)}</p>

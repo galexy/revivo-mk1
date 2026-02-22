@@ -78,6 +78,14 @@ interface StepTypeSelectionProps {
 export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
   const selectedType = form.watch('accountType');
 
+  const handleTypeSelect = (value: string) => {
+    form.setValue('accountType', value as any);
+    // Auto-advance to next step after brief delay for visual feedback
+    setTimeout(() => {
+      onNext();
+    }, 200);
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -89,7 +97,7 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
 
       <RadioGroup
         value={selectedType}
-        onValueChange={(value) => form.setValue('accountType', value as any)}
+        onValueChange={handleTypeSelect}
         className="grid gap-3 sm:grid-cols-2"
       >
         {accountTypes.map((type) => {
@@ -117,12 +125,6 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
           );
         })}
       </RadioGroup>
-
-      <div className="flex justify-end">
-        <Button onClick={onNext} disabled={!selectedType}>
-          Next
-        </Button>
-      </div>
     </div>
   );
 }
