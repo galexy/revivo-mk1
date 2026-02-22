@@ -44,6 +44,71 @@ export const mockAccount: AccountResponse = {
   updated_at: '2024-01-15T00:00:00Z',
 };
 
+// Mock credit card account
+export const mockCreditCardAccount: AccountResponse = {
+  ...mockAccount,
+  id: 'acc_11111111111',
+  name: 'Test Credit Card',
+  account_type: 'credit_card',
+  opening_balance: {
+    amount: '0.00',
+    currency: 'USD',
+  },
+  current_balance: {
+    amount: '-500.00',
+    currency: 'USD',
+  },
+  credit_limit: {
+    amount: '5000.00',
+    currency: 'USD',
+  },
+  available_credit: {
+    amount: '4500.00',
+    currency: 'USD',
+  },
+  apr: '0.1899',
+  due_date: '15',
+};
+
+// Mock loan account
+export const mockLoanAccount: AccountResponse = {
+  ...mockAccount,
+  id: 'acc_22222222222',
+  name: 'Auto Loan',
+  account_type: 'loan',
+  subtype: 'auto_loan',
+  opening_balance: {
+    amount: '25000.00',
+    currency: 'USD',
+  },
+  current_balance: {
+    amount: '-20000.00',
+    currency: 'USD',
+  },
+  apr: '0.0599',
+  term_months: 60,
+};
+
+// Mock rewards account
+export const mockRewardsAccount: AccountResponse = {
+  ...mockAccount,
+  id: 'acc_33333333333',
+  name: 'Airline Miles',
+  account_type: 'rewards',
+  opening_balance: {
+    amount: '0.00',
+    currency: 'USD',
+  },
+  current_balance: {
+    amount: '0.00',
+    currency: 'USD',
+  },
+  rewards_balance: {
+    value: '50000',
+    unit: 'miles',
+  },
+};
+
 // Mock accounts list
 export const mockAccountsList: AccountListResponse = {
   accounts: [
@@ -62,8 +127,10 @@ export const mockAccountsList: AccountListResponse = {
         currency: 'USD',
       },
     },
+    mockCreditCardAccount,
+    mockLoanAccount,
   ],
-  total: 2,
+  total: 4,
 };
 
 // Mock category fixture

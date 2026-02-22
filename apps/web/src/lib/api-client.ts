@@ -18,6 +18,10 @@ export type CreateCheckingAccountRequest = components['schemas']['CreateChecking
 export type CreateSavingsAccountRequest = components['schemas']['CreateSavingsAccountRequest'];
 export type CreateCreditCardAccountRequest =
   components['schemas']['CreateCreditCardAccountRequest'];
+export type CreateLoanAccountRequest = components['schemas']['CreateLoanAccountRequest'];
+export type CreateBrokerageAccountRequest = components['schemas']['CreateBrokerageAccountRequest'];
+export type CreateIraAccountRequest = components['schemas']['CreateIraAccountRequest'];
+export type CreateRewardsAccountRequest = components['schemas']['CreateRewardsAccountRequest'];
 export type UpdateAccountRequest = components['schemas']['UpdateAccountRequest'];
 
 export type CreateTransactionRequest = components['schemas']['CreateTransactionRequest'];
@@ -55,6 +59,30 @@ export async function createCreditCardAccount(
   data: CreateCreditCardAccountRequest,
 ): Promise<AccountResponse> {
   const response = await api.post<AccountResponse>('/api/v1/accounts/credit-card', data);
+  return response.data;
+}
+
+export async function createLoanAccount(data: CreateLoanAccountRequest): Promise<AccountResponse> {
+  const response = await api.post<AccountResponse>('/api/v1/accounts/loan', data);
+  return response.data;
+}
+
+export async function createBrokerageAccount(
+  data: CreateBrokerageAccountRequest,
+): Promise<AccountResponse> {
+  const response = await api.post<AccountResponse>('/api/v1/accounts/brokerage', data);
+  return response.data;
+}
+
+export async function createIraAccount(data: CreateIraAccountRequest): Promise<AccountResponse> {
+  const response = await api.post<AccountResponse>('/api/v1/accounts/ira', data);
+  return response.data;
+}
+
+export async function createRewardsAccount(
+  data: CreateRewardsAccountRequest,
+): Promise<AccountResponse> {
+  const response = await api.post<AccountResponse>('/api/v1/accounts/rewards', data);
   return response.data;
 }
 

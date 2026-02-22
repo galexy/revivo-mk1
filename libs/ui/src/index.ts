@@ -39,6 +39,33 @@ export {
   DropdownMenuShortcut,
 } from './components/dropdown-menu';
 export { Avatar, AvatarFallback, AvatarImage } from './components/avatar';
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from './lib/dialog';
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+} from './lib/select';
+export { RadioGroup, RadioGroupItem } from './lib/radio-group';
+export { Separator } from './lib/separator';
+export { Badge, badgeVariants } from './lib/badge';
 
 // Utilities
 export { cn } from './lib/utils';

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Own your financial data and access it anywhere through any interface - web, API, CLI, or AI. Your data, your tools, no vendor lock-in.
-**Current focus:** Phase 14 (Frontend API & Routing) - Complete
+**Current focus:** Phase 15 (API Integration Validation) - Complete
 
 ## Current Position
 
-Phase: 14 of 32 (Frontend API & Routing)
-Plan: 4 of 4
+Phase: 15 of 32 (API Integration Validation)
+Plan: 10 of 10 (gap closure)
 Status: Complete
-Last activity: 2026-02-11 - Completed 14-04-PLAN.md (E2E Test Auth Fixtures)
+Last activity: 2026-02-22 - Completed 15-10-PLAN.md (wizard UX fixes)
 
-Progress: [███████░░░] ~72%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 72
+- Total plans completed: 81
 - Average duration: 4.4 min
-- Total execution time: 7.15 hours
+- Total execution time: 7.95 hours
 
 **By Phase:**
 
@@ -45,10 +45,11 @@ Progress: [███████░░░] ~72%
 | 12-frontend-infrastructure | 6 | 24 min | 4.0 min |
 | 13-login-ui | 6 | 49 min | 8.2 min |
 | 14-frontend-api-routing | 4 | 13 min | 3.3 min |
+| 15-api-integration-validation | 10 | 56 min | 5.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 13-06 (30 min), 14-01 (2 min), 14-04 (2 min), 14-02 (5 min), 14-03 (4 min)
-- Trend: Phase 14 complete. Full API data layer + test infrastructure in 13 min (4 plans).
+- Last 5 plans: 15-06 (7 min), 15-07 (13 min), 15-08 (11 min), 15-09 (2 min), 15-10 (4 min)
+- Trend: Phase 15 complete. All 10 plans executed (8 original + 2 gap closures), all UAT issues resolved.
 
 *Updated after each plan completion*
 
@@ -92,11 +93,28 @@ Recent decisions affecting current work:
 - window.matchMedia mock in test-setup.ts for theme detection in JSDOM
 - Playwright chromium-only configuration for e2e smoke tests
 - Explicit Nx targets (lint, format, e2e) complement @nx/vite inferred targets
+- Testing Library queries: use getAllByText for duplicate elements (DialogTitle + content)
+- Wizard step tests query unique form elements (labelText) not generic headings
+- waitFor uses queryByX (returns null) not getByX (throws) for async element appearance
 - Playwright auth setup uses Mailpit REST API to extract verification token from email
 - Setup project as dependency pattern (runs once, saves storageState for all tests)
+- Auto-advance wizard steps with 200ms delay for visual feedback before transition
+- Enter key navigation in text inputs to advance wizard steps
+- Edit mode wizard skips type selection, shows 3 dots, proper button labels ("Update Account")
+- E2E account tests use wizard UI (not API) for test data setup (page.request doesn't inherit storageState cookies)
+- Account wizard radio buttons need getByLabel().click({ force: true }) (labels intercept pointer events)
+- Unique account names with Date.now() timestamps prevent test data collisions
 - Unauthenticated tests override storageState with empty cookies/origins
 - QueryClient stale times per entity: 30s default, 60s accounts, 15s transactions, 5min categories
 - QueryClientProvider wraps AuthProvider (auth context can use queries if needed)
+- API accepts amount as number | string (MoneySchema-Input), pass form string values directly
+- Rewards accounts use rewards_balance with value/unit, not opening_balance with amount/currency
+- Mutation hooks invalidate queryKeys.accounts.lists() in onSettled for cache refresh
+- useDeleteAccount also removeQueries for specific account detail query
+- Account detail route nested under dashboard (/dashboard/accounts/$accountId) for layout inheritance
+- AccountSidebar uses useParams to detect active account from route params for highlighting
+- Edit mode skips step 0 in multi-step wizards (immutable field like account type)
+- Form data accumulation pattern: merge current + accumulated on navigation for persistence
 - Auth context stays React Context (TanStack Query for server state only)
 - MSW for API mocking (intercepts at network boundary, tests full axios chain)
 - Test fixtures use generated OpenAPI types for type safety
@@ -326,10 +344,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-11
-Stopped at: Phase 14 complete (4/4 plans, verification passed 6/6)
+Last session: 2026-02-22
+Stopped at: Phase 15 complete (10/10 plans, all UAT gaps fixed, wizard UX polished)
 Resume file: None
-Next action: Plan or execute Phase 15 (API Integration Validation)
+Next action: Plan Phase 16 (Error Handling Patterns) or user-directed next step
 
 ## Roadmap Evolution
 
@@ -730,3 +748,63 @@ Key stats:
 - Verification: 5/5 success criteria confirmed
 
 Ready for Phase 14: Frontend API & Routing
+
+## Phase 14 Milestone
+
+**Phase 14: Frontend API & Routing - COMPLETE**
+
+All success criteria met:
+1. TanStack Query configured for API state management
+2. TanStack Router loaders use queryOptions + ensureQueryData for instant navigation
+3. Type-safe API client generated from OpenAPI spec
+4. Authentication token automatically included in API requests
+5. API error responses handled consistently
+6. Playwright e2e smoke tests updated for auth
+
+Plans completed (4 of 4):
+- 14-01: OpenAPI type generation + TanStack Query install
+- 14-02: TanStack Query setup + type-safe API client + queryOptions + route loaders
+- 14-03: MSW test infrastructure + API client/error tests
+- 14-04: Playwright e2e auth fixtures + smoke tests
+
+Key stats:
+- 72 total plans completed across all phases
+- OpenAPI type generation pipeline (Python script -> openapi-typescript -> api-types.generated.ts)
+- MSW v2 for API mocking in Vitest tests
+- Playwright auth fixture chain (register -> Mailpit verify -> login -> storageState)
+
+Ready for Phase 15: API Integration Validation
+
+## Phase 15 Milestone
+
+**Phase 15: API Integration Validation - COMPLETE**
+
+All success criteria met:
+1. User can create an account via 4-step wizard UI (all 7 types)
+2. User can update an account via edit wizard (pre-filled, type locked)
+3. User can delete an account via type-to-confirm dialog
+4. Sidebar shows accounts grouped by type (Cash, Credit, Loans, Investments, Rewards) with subtotals
+5. E2E tests cover account CRUD flows
+6. Chrome DevTools MCP used to automate UAT (all flows pass with gap fixes)
+
+Plans completed (9 of 9):
+- 15-01: Dependencies, shadcn/ui components, API client completion
+- 15-02: Empty state welcome screen + account sidebar with grouping
+- 15-03: Account wizard modal (4-step) + delete confirmation dialog
+- 15-04: TanStack Query mutation hooks + DashboardPage rewire + routing
+- 15-05: useAccountWizard hook (multi-step form state)
+- 15-06: Vitest unit/component tests (50 new tests, 88 total)
+- 15-07: Playwright E2E tests for account CRUD flows
+- 15-08: UAT via Chrome DevTools MCP (discovered 2 gaps)
+- 15-09: UAT gap closure (Tailwind v4 @theme + APR conversion)
+
+Key stats:
+- 80 total plans completed across all phases
+- 50 new Vitest tests (88 total web tests)
+- 3 Playwright E2E tests for account CRUD
+- 5 shadcn/ui components added (Dialog, Select, RadioGroup, Separator, Badge)
+- Full account CRUD: 7 account types, type-specific fields, currency formatting
+- UAT discovered 2 critical gaps, both fixed in plan 15-09
+- Verification: 8/8 must-haves confirmed (15-08) + 4/4 gap fixes (15-09)
+
+Ready for Phase 16: Error Handling Patterns

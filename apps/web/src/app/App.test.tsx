@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { AuthContext, type AuthContextType } from '../features/auth/context/AuthContext';
 import { routeTree } from '../routes';
 import { createQueryClient } from '../lib/query-client';
@@ -9,7 +10,7 @@ import { createQueryClient } from '../lib/query-client';
 vi.mock('../lib/api', () => ({
   default: {
     post: vi.fn(),
-    get: vi.fn(),
+    get: vi.fn(() => Promise.resolve({ data: { accounts: [] } })),
   },
   setAccessToken: vi.fn(),
   getAccessToken: vi.fn(() => null),
@@ -29,17 +30,20 @@ describe('App routing', () => {
   });
 
   it('unauthenticated user at / is redirected to /login', async () => {
+    const queryClient = createQueryClient();
     const history = createMemoryHistory({ initialEntries: ['/'] });
     const router = createRouter({
       routeTree,
       history,
-      context: { auth: mockAuthContext, queryClient: createQueryClient() },
+      context: { auth: mockAuthContext, queryClient },
     });
 
     render(
-      <AuthContext.Provider value={mockAuthContext}>
-        <RouterProvider router={router} />
-      </AuthContext.Provider>,
+      <QueryClientProvider client={queryClient}>
+        <AuthContext.Provider value={mockAuthContext}>
+          <RouterProvider router={router} />
+        </AuthContext.Provider>
+      </QueryClientProvider>,
     );
 
     // Wait for redirect to complete
@@ -74,17 +78,20 @@ describe('App routing', () => {
       logout: vi.fn(),
     };
 
+    const queryClient = createQueryClient();
     const history = createMemoryHistory({ initialEntries: ['/'] });
     const router = createRouter({
       routeTree,
       history,
-      context: { auth: mockAuthContext, queryClient: createQueryClient() },
+      context: { auth: mockAuthContext, queryClient },
     });
 
     render(
-      <AuthContext.Provider value={mockAuthContext}>
-        <RouterProvider router={router} />
-      </AuthContext.Provider>,
+      <QueryClientProvider client={queryClient}>
+        <AuthContext.Provider value={mockAuthContext}>
+          <RouterProvider router={router} />
+        </AuthContext.Provider>
+      </QueryClientProvider>,
     );
 
     // Wait for redirect to complete
@@ -92,9 +99,9 @@ describe('App routing', () => {
       expect(router.state.location.pathname).toBe('/dashboard');
     });
 
-    // Verify dashboard page is rendered
+    // Verify dashboard page is rendered (shows empty state since no accounts)
     await waitFor(() => {
-      expect(screen.getByText(/personal finance/i)).toBeInTheDocument();
+      expect(screen.getByText(/welcome to personal finance/i)).toBeInTheDocument();
     });
   });
 });

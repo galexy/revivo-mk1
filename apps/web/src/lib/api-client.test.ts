@@ -13,8 +13,8 @@ describe('Account API client', () => {
     const result = await fetchAccounts();
 
     expect(result).toEqual(mockAccountsList);
-    expect(result.accounts).toHaveLength(2);
-    expect(result.total).toBe(2);
+    expect(result.accounts).toHaveLength(4);
+    expect(result.total).toBe(4);
     expect(result.accounts[0].id).toBe('acc_01234567890');
   });
 
