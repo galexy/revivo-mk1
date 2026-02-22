@@ -3,10 +3,49 @@
 ## Overview
 
 - Python FastAPI + PostgreSQL monorepo managed by Nx
-- Docker Compose setup: app service + postgres service
+- PostgreSQL 16, Mailpit, and all dependencies run inside a single container (no Docker Compose)
+- Both local devcontainer and Claude Code Web use the same setup: `scripts/setup-postgres.sh`
 - Python dependency management: hatch packages in root pyproject.toml (editable install)
 - Tests: pytest with unit and integration directories across apps and libs
 - Integration tests use transactional rollback (session-scoped setup) which can mask issues that only appear with committed data
+
+## Environment Setup
+
+Both development environments (local devcontainer and Claude Code Web) work identically: PostgreSQL 16 and Mailpit are installed in the container image, and `scripts/setup-postgres.sh` starts them and creates the required databases. No Docker Compose is needed.
+
+### How it works
+
+The devcontainer Dockerfile installs PostgreSQL 16 and Mailpit directly. On container start, `scripts/setup-postgres.sh` runs automatically (via `postStartCommand` locally, via SessionStart hook on Claude Code Web) to:
+- Start PostgreSQL if it isn't running
+- Configure password authentication for TCP connections
+- Create required databases (`personal_finance`, `finance_test`, `jobs`)
+- Set the `postgres` user password to `postgres`
+- Start Mailpit (SMTP on `:1025`, Web UI on `:8025`)
+
+If the setup hasn't run or you need to re-run manually:
+
+```bash
+sudo bash scripts/setup-postgres.sh
+```
+
+### Local Development (VS Code Devcontainer)
+
+```bash
+# VS Code: "Reopen in Container" — handles everything automatically
+```
+
+The devcontainer builds a single container with all services. No external Docker Compose services are needed.
+
+### Connection defaults
+
+All database code defaults to `localhost:5432` when no environment variables are set. No environment-specific configuration is needed.
+
+| Variable | Default value |
+|---|---|
+| `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/personal_finance` |
+| `DATABASE_URL_SYNC` | _(derived from DATABASE_URL)_ |
+| `TEST_DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/finance_test` |
+| `JOB_QUEUE_DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/jobs` |
 
 ## Monorepo Structure
 
