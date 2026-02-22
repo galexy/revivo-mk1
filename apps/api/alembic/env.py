@@ -28,7 +28,7 @@ database_url = os.getenv(
     "DATABASE_URL_SYNC",
     os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/finance",
+        "postgresql://postgres:postgres@localhost:5432/personal_finance",
     ),
 )
 config.set_main_option("sqlalchemy.url", database_url)

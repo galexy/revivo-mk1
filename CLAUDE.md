@@ -3,10 +3,53 @@
 ## Overview
 
 - Python FastAPI + PostgreSQL monorepo managed by Nx
-- Docker Compose setup: app service + postgres service
+- Runs in two environments: Docker Compose (local dev) and Claude Code Web (cloud)
 - Python dependency management: hatch packages in root pyproject.toml (editable install)
 - Tests: pytest with unit and integration directories across apps and libs
 - Integration tests use transactional rollback (session-scoped setup) which can mask issues that only appear with committed data
+
+## Environment Setup
+
+This project supports two development environments. PostgreSQL configuration auto-detects which environment you're in.
+
+### Claude Code Web (cloud)
+
+PostgreSQL 16 is pre-installed in the environment. A SessionStart hook runs `scripts/setup-postgres.sh` automatically to:
+- Start PostgreSQL if it isn't running
+- Configure password authentication for TCP connections
+- Create required databases (`personal_finance`, `finance_test`, `jobs`)
+- Set the `postgres` user password to `postgres`
+
+If the hook hasn't run or you need to set up manually:
+
+```bash
+sudo bash scripts/setup-postgres.sh
+```
+
+No Docker Compose is needed. All code defaults to `localhost:5432` when no environment variables are set.
+
+### Local Development (Docker Compose / Devcontainer)
+
+Docker Compose provides PostgreSQL via the `postgres` service. Environment variables are set explicitly in `docker-compose.yml` and `.devcontainer/devcontainer.json` to point at the Docker hostname (`postgres:5432`).
+
+```bash
+# Start services
+docker compose up -d
+
+# Or use VS Code Devcontainer (recommended)
+# "Reopen in Container" — handles everything automatically
+```
+
+### How environment detection works
+
+All database code defaults to `localhost:5432` when no environment variables are set — this works out-of-the-box for Claude Code Web. Docker Compose and the devcontainer set `DATABASE_URL`, `DATABASE_URL_SYNC`, and `JOB_QUEUE_DATABASE_URL` explicitly to point at Docker service hostnames. No conditional logic or feature flags are needed.
+
+| Variable | Claude Code Web (default) | Docker Compose (explicit) |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://...@localhost:5432/personal_finance` | `postgresql+asyncpg://...@postgres:5432/personal_finance` |
+| `DATABASE_URL_SYNC` | _(derived from DATABASE_URL)_ | `postgresql+psycopg2://...@postgres:5432/personal_finance` |
+| `TEST_DATABASE_URL` | `postgresql://...@localhost:5432/finance_test` | `postgresql://...@postgres:5432/finance_test` |
+| `JOB_QUEUE_DATABASE_URL` | `postgresql://...@localhost:5432/jobs` | `postgresql://...@postgres-jobs:5432/jobs` |
 
 ## Monorepo Structure
 

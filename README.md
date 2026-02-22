@@ -12,7 +12,23 @@ A modern personal finance application that provides data sovereignty and proper 
 
 ## Quick Start
 
-### Using VS Code Devcontainer (Recommended)
+### Using Claude Code Web
+
+Claude Code Web environments come with PostgreSQL 16 pre-installed. A SessionStart hook automatically configures the database on session start.
+
+If you need to set up manually:
+
+```bash
+sudo bash scripts/setup-postgres.sh
+uv sync --all-packages
+pnpm install
+cd apps/api && uv run --package personal-finance-api alembic upgrade head
+npx nx serve api
+```
+
+No Docker is needed — all code defaults to `localhost:5432` when no environment variables are set.
+
+### Using VS Code Devcontainer
 
 1. Install [Docker](https://docs.docker.com/get-docker/) and [VS Code](https://code.visualstudio.com/)
 2. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
@@ -25,7 +41,7 @@ The devcontainer will automatically:
 - Install Python dependencies via uv
 - Configure VS Code with Python, Ruff, and Pylance extensions
 
-### Manual Setup
+### Manual Setup (without Docker)
 
 ```bash
 # Install uv (Python package manager)
@@ -38,13 +54,23 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync --all-packages
 pnpm install
 
-# Start services
-docker compose up -d
+# Set up PostgreSQL (requires local PostgreSQL 16 installation)
+sudo bash scripts/setup-postgres.sh
 
 # Run database migrations
 cd apps/api && uv run --package personal-finance-api alembic upgrade head
 
 # Start the development server
+npx nx serve api
+```
+
+### Manual Setup (with Docker)
+
+```bash
+uv sync --all-packages
+pnpm install
+docker compose up -d
+cd apps/api && uv run --package personal-finance-api alembic upgrade head
 npx nx serve api
 ```
 

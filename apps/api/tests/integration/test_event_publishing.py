@@ -30,7 +30,7 @@ def database_url():
     """Get test database URL."""
     return os.getenv(
         "TEST_DATABASE_URL",
-        "postgresql://postgres:postgres@postgres:5432/finance_test",
+        "postgresql://postgres:postgres@localhost:5432/finance_test",
     )
 
 
