@@ -19,6 +19,7 @@ PostgreSQL 16 is pre-installed in the environment. A SessionStart hook runs `scr
 - Configure password authentication for TCP connections
 - Create required databases (`personal_finance`, `finance_test`, `jobs`)
 - Set the `postgres` user password to `postgres`
+- Install and start Mailpit (SMTP on `:1025`, Web UI on `:8025`)
 
 If the hook hasn't run or you need to set up manually:
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Setup PostgreSQL for local development (Claude Code Web or bare-metal).
+# Setup PostgreSQL and Mailpit for local development (Claude Code Web or bare-metal).
 #
 # This script is idempotent — safe to run multiple times.
 # It starts PostgreSQL, configures password auth for the postgres user,
-# and creates the required databases.
+# creates the required databases, and installs/starts Mailpit.
 #
 # Usage:
 #   sudo bash scripts/setup-postgres.sh
 #
 # Skip this script when developing inside the Docker Compose devcontainer,
-# which provides its own PostgreSQL service.
+# which provides its own PostgreSQL and Mailpit services.
 
 set -euo pipefail
 
@@ -17,6 +17,8 @@ PG_VERSION="${PG_VERSION:-16}"
 PG_USER="postgres"
 PG_PASSWORD="postgres"
 DATABASES=("personal_finance" "finance_test" "jobs")
+
+MAILPIT_VERSION="${MAILPIT_VERSION:-v1.29.1}"
 
 HBA_FILE="/etc/postgresql/${PG_VERSION}/main/pg_hba.conf"
 
@@ -76,9 +78,53 @@ echo "  Port:      5432"
 echo "  User:      ${PG_USER}"
 echo "  Password:  ${PG_PASSWORD}"
 echo "  Databases: ${DATABASES[*]}"
+
+# ── 5. Install and start Mailpit ─────────────────────────────────────────────
+
+if command -v mailpit &>/dev/null; then
+    echo ""
+    echo "Mailpit is already installed: $(mailpit version)"
+else
+    echo ""
+    echo "Installing Mailpit ${MAILPIT_VERSION}..."
+    ARCH="$(uname -m)"
+    case "$ARCH" in
+        x86_64)  MAILPIT_ARCH="linux-amd64" ;;
+        aarch64) MAILPIT_ARCH="linux-arm64" ;;
+        *)       echo "WARNING: Unsupported architecture ${ARCH}, skipping Mailpit." ; MAILPIT_ARCH="" ;;
+    esac
+    if [ -n "$MAILPIT_ARCH" ]; then
+        curl -sL --max-time 30 \
+            "https://github.com/axllent/mailpit/releases/download/${MAILPIT_VERSION}/mailpit-${MAILPIT_ARCH}.tar.gz" \
+            | tar -xzf - -C /usr/local/bin mailpit
+        chmod +x /usr/local/bin/mailpit
+        echo "Mailpit installed: $(mailpit version)"
+    fi
+fi
+
+# Start Mailpit if not already running
+if pgrep -x mailpit &>/dev/null; then
+    echo "Mailpit is already running."
+else
+    echo "Starting Mailpit (SMTP :1025, Web UI :8025)..."
+    nohup mailpit --smtp 0.0.0.0:1025 --listen 0.0.0.0:8025 \
+        --smtp-auth-accept-any --smtp-auth-allow-insecure \
+        > /tmp/mailpit.log 2>&1 &
+    sleep 1
+    if pgrep -x mailpit &>/dev/null; then
+        echo "Mailpit started (PID $(pgrep -x mailpit))."
+    else
+        echo "WARNING: Mailpit failed to start. Check /tmp/mailpit.log"
+    fi
+fi
+
 echo ""
 echo "Connection URLs:"
 echo "  DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/personal_finance"
 echo "  DATABASE_URL_SYNC=postgresql+psycopg2://postgres:postgres@localhost:5432/personal_finance"
 echo "  TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/finance_test"
 echo "  JOB_QUEUE_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/jobs"
+echo ""
+echo "Mailpit:"
+echo "  SMTP:   localhost:1025"
+echo "  Web UI: http://localhost:8025"
