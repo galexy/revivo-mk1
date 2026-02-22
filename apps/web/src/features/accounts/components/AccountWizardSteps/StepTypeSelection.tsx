@@ -4,7 +4,6 @@
  */
 import { RadioGroup, RadioGroupItem } from '@workspace/ui';
 import { Label } from '@workspace/ui';
-import { Button } from '@workspace/ui';
 import {
   Wallet,
   PiggyBank,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormData } from '../../validation/accountSchemas';
+
 
 interface AccountType {
   value: string;
@@ -71,7 +71,7 @@ const accountTypes: AccountType[] = [
 ];
 
 interface StepTypeSelectionProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<Partial<AccountFormData>>;
   onNext: () => void;
 }
 
@@ -79,7 +79,7 @@ export function StepTypeSelection({ form, onNext }: StepTypeSelectionProps) {
   const selectedType = form.watch('accountType');
 
   const handleTypeSelect = (value: string) => {
-    form.setValue('accountType', value as any);
+    form.setValue('accountType', value as AccountFormData['accountType']);
     // Auto-advance to next step after brief delay for visual feedback
     setTimeout(() => {
       onNext();

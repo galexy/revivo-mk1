@@ -4,7 +4,7 @@
  * Supports all 7 account types with type-specific fields.
  */
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
@@ -48,7 +48,7 @@ export function AccountWizard({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(stepSchemas[currentStep]) as any,
+    resolver: zodResolver(stepSchemas[currentStep]) as Resolver<Partial<AccountFormData>>,
     defaultValues: formData,
     mode: 'onChange',
   });
@@ -70,7 +70,7 @@ export function AccountWizard({
   useEffect(() => {
     if (editAccount && open) {
       const editData: Partial<AccountFormData> = {
-        accountType: editAccount.account_type as any,
+        accountType: editAccount.account_type as AccountFormData['accountType'],
         name: editAccount.name,
         openingBalance: parseFloat(editAccount.current_balance.amount).toFixed(2),
       };
@@ -87,10 +87,13 @@ export function AccountWizard({
         editData.termMonths = editAccount.term_months.toString();
       }
       if (editAccount.subtype) {
-        editData.subtype = editAccount.subtype as any;
+        editData.subtype = editAccount.subtype as AccountFormData['subtype'];
       }
-      if ('rewards_unit' in editAccount && (editAccount as any).rewards_unit) {
-        editData.rewardsUnit = (editAccount as any).rewards_unit;
+      if ('rewards_unit' in editAccount) {
+        const rewardsUnit = (editAccount as Record<string, unknown>).rewards_unit;
+        if (typeof rewardsUnit === 'string') {
+          editData.rewardsUnit = rewardsUnit;
+        }
       }
 
       setFormData(editData);

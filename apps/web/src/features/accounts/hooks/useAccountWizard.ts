@@ -3,7 +3,7 @@
  * Handles step navigation, per-step validation, form data accumulation, and reset behavior.
  */
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   stepSchemas,
@@ -54,8 +54,11 @@ function mapAccountToFormData(account: AccountResponse): Partial<AccountFormData
     formData.subtype = account.subtype as AccountFormData['subtype'];
   }
   // Rewards unit (if exists in the response)
-  if ('rewards_unit' in account && (account as any).rewards_unit) {
-    formData.rewardsUnit = (account as any).rewards_unit;
+  if ('rewards_unit' in account) {
+    const rewardsUnit = (account as Record<string, unknown>).rewards_unit;
+    if (typeof rewardsUnit === 'string') {
+      formData.rewardsUnit = rewardsUnit;
+    }
   }
 
   return formData;
@@ -92,7 +95,7 @@ export function useAccountWizard(
 
   // React Hook Form with dynamic schema for current step
   const form = useForm<Partial<AccountFormData>>({
-    resolver: zodResolver(stepSchemas[currentStep]) as any,
+    resolver: zodResolver(stepSchemas[currentStep]) as Resolver<Partial<AccountFormData>>,
     defaultValues: formData,
     mode: 'onBlur',
   });

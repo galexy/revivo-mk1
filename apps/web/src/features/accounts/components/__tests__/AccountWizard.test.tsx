@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AccountWizard } from '../AccountWizard';
+import type { AccountResponse } from '@/lib/api-client';
 
 // Mock TanStack Router
 vi.mock('@tanstack/react-router', () => ({
@@ -272,7 +273,7 @@ describe('AccountWizard', () => {
           open={true}
           onOpenChange={mockOnOpenChange}
           onSubmit={mockOnSubmit}
-          editAccount={mockEditAccount as any}
+          editAccount={mockEditAccount as AccountResponse}
         />
       </QueryClientProvider>,
     );

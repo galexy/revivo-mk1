@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { groupAccounts, formatCurrency, ACCOUNT_CATEGORIES } from './utils';
+import { groupAccounts, formatCurrency } from './utils';
 import type { AccountResponse } from '@/lib/api-client';
 
 describe('groupAccounts', () => {

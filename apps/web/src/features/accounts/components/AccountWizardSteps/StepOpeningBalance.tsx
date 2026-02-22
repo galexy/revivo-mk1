@@ -8,7 +8,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormData } from '../../validation/accountSchemas';
 
 interface StepOpeningBalanceProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<Partial<AccountFormData>>;
   accountType: string;
   onNext: () => void;
   onBack: () => void;

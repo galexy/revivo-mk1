@@ -7,7 +7,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { AccountFormData } from '../../validation/accountSchemas';
 
 interface StepDetailsProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<Partial<AccountFormData>>;
   accountType: string;
   onNext: () => void;
   onBack: () => void;
@@ -103,7 +103,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
 
             <div className="space-y-2">
               <Label htmlFor="loanSubtype">Loan Type</Label>
-              <Select value={subtype} onValueChange={(value) => setValue('subtype', value as any)}>
+              <Select value={subtype} onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}>
                 <SelectTrigger id="loanSubtype">
                   <SelectValue placeholder="Select loan type" />
                 </SelectTrigger>
@@ -127,7 +127,7 @@ export function StepDetails({ form, accountType, onNext, onBack }: StepDetailsPr
         {accountType === 'ira' && (
           <div className="space-y-2">
             <Label htmlFor="iraSubtype">IRA Type</Label>
-            <Select value={subtype} onValueChange={(value) => setValue('subtype', value as any)}>
+            <Select value={subtype} onValueChange={(value) => setValue('subtype', value as AccountFormData['subtype'])}>
               <SelectTrigger id="iraSubtype">
                 <SelectValue placeholder="Select IRA type" />
               </SelectTrigger>

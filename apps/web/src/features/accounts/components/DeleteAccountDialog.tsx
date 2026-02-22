@@ -3,7 +3,7 @@
  * Requires user to type account name to confirm deletion.
  * Prevents accidental data loss with type-to-confirm pattern.
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -30,13 +30,22 @@ export function DeleteAccountDialog({
   onConfirmDelete,
 }: DeleteAccountDialogProps) {
   const [confirmText, setConfirmText] = useState('');
+  const [prevOpen, setPrevOpen] = useState(open);
 
-  // Reset state when dialog closes
-  useEffect(() => {
-    if (!open) {
+  // Reset state when dialog closes (React "adjust state during render" pattern)
+  if (prevOpen && !open) {
+    setPrevOpen(open);
+    setConfirmText('');
+  } else if (prevOpen !== open) {
+    setPrevOpen(open);
+  }
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
       setConfirmText('');
     }
-  }, [open]);
+    onOpenChange(isOpen);
+  };
 
   const handleClose = () => {
     setConfirmText('');
@@ -53,7 +62,7 @@ export function DeleteAccountDialog({
   const isConfirmed = confirmText === accountName;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Delete Account</DialogTitle>
