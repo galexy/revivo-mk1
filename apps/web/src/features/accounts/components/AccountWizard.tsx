@@ -53,13 +53,16 @@ export function AccountWizard({
     mode: 'onChange',
   });
 
-  // Reset form when dialog closes
+  // Reset form when dialog closes, set correct step when opening
   useEffect(() => {
     if (!open) {
-      setCurrentStep(editAccount ? 1 : 0);
       setFormData({});
       form.reset();
       setIsSubmitting(false);
+      setCurrentStep(0);
+    } else {
+      // When opening, set step based on mode
+      setCurrentStep(editAccount ? 1 : 0);
     }
   }, [open, form, editAccount]);
 
