@@ -1,3 +1,23 @@
+# This code was generated using AI as an experiment and study
+
+The code in this repo is almost 100% AI generated using the [GSD](https://github.com/gsd-build/get-shit-done).
+I wanted to test out the GSD plugin/skills with a sizable problem to get a feel for what the product
+development experiement felt like. I did not complete this project and stopped once I felt that I had
+good handle of what GSD was capable of.
+
+I will sharing a write-up of my impressions shortly.
+
+I'm keeping this repo public so that anyone can learn and get a sense of what a vibe coded
+project using GSD can potentially look like.
+
+## Use at your own risk
+
+- This project is not a complete working replacement of Quicken
+- I did not rigoursly evaluate the quality of the tests that Claude Code generated
+- The devcontainer is a minimal attempt to isolate the coding agent to allow for --dangerously-skip-permissions. I did not harden this container and suspect its possilbe for rouge coding agents to escape the container.
+
+---
+
 # Personal Finance Platform
 
 A modern personal finance application that provides data sovereignty and proper domain modeling of real-world financial transactions. Built with Domain-Driven Design and Clean Architecture principles.
