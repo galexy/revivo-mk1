@@ -1,14 +1,15 @@
 {
   "name": "Personal Finance Platform",
-  "dockerComposeFile": [
-    "../docker-compose.yml",
-    "../docker-compose.override.yml"
-  ],
-  "service": "app",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "runArgs": [
     "--cap-add=NET_ADMIN",
-    "--cap-add=NET_RAW"
+    "--cap-add=NET_RAW",
+    "--init"
   ],
   "customizations": {
     "vscode": {
@@ -58,6 +59,7 @@
     8000,
     5432,
     8025,
+    1025,
     9323
   ],
   "remoteUser": "developer",
@@ -69,13 +71,11 @@
     "NODE_OPTIONS": "--max-old-space-size=4096",
     "CLAUDE_CONFIG_DIR": "/home/developer/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true",
-    "DATABASE_URL": "postgresql+asyncpg://postgres:postgres@postgres:5432/personal_finance",
-    "DATABASE_URL_SYNC": "postgresql+psycopg2://postgres:postgres@postgres:5432/personal_finance",
     "ENVIRONMENT": "development",
     "LOG_LEVEL": "DEBUG"
   },
   "postCreateCommand": "uv sync && npx pnpm install --frozen-lockfile",
-  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "postStartCommand": "sudo bash /workspace/scripts/setup-postgres.sh && sudo /usr/local/bin/init-firewall.sh",
   "waitFor": "postStartCommand",
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}

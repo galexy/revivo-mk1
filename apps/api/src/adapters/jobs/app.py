@@ -20,7 +20,7 @@ def create_job_queue() -> App:
     """
     conninfo = os.getenv(
         "JOB_QUEUE_DATABASE_URL",
-        "postgresql://postgres:postgres@postgres-jobs:5432/jobs",
+        "postgresql://postgres:postgres@localhost:5432/jobs",
     )
 
     return App(

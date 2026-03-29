@@ -58,7 +58,7 @@ def get_settings() -> dict[str, str]:
     return {
         "environment": os.getenv("ENVIRONMENT", "development"),
         "database_url": os.getenv(
-            "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/finance"
+            "DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/personal_finance"
         ),
         "log_level": os.getenv("LOG_LEVEL", "INFO"),
     }

@@ -31,7 +31,7 @@ def get_database_url() -> str:
     """
     url = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@postgres:5432/finance",
+        "postgresql://postgres:postgres@localhost:5432/personal_finance",
     )
 
     # If DATABASE_URL has asyncpg driver, prefer DATABASE_URL_SYNC if available

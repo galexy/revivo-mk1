@@ -1,5 +1,6 @@
 # Development container for Personal Finance Platform
-# Migrated from Claude Code devcontainer baseline with Python 3.12 + uv support
+# Self-contained: PostgreSQL 16 + Mailpit run inside the container (no Docker Compose).
+# Mirrors the Claude Code Web remote environment so local dev behaves identically.
 
 FROM python:3.12-slim
 
@@ -36,6 +37,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     chromium \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PostgreSQL 16 from the official PGDG repository
+RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo "$VERSION_CODENAME")-pgdg main" \
+        > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-16 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Mailpit
+ARG MAILPIT_VERSION=v1.29.1
+RUN ARCH=$(dpkg --print-architecture) \
+    && curl -sL "https://github.com/axllent/mailpit/releases/download/${MAILPIT_VERSION}/mailpit-linux-${ARCH}.tar.gz" \
+        | tar -xzf - -C /usr/local/bin mailpit \
+    && chmod +x /usr/local/bin/mailpit
 
 # Install Node.js 20 for Claude Code
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \

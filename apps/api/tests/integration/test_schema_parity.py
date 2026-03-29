@@ -34,7 +34,7 @@ def get_test_database_url() -> str:
     """Get database URL for testing."""
     return os.getenv(
         "TEST_DATABASE_URL",
-        "postgresql://postgres:postgres@postgres:5432/finance_test",
+        "postgresql://postgres:postgres@localhost:5432/finance_test",
     )
 
 
